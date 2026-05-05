@@ -636,6 +636,9 @@ th {
   <h2>Admin Panel</h2>
   <button onclick="showSection('usersSection')">Users</button>
   <button onclick="showSection('linksSection')">Links</button>
+  <button onclick="showSection('bookingsSection')">
+  <i class="fa-solid fa-door-open"></i> Bookings
+    </button>
   <button class="logout-btn" onclick="openLogoutModal()">Logout</button>
 </div>
 
@@ -1063,14 +1066,16 @@ function closeDeleteModal() {
 async function confirmDelete() {
   let url = deleteType === "link"
     ? `${API}/api/links/${deleteId}`
+    : deleteType === "booking"
+    ? `${API}/api/bookings/${deleteId}`
     : `${API}/api/users/${deleteId}`;
 
   await fetch(url, { method: "DELETE" });
-
   showToast("Deleted!");
   closeDeleteModal();
 
   if (deleteType === "link") loadLinks();
+  else if (deleteType === "booking") loadBookings();
   else loadUsers();
 }
 
@@ -1085,6 +1090,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadLinkDepartments();
     await loadUsers();
     await loadLinks();
+    await loadBookings();
     console.log("INIT SUCCESS");
   } catch (err) {
     console.error("INIT ERROR:", err);
