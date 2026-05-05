@@ -112,6 +112,9 @@ async function setupDatabase() {
   }
 }
 
+const bookingRoutes = require("./routes/booking");
+app.use("/api/bookings", bookingRoutes);
+
 // ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
