@@ -1,743 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Room Booking – AccessHub</title>
-  <script>const API = window.location.origin;</script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<!-- Room Type -->
+<div class="form-group full">
+  <label>Room Type <span class="required">*</span></label>
 
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f1f5f9;
-      display: flex;
-    }
+  <select id="roomSelect" onchange="onRoomOrDateChange()">
 
-    /* ========================= */
-    /* SIDEBAR */
-    /* ========================= */
-    .sidebar {
-      width: 240px;
-      background: #1e293b;
-      color: white;
-      height: 100vh;
-      padding: 20px;
-      position: fixed;
-      display: flex;
-      flex-direction: column;
-    }
+    <option value="">-- Select Room --</option>
 
-    .sidebar h2 { margin-bottom: 25px; }
+    <option value="1">
+      Meeting Room Pejabat Urusan
+    </option>
 
-    .sidebar button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: none;
-      background: #334155;
-      color: white;
-      cursor: pointer;
-      border-radius: 8px;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: 0.2s;
-    }
+    <option value="2">
+      Meeting Room Director
+    </option>
 
-    .sidebar button:hover { background: #475569; transform: translateX(3px); }
-    .sidebar button.active { background: #3b82f6; }
+    <option value="3">
+      The Nest
+    </option>
 
-    .logout-btn {
-      margin-top: auto !important;
-      background: #334155 !important;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 15px !important;
-      justify-content: center !important;
-    }
-
-    .sidebar .logout-btn:hover {
-      background: #ef4444 !important;
-      transform: translateX(3px);
-    }
-
-    /* ========================= */
-    /* MAIN */
-    /* ========================= */
-    .main {
-      margin-left: 240px;
-      padding: 30px;
-      width: calc(100% - 240px);
-    }
-
-    .page-header {
-      margin-bottom: 24px;
-    }
-
-    .page-header h2 {
-      font-size: 22px;
-      color: #1e293b;
-      font-weight: 700;
-    }
-
-    .page-header p {
-      color: #64748b;
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    /* ========================= */
-    /* TABS */
-    /* ========================= */
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .tab-btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      background: #e2e8f0;
-      color: #475569;
-      transition: 0.2s;
-    }
-
-    .tab-btn.active {
-      background: #3b82f6;
-      color: white;
-    }
-
-    /* ========================= */
-    /* CARD */
-    /* ========================= */
-    .card {
-      background: white;
-      padding: 28px;
-      border-radius: 14px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .card h3 {
-      font-size: 16px;
-      color: #1e293b;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    /* ========================= */
-    /* FORM */
-    /* ========================= */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full { grid-column: 1 / -1; }
-
-    .form-group label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    .form-group label span.required {
-      color: #ef4444;
-      margin-left: 2px;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #1e293b;
-      background: #f8fafc;
-      transition: border 0.2s;
-      outline: none;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: #3b82f6;
-      background: white;
-    }
-
-    .form-group input:read-only {
-      background: #f1f5f9;
-      color: #64748b;
-      cursor: not-allowed;
-    }
-
-    /* Duration row */
-    .duration-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .duration-row select { flex: 1; }
-
-    /* ========================= */
-    /* SLOT AVAILABILITY */
-    /* ========================= */
-    .slots-info {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .slot-tag {
-      display: inline-block;
-      background: #fee2e2;
-      color: #dc2626;
-      padding: 3px 8px;
-      border-radius: 5px;
-      font-size: 11px;
-      margin: 2px 2px;
-    }
-
-    /* ========================= */
-    /* SUBMIT BUTTON */
-    /* ========================= */
-    .btn-submit {
-      margin-top: 24px;
-      width: 100%;
-      padding: 13px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-submit:hover { background: #2563eb; transform: translateY(-1px); }
-    .btn-submit:active { transform: scale(0.98); }
-
-    /* ========================= */
-    /* MY BOOKINGS TABLE */
-    /* ========================= */
-    .table-container { overflow-x: auto; }
-
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px 14px; text-align: left; font-size: 14px; }
-    th { background: #e2e8f0; color: #374151; font-weight: 600; }
-    tr:hover td { background: #f8fafc; }
-
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-pending  { background: #fef9c3; color: #854d0e; }
-    .status-approved { background: #dcfce7; color: #166534; }
-    .status-rejected { background: #fee2e2; color: #991b1b; }
-
-    /* ========================= */
-    /* TOAST */
-    /* ========================= */
-    .toast {
-      position: fixed;
-      top: 20px; right: 20px;
-      background: white;
-      color: #1e293b;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-      max-width: 300px;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 4px solid #22c55e; }
-    .toast.error   { border-left: 4px solid #ef4444; }
-
-    /* ========================= */
-    /* EMPTY STATE */
-    /* ========================= */
-    .empty {
-      text-align: center;
-      color: #94a3b8;
-      padding: 40px 0;
-      font-size: 14px;
-    }
-
-    .empty i { font-size: 36px; margin-bottom: 10px; display: block; }
-  </style>
-</head>
-<body>
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h2>AccessHub</h2>
-  <button onclick="window.location.href='index.html'">
-    <i class="fa-solid fa-house"></i> Dashboard
-  </button>
-  <button class="active">
-    <i class="fa-solid fa-door-open"></i> Room Booking
-  </button>
-  <button class="logout-btn" onclick="logout()">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
-  </button>
+  </select>
 </div>
 
-<!-- MAIN -->
-<div class="main">
-
-  <div class="page-header">
-    <h2>Room Booking</h2>
-    <p>Book a meeting room for your event or discussion.</p>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('bookTab', this)">
-      <i class="fa-solid fa-plus"></i> New Booking
-    </button>
-    <button class="tab-btn" onclick="showTab('myBookingsTab', this); loadMyBookings()">
-      <i class="fa-solid fa-list"></i> My Bookings
-    </button>
-  </div>
-
-  <!-- ========================= -->
-  <!-- TAB: NEW BOOKING -->
-  <!-- ========================= -->
-  <div id="bookTab">
-    <div class="card">
-      <h3><i class="fa-solid fa-calendar-plus" style="color:#3b82f6;margin-right:8px;"></i>Booking Form</h3>
-
-      <div class="form-grid">
-
-        <!-- Room Type -->
-        <div class="form-group full">
-          <label>Room Type <span class="required">*</span></label>
-          <select id="roomSelect" onchange="onRoomOrDateChange()">
-            <option value="">-- Select Room --</option>
-          </select>
-        </div>
-
-        <!-- Event Name -->
-        <div class="form-group full">
-          <label>Event Name <span class="required">*</span></label>
-          <input type="text" id="eventName" placeholder="e.g. Q3 Planning Meeting">
-        </div>
-
-        <!-- Date -->
-        <div class="form-group">
-          <label>Date <span class="required">*</span></label>
-          <input type="date" id="bookingDate" onchange="onRoomOrDateChange()">
-        </div>
-
-        <!-- Time -->
-        <div class="form-group">
-          <label>Start Time <span class="required">*</span></label>
-          <select id="startTime" onchange="updateEndTime()">
-            <option value="">-- Select Time --</option>
-          </select>
-        </div>
-
-        <!-- Duration -->
-        <div class="form-group">
-          <label>Duration <span class="required">*</span></label>
-          <div class="duration-row">
-            <select id="durationHours" onchange="updateEndTime()">
-              <option value="0">0 hr</option>
-              <option value="1">1 hr</option>
-              <option value="2">2 hr</option>
-              <option value="3">3 hr</option>
-              <option value="4">4 hr</option>
-            </select>
-            <select id="durationMins" onchange="updateEndTime()">
-              <option value="0">0 min</option>
-              <option value="30">30 min</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- End Time (auto calculated) -->
-        <div class="form-group">
-          <label>End Time</label>
-          <input type="text" id="endTime" placeholder="Auto-calculated" readonly>
-        </div>
-
-        <!-- Booked slots info -->
-        <div class="form-group full">
-          <div class="slots-info" id="slotsInfo"></div>
-        </div>
-
-        <!-- Name -->
-        <div class="form-group">
-          <label>Full Name <span class="required">*</span></label>
-          <input type="text" id="bookerName" placeholder="Your full name">
-        </div>
-
-        <!-- Department -->
-        <div class="form-group">
-          <label>Department <span class="required">*</span></label>
-          <input type="text" id="bookerDept" placeholder="Your department">
-        </div>
-
-        <!-- Phone -->
-        <div class="form-group">
-          <label>Phone Number <span class="required">*</span></label>
-          <input type="tel" id="bookerPhone" placeholder="e.g. 0123456789">
-        </div>
-
-      </div>
-
-      <button class="btn-submit" onclick="submitBooking()">
-        <i class="fa-solid fa-paper-plane"></i> Submit Booking
-      </button>
-
-    </div>
-  </div>
-
-  <!-- ========================= -->
-  <!-- TAB: MY BOOKINGS -->
-  <!-- ========================= -->
-  <div id="myBookingsTab" style="display:none;">
-    <div class="card">
-      <h3><i class="fa-solid fa-list" style="color:#3b82f6;margin-right:8px;"></i>My Bookings</h3>
-      <div class="table-container">
-        <table id="myBookingsTable">
-          <thead>
-            <tr>
-              <th>Room</th>
-              <th>Event</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
+<!-- Event Name -->
+<div class="form-group full">
+  <label>Event Name <span class="required">*</span></label>
+  <input type="text" id="eventName" placeholder="e.g. Q3 Planning Meeting">
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
+<!-- Date -->
+<div class="form-group">
+  <label>Date <span class="required">*</span></label>
+  <input type="date" id="bookingDate" onchange="onRoomOrDateChange()">
+</div>
 
-<script>
-/* ========================= */
-/* GLOBALS */
-/* ========================= */
-let bookedSlots = [];
+<!-- Time -->
+<div class="form-group">
+  <label>Start Time <span class="required">*</span></label>
 
-const TIME_SLOTS = [];
-for (let h = 8; h <= 21; h++) {
-  TIME_SLOTS.push(`${String(h).padStart(2,'0')}:00`);
-  if (h < 22) TIME_SLOTS.push(`${String(h).padStart(2,'0')}:30`);
-}
-// Last slot 22:00 (10 PM)
-TIME_SLOTS.push("22:00");
+  <select id="startTime" onchange="updateEndTime()">
+    <option value="">-- Select Time --</option>
+  </select>
+</div>
 
-/* ========================= */
-/* TOAST */
-/* ========================= */
-function showToast(msg, type = "default") {
-  const toast = document.getElementById("toast");
-  toast.className = "toast";
-  void toast.offsetWidth;
-  toast.innerText = msg;
-  if (type === "success") toast.classList.add("success");
-  if (type === "error")   toast.classList.add("error");
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3000);
-}
+<!-- Duration -->
+<div class="form-group">
+  <label>Duration <span class="required">*</span></label>
 
-/* ========================= */
-/* TABS */
-/* ========================= */
-function showTab(tabId, btn) {
-  document.getElementById("bookTab").style.display = "none";
-  document.getElementById("myBookingsTab").style.display = "none";
-  document.getElementById(tabId).style.display = "block";
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-}
+  <div class="duration-row">
 
-/* ========================= */
-/* LOAD ROOMS */
-/* ========================= */
-async function loadRooms() {
-  const res = await fetch(`${API}/api/bookings/rooms`);
-  const rooms = await res.json();
-  const sel = document.getElementById("roomSelect");
-  rooms.forEach(r => {
-    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
-  });
-}
+    <select id="durationHours" onchange="updateEndTime()">
+      <option value="0">0 hr</option>
+      <option value="1">1 hr</option>
+      <option value="2">2 hr</option>
+      <option value="3">3 hr</option>
+      <option value="4">4 hr</option>
+    </select>
 
-/* ========================= */
-/* POPULATE TIME SLOTS */
-/* ========================= */
-function populateTimeSlots(disabledRanges = []) {
-  const sel = document.getElementById("startTime");
-  const current = sel.value;
-  sel.innerHTML = `<option value="">-- Select Time --</option>`;
+    <select id="durationMins" onchange="updateEndTime()">
+      <option value="0">0 min</option>
+      <option value="30">30 min</option>
+    </select>
 
-  TIME_SLOTS.forEach(slot => {
-    if (slot === "22:00") return; // can't start at last slot
-    const isBooked = isSlotBooked(slot, disabledRanges);
-    const opt = document.createElement("option");
-    opt.value = slot;
-    opt.textContent = formatTime(slot) + (isBooked ? " (Booked)" : "");
-    opt.disabled = isBooked;
-    if (slot === current && !isBooked) opt.selected = true;
-    sel.appendChild(opt);
-  });
-}
+  </div>
+</div>
 
-function isSlotBooked(slot, ranges) {
-  return ranges.some(r => slot >= r.start_time.slice(0,5) && slot < r.end_time.slice(0,5));
-}
+<!-- End Time -->
+<div class="form-group">
+  <label>End Time</label>
+  <input type="text" id="endTime" placeholder="Auto-calculated" readonly>
+</div>
 
-/* ========================= */
-/* ON ROOM OR DATE CHANGE */
-/* ========================= */
-async function onRoomOrDateChange() {
-  const room_id = document.getElementById("roomSelect").value;
-  const date    = document.getElementById("bookingDate").value;
-  bookedSlots = [];
-  document.getElementById("slotsInfo").innerHTML = "";
+<!-- Booked slots -->
+<div class="form-group full">
+  <div class="slots-info" id="slotsInfo"></div>
+</div>
 
-  if (!room_id || !date) {
-    populateTimeSlots([]);
-    return;
-  }
+<!-- Name -->
+<div class="form-group">
+  <label>Full Name <span class="required">*</span></label>
+  <input type="text" id="bookerName" placeholder="Your full name">
+</div>
 
-  const res = await fetch(`${API}/api/bookings/slots?room_id=${room_id}&date=${date}`);
-  bookedSlots = await res.json();
+<!-- Department -->
+<div class="form-group">
+  <label>Department <span class="required">*</span></label>
 
-  populateTimeSlots(bookedSlots);
+  <select id="bookerDept">
 
-  if (bookedSlots.length > 0) {
-    const tags = bookedSlots.map(s =>
-      `<span class="slot-tag">${formatTime(s.start_time.slice(0,5))} – ${formatTime(s.end_time.slice(0,5))}</span>`
-    ).join("");
-    document.getElementById("slotsInfo").innerHTML =
-      `<i class="fa-solid fa-circle-info"></i> Booked slots: ${tags}`;
-  }
+    <option value="">-- Select Department --</option>
 
-  updateEndTime();
-}
+    <option>PJU</option>
+    <option>Farm - Development</option>
+    <option>Factory</option>
+    <option>BEET</option>
+    <option>ABF</option>
+    <option>Marketing</option>
+    <option>HRAISC</option>
+    <option>Farm - Flock Health</option>
+    <option>Farm - Technical</option>
+    <option>Fresh Frozen Chicken (FFC)</option>
+    <option>Farm - Planning</option>
+    <option>Naka Biolife</option>
+    <option>Sales</option>
+    <option>Logistic</option>
+    <option>Outlet Operation</option>
+    <option>Finance And Account</option>
+    <option>M & F</option>
+    <option>Business Development & IT</option>
+    <option>QC</option>
 
-/* ========================= */
-/* UPDATE END TIME */
-/* ========================= */
-function updateEndTime() {
-  const start = document.getElementById("startTime").value;
-  const hours = parseInt(document.getElementById("durationHours").value) || 0;
-  const mins  = parseInt(document.getElementById("durationMins").value)  || 0;
+  </select>
+</div>
 
-  if (!start || (hours === 0 && mins === 0)) {
-    document.getElementById("endTime").value = "";
-    return;
-  }
-
-  const [h, m] = start.split(":").map(Number);
-  const total = h * 60 + m + hours * 60 + mins;
-
-  if (total > 22 * 60) {
-    document.getElementById("endTime").value = "Exceeds 10:00 PM";
-    return;
-  }
-
-  const endH = Math.floor(total / 60);
-  const endM = total % 60;
-  const endStr = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
-  document.getElementById("endTime").value = formatTime(endStr);
-}
-
-/* ========================= */
-/* FORMAT TIME */
-/* ========================= */
-function formatTime(t) {
-  const [h, m] = t.split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-
-/* ========================= */
-/* SUBMIT BOOKING */
-/* ========================= */
-async function submitBooking() {
-  const room_id        = document.getElementById("roomSelect").value;
-  const event_name     = document.getElementById("eventName").value.trim();
-  const date           = document.getElementById("bookingDate").value;
-  const start_time     = document.getElementById("startTime").value;
-  const duration_hours = parseInt(document.getElementById("durationHours").value) || 0;
-  const duration_mins  = parseInt(document.getElementById("durationMins").value) || 0;
-  const name           = document.getElementById("bookerName").value.trim();
-  const department     = document.getElementById("bookerDept").value.trim();
-  const phone          = document.getElementById("bookerPhone").value.trim();
-
-  if (!room_id || !event_name || !date || !start_time || !name || !department || !phone) {
-    showToast("Please fill all required fields", "error");
-    return;
-  }
-
-  if (duration_hours === 0 && duration_mins === 0) {
-    showToast("Please select a duration", "error");
-    return;
-  }
-
-  // Calculate end time
-  const [h, m] = start_time.split(":").map(Number);
-  const total = h * 60 + m + duration_hours * 60 + duration_mins;
-  if (total > 22 * 60) {
-    showToast("Booking exceeds 10:00 PM limit", "error");
-    return;
-  }
-
-  const endH = Math.floor(total / 60);
-  const endM = total % 60;
-  const end_time = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
-
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const user = JSON.parse(userData);
-
-  const res = await fetch(`${API}/api/bookings`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      room_id, user_id: user.id, event_name, date,
-      start_time, end_time, duration_hours, duration_minutes: duration_mins,
-      name, department, phone
-    })
-  });
-
-  const result = await res.json();
-
-  if (!res.ok) {
-    showToast(result.error || "Booking failed", "error");
-    return;
-  }
-
-  showToast("Booking submitted! Awaiting approval.", "success");
-
-  // Reset form
-  document.getElementById("eventName").value   = "";
-  document.getElementById("bookingDate").value  = "";
-  document.getElementById("startTime").value    = "";
-  document.getElementById("durationHours").value = "0";
-  document.getElementById("durationMins").value  = "0";
-  document.getElementById("endTime").value      = "";
-  document.getElementById("bookerName").value   = "";
-  document.getElementById("bookerDept").value   = "";
-  document.getElementById("bookerPhone").value  = "";
-  document.getElementById("slotsInfo").innerHTML = "";
-  bookedSlots = [];
-  populateTimeSlots([]);
-}
-
-/* ========================= */
-/* MY BOOKINGS */
-/* ========================= */
-async function loadMyBookings() {
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const user = JSON.parse(userData);
-
-  const res = await fetch(`${API}/api/bookings/user/${user.id}`);
-  const bookings = await res.json();
-
-  const tbody = document.querySelector("#myBookingsTable tbody");
-
-  if (!Array.isArray(bookings) || bookings.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="5">
-        <div class="empty">
-          <i class="fa-regular fa-calendar-xmark"></i>
-          No bookings yet
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = "";
-  bookings.forEach(b => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${b.room_name}</td>
-        <td>${b.event_name}</td>
-        <td>${formatDate(b.date)}</td>
-        <td>${formatTime(b.start_time.slice(0,5))} – ${formatTime(b.end_time.slice(0,5))}</td>
-        <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
-      </tr>
-    `;
-  });
-}
-
-/* ========================= */
-/* HELPERS */
-/* ========================= */
-function formatDate(d) {
-  return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
-}
-
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-/* ========================= */
-/* LOGOUT */
-/* ========================= */
-function logout() {
-  localStorage.clear();
-  sessionStorage.clear();
-  window.location.href = "login.html";
-}
-
-/* ========================= */
-/* INIT */
-/* ========================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  const token    = localStorage.getItem("token") || sessionStorage.getItem("token");
-  const userData = localStorage.getItem("user")  || sessionStorage.getItem("user");
-
-  if (!token || !userData) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  // Set min date to today
-  document.getElementById("bookingDate").min = new Date().toISOString().split("T")[0];
-
-  await loadRooms();
-  populateTimeSlots([]);
-});
-</script>
-</body>
-</html>
+<!-- Phone -->
+<div class="form-group">
+  <label>Phone Number <span class="required">*</span></label>
+  <input type="tel" id="bookerPhone" placeholder="e.g. 0123456789">
+</div>
