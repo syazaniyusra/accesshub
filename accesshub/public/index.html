@@ -59,10 +59,20 @@
     .logout-btn {
       margin-top: auto;
       background: #ef4444 !important;
-
       display: flex;
       justify-content: center;   
       align-items: center;       
+    }
+
+    .booking-btn {
+      background: #1d4ed8 !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .booking-btn:hover {
+      background: #2563eb !important;
     }
 
     /* MAIN */
@@ -194,17 +204,7 @@
 
     .input-group input::placeholder {
     position: relative;
-    top: 1px;   /* 🔥 adjust vertically */
-    }
-
-    .booking-btn {
-    background: #1d4ed8 !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    }
-  .booking-btn:hover {
-    background: #2563eb !important;
+    top: 1px;
     }
   </style>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -215,11 +215,11 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h2>AccessHub</h2>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-
+  <!-- All + dept buttons inserted here by generateSidebar() -->
   <button class="booking-btn" onclick="window.location.href='booking.html'">
     <i class="fas fa-door-open"></i> Room Booking
   </button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 
 <!-- MAIN -->
@@ -289,6 +289,7 @@ async function loadLinks() {
     console.error("Fetch error:", err);
   }
 }
+
 // ===============================
 // LOAD DEPARTMENTS (SIDEBAR)
 // ===============================
@@ -353,28 +354,30 @@ function renderDashboard(data, keyword = "") {
 function generateSidebar(departments) {
   const sidebar = document.querySelector(".sidebar");
 
+  // Remove any previously generated dept buttons
   sidebar.querySelectorAll("button:not(.logout-btn):not(.booking-btn)").forEach(btn => btn.remove());
 
   const allBtn = document.createElement("button");
   allBtn.innerText = "All";
-
   allBtn.onclick = () => {
     setActive(allBtn);
     renderDashboard(allData);
   };
-
-  sidebar.insertBefore(allBtn, document.querySelector(".logout-btn"));
+  // Insert "All" before the blue booking-btn
+  sidebar.insertBefore(allBtn, document.querySelector(".booking-btn"));
 
   departments.forEach(dep => {
+    // ✅ Skip "Room Booking" department — it's handled by the booking-btn below
+    if (dep.name.toLowerCase() === "room booking") return;
+
     const btn = document.createElement("button");
     btn.innerText = dep.name;
-
     btn.onclick = () => {
       setActive(btn);
       filterCategory(dep.id);
     };
-
-    sidebar.insertBefore(btn, document.querySelector(".logout-btn"));
+    // Insert each dept button before the blue booking-btn
+    sidebar.insertBefore(btn, document.querySelector(".booking-btn"));
   });
 
   setActive(allBtn);
@@ -395,6 +398,7 @@ function filterCategory(departmentId) {
 
   renderDashboard(filtered);
 }
+
 // ===============================
 // ACTIVE BUTTON
 // ===============================
