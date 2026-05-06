@@ -1,3 +1,110 @@
+/* ========================= */
+/* FORM */
+/* ========================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group label span.required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* ========================= */
+/* INPUT + SELECT */
+/* ========================= */
+
+.form-group input,
+.form-group select {
+
+  width: 100%;
+  padding: 10px 14px;
+
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+
+  font-size: 14px;
+  color: #1e293b;
+
+  background: #f8fafc;
+
+  transition: border 0.2s;
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* ========================= */
+/* SELECT DROPDOWN ARROW */
+/* ========================= */
+
+.form-group select {
+
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 8 10 12 14 8'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+
+  padding-right: 40px;
+
+  cursor: pointer;
+}
+
+/* ========================= */
+/* FOCUS */
+/* ========================= */
+
+.form-group input:focus,
+.form-group select:focus {
+
+  border-color: #3b82f6;
+  background: white;
+}
+
+/* ========================= */
+/* READ ONLY */
+/* ========================= */
+
+.form-group input:read-only {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* ========================= */
+/* DURATION */
+/* ========================= */
+
+.duration-row {
+  display: flex;
+  gap: 10px;
+}
+
+.duration-row select {
+  flex: 1;
+}
 <!-- ========================= -->
 <!-- FORM -->
 <!-- ========================= -->
