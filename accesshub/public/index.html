@@ -196,6 +196,16 @@
     position: relative;
     top: 1px;   /* 🔥 adjust vertically */
     }
+
+    .booking-btn {
+    background: #1d4ed8 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+  .booking-btn:hover {
+    background: #2563eb !important;
+    }
   </style>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
@@ -206,6 +216,10 @@
 <div class="sidebar">
   <h2>AccessHub</h2>
   <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <button class="booking-btn" onclick="window.location.href='booking.html'">
+    <i class="fas fa-door-open"></i> Room Booking
+  </button>
 </div>
 
 <!-- MAIN -->
@@ -339,7 +353,7 @@ function renderDashboard(data, keyword = "") {
 function generateSidebar(departments) {
   const sidebar = document.querySelector(".sidebar");
 
-  sidebar.querySelectorAll("button:not(.logout-btn)").forEach(btn => btn.remove());
+  sidebar.querySelectorAll("button:not(.logout-btn):not(.booking-btn)").forEach(btn => btn.remove());
 
   const allBtn = document.createElement("button");
   allBtn.innerText = "All";
@@ -385,7 +399,7 @@ function filterCategory(departmentId) {
 // ACTIVE BUTTON
 // ===============================
 function setActive(button) {
-  document.querySelectorAll(".sidebar button").forEach(btn => {
+  document.querySelectorAll(".sidebar button:not(.booking-btn):not(.logout-btn)").forEach(btn => {
     btn.classList.remove("active");
   });
   button.classList.add("active");
