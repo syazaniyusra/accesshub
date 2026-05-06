@@ -464,21 +464,25 @@
 
   <!-- Duration: removed 0hr/0min nonsense -->
   <div class="form-group">
-    <label>Duration <span class="required">*</span></label>
-    <div class="duration-row">
-      <select id="durationHours" onchange="updateEndTime()">
-        <option value="">-- Select Duration --</option>
-        <option value="1">1 hr</option>
-        <option value="2">2 hr</option>
-        <option value="3">3 hr</option>
-        <option value="4">4 hr</option>
-      </select>
-      <select id="durationMins" onchange="updateEndTime()">
-        <option value="0">+ 0 min</option>
-        <option value="30">+ 30 min</option>
-      </select>
-    </div>
-  </div>
+  <label>Select Duration <span class="required">*</span></label>
+
+  <select id="duration" onchange="updateEndTime()">
+    <option value="">-- Select Duration --</option>
+
+    <option value="30">30 Minutes</option>
+
+    <option value="60">1 Hour</option>
+    <option value="90">1 Hour 30 Minutes</option>
+
+    <option value="120">2 Hours</option>
+    <option value="150">2 Hours 30 Minutes</option>
+
+    <option value="180">3 Hours</option>
+    <option value="210">3 Hours 30 Minutes</option>
+
+    <option value="240">4 Hours</option>
+  </select>
+</div>
 
   <div class="form-group">
     <label>End Time</label>
@@ -657,55 +661,72 @@ function onFieldChange() {
 
 /* ---- END TIME CALC ---- */
 function updateEndTime() {
-  const start = document.getElementById('startTime').value;
-  const hrs   = parseInt(document.getElementById('durationHours').value) || 0;
-  const mins  = parseInt(document.getElementById('durationMins').value)  || 0;
 
-  if (!start || hrs === 0 && mins === 0) {
+  const start = document.getElementById('startTime').value;
+  const duration = parseInt(document.getElementById('duration').value) || 0;
+
+  if (!start || !duration) {
     document.getElementById('endTime').value = '';
     highlightSelectedSlots();
     return;
   }
 
   const [h, m] = start.split(':').map(Number);
-  const total  = h * 60 + m + hrs * 60 + mins;
-  const eh     = Math.floor(total / 60) % 24;
-  const em     = total % 60;
-  const ap     = eh >= 12 ? 'PM' : 'AM';
-  const dh     = eh > 12 ? eh - 12 : (eh === 0 ? 12 : eh);
-  document.getElementById('endTime').value = `${dh}:${String(em).padStart(2,'0')} ${ap}`;
+
+  const total = (h * 60) + m + duration;
+
+  const eh = Math.floor(total / 60) % 24;
+  const em = total % 60;
+
+  const ap = eh >= 12 ? 'PM' : 'AM';
+
+  const dh = eh > 12
+    ? eh - 12
+    : (eh === 0 ? 12 : eh);
+
+  document.getElementById('endTime').value =
+    `${dh}:${String(em).padStart(2,'0')} ${ap}`;
 
   highlightSelectedSlots();
 }
 
 /* ---- HIGHLIGHT DURATION RANGE ---- */
 function highlightSelectedSlots() {
+
   const startTime = document.getElementById('startTime').value;
-  const hrs       = parseInt(document.getElementById('durationHours').value) || 0;
-  const mins      = parseInt(document.getElementById('durationMins').value)  || 0;
-  const totalMins = hrs * 60 + mins;
 
-  const bookedTimes = Array.from(document.querySelectorAll('.time-slot-btn.booked'))
-    .map(b => b.dataset.time);
+  const totalMins =
+    parseInt(document.getElementById('duration').value) || 0;
 
-  /* reset non-booked slots */
-  document.querySelectorAll('.time-slot-btn:not(.booked)').forEach(b => {
-    b.classList.remove('selected');
-    b.classList.add('available');
-  });
+  const bookedTimes = Array.from(
+    document.querySelectorAll('.time-slot-btn.booked')
+  ).map(b => b.dataset.time);
+
+  document.querySelectorAll('.time-slot-btn:not(.booked)')
+    .forEach(b => {
+      b.classList.remove('selected');
+      b.classList.add('available');
+    });
 
   if (!startTime || totalMins === 0) return;
 
-  const [sh, sm]  = startTime.split(':').map(Number);
+  const [sh, sm] = startTime.split(':').map(Number);
+
   const startMins = sh * 60 + sm;
   const endMins   = startMins + totalMins;
 
   ALL_SLOTS.forEach(slot => {
-    const [h, m]    = slot.split(':').map(Number);
+
+    const [h, m] = slot.split(':').map(Number);
+
     const slotStart = h * 60 + m;
-    /* colour every slot whose START falls within [startMins, endMins) */
+
     if (slotStart >= startMins && slotStart < endMins) {
-      const btn = document.querySelector(`.time-slot-btn[data-time="${slot}"]`);
+
+      const btn = document.querySelector(
+        `.time-slot-btn[data-time="${slot}"]`
+      );
+
       if (btn && !bookedTimes.includes(slot)) {
         btn.classList.remove('available');
         btn.classList.add('selected');
@@ -782,15 +803,14 @@ async function submitBooking() {
   const room  = document.getElementById('roomSelect').value;
   const date  = document.getElementById('bookingDate').value;
   const start = document.getElementById('startTime').value;
-  const hrs   = document.getElementById('durationHours').value;
-  const mins  = document.getElementById('durationMins').value;
+  const duration = document.getElementById('duration').value;
   const event = document.getElementById('eventName').value.trim();
   const name  = document.getElementById('bookerName').value.trim();
   const dept  = document.getElementById('bookerDept').value;
   const phone = document.getElementById('bookerPhone').value.trim();
 
   /* hrs must be a real selection (not empty string) */
-  if (!room || !date || !start || !hrs || !event || !name || !dept || !phone) {
+  if (!room || !date || !start || !duration || !event || !name || !dept || !phone) {
     _toast('Please fill in all required fields', 'error');
     return;
   }
@@ -813,8 +833,7 @@ async function submitBooking() {
         room_id:       room,
         booking_date:  date,
         start_time:    start,
-        duration_hrs:  hrs,
-        duration_mins: mins,
+        duration_mins: duration,
         event_name:    event,
         booker_name:   name,
         department:    dept,
@@ -842,10 +861,9 @@ function _toast(msg, type) {
 }
 
 function resetForm() {
-  ['roomSelect','startTime','durationHours','bookerDept'].forEach(id =>
+  ['roomSelect','startTime','duration','bookerDept'].forEach(id =>
     document.getElementById(id).selectedIndex = 0
   );
-  document.getElementById('durationMins').selectedIndex = 0;
   ['bookingDate','eventName','bookerName','bookerPhone','endTime'].forEach(id =>
     document.getElementById(id).value = ''
   );
