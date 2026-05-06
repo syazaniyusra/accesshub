@@ -1,154 +1,334 @@
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-<style>
-  /* ========================= */
-/* TOP ACTIONS */
-/* ========================= */
+  <h2>AccessHub</h2>
 
-.top-actions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  background: #e2e8f0;
-  color: #1e293b;
-  transition: 0.2s;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tab-btn.active {
-  background: #3b82f6;
-  color: white;
-}
-
-/* ========================= */
-/* TABLE */
-/* ========================= */
-
-.table-container {
-  overflow-x: auto;
-  margin-top: 20px;
-}
-
-#myBookingsTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-#myBookingsTable th {
-  background: #f1f5f9;
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
-}
-
-#myBookingsTable td {
-  padding: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 14px;
-}
-
-.status-badge {
-  background: #dcfce7;
-  color: #166534;
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-.empty {
-  text-align: center;
-  color: #64748b;
-  padding: 20px;
-}
-</style>
-<!-- ========================= -->
-<!-- TOP ACTION BUTTONS -->
-<!-- ========================= -->
-
-<div class="top-actions">
-
-  <button
-    class="tab-btn active"
-    id="newBookingBtn"
-    onclick="showBookingForm()"
-  >
-    <i class="fas fa-plus"></i>
-    New Booking
+  <button>
+    All
   </button>
 
-  <button
-    class="tab-btn"
-    id="historyBtn"
-    onclick="showBookingHistory()"
-  >
-    <i class="fas fa-list"></i>
-    My Bookings
+  <button>
+    HRAISC
+  </button>
+
+  <button>
+    Finance & Account
+  </button>
+
+  <button>
+    Logistics & Maintenance
+  </button>
+
+  <button class="active">
+    <i class="fa-solid fa-door-open"></i>
+    Room Booking
   </button>
 
 </div>
 
-<!-- ========================= -->
-<!-- BOOKING FORM -->
-<!-- ========================= -->
+<!-- MAIN -->
+<div class="main">
 
-<div id="bookingFormSection">
+  <div class="page-header">
+    <h2>Room Booking</h2>
+    <p>Book a meeting room for your event or discussion.</p>
+  </div>
 
-  <!-- EXISTING BOOKING FORM HERE -->
+  <!-- TABS -->
+  <div class="tabs">
 
-</div>
+    <button
+      class="tab-btn active"
+      onclick="showTab('bookTab', this)"
+    >
+      <i class="fa-solid fa-plus"></i>
+      New Booking
+    </button>
 
-<!-- ========================= -->
-<!-- BOOKING HISTORY -->
-<!-- ========================= -->
-
-<div id="bookingHistorySection" style="display:none;">
-
-  <div class="card">
-
-    <h3>
-      <i
-        class="fa-solid fa-list"
-        style="color:#3b82f6;margin-right:8px;"
-      ></i>
-
+    <button
+      class="tab-btn"
+      onclick="showTab('myBookingsTab', this); loadMyBookings()"
+    >
+      <i class="fa-solid fa-list"></i>
       My Bookings
-    </h3>
+    </button>
 
-    <div class="table-container">
+  </div>
 
-      <table id="myBookingsTable">
+  <!-- ========================= -->
+  <!-- TAB: NEW BOOKING -->
+  <!-- ========================= -->
 
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+  <div id="bookTab">
 
-        <tbody id="bookingHistoryList">
+    <div class="card">
 
-          <tr>
-            <td colspan="5" class="empty">
-              No booking history found
-            </td>
-          </tr>
+      <h3>
+        <i
+          class="fa-solid fa-calendar-plus"
+          style="color:#3b82f6;margin-right:8px;"
+        ></i>
 
-        </tbody>
+        Booking Form
+      </h3>
 
-      </table>
+      <div class="form-grid">
+
+        <!-- Room Type -->
+        <div class="form-group full">
+
+          <label>
+            Room Type <span class="required">*</span>
+          </label>
+
+          <select
+            id="roomSelect"
+            onchange="onRoomOrDateChange()"
+          >
+
+            <option value="">
+              -- Select Room --
+            </option>
+
+            <option value="1">
+              Meeting Room Pejabat Urusan
+            </option>
+
+            <option value="2">
+              Meeting Room Director
+            </option>
+
+            <option value="3">
+              The Nest
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- Event Name -->
+        <div class="form-group full">
+
+          <label>
+            Event Name <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="eventName"
+            placeholder="e.g. Q3 Planning Meeting"
+          >
+
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+
+          <label>
+            Date <span class="required">*</span>
+          </label>
+
+          <input
+            type="date"
+            id="bookingDate"
+            onchange="onRoomOrDateChange()"
+          >
+
+        </div>
+
+        <!-- Start Time -->
+        <div class="form-group">
+
+          <label>
+            Start Time <span class="required">*</span>
+          </label>
+
+          <select
+            id="startTime"
+            onchange="updateEndTime()"
+          >
+
+            <option value="">
+              -- Select Time --
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+
+          <label>
+            Duration <span class="required">*</span>
+          </label>
+
+          <div class="duration-row">
+
+            <select
+              id="durationHours"
+              onchange="updateEndTime()"
+            >
+              <option value="0">0 hr</option>
+              <option value="1">1 hr</option>
+              <option value="2">2 hr</option>
+              <option value="3">3 hr</option>
+              <option value="4">4 hr</option>
+            </select>
+
+            <select
+              id="durationMins"
+              onchange="updateEndTime()"
+            >
+              <option value="0">0 min</option>
+              <option value="30">30 min</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <!-- End Time -->
+        <div class="form-group">
+
+          <label>
+            End Time
+          </label>
+
+          <input
+            type="text"
+            id="endTime"
+            placeholder="Auto-calculated"
+            readonly
+          >
+
+        </div>
+
+        <!-- Booked slots -->
+        <div class="form-group full">
+          <div class="slots-info" id="slotsInfo"></div>
+        </div>
+
+        <!-- Full Name -->
+        <div class="form-group">
+
+          <label>
+            Full Name <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="bookerName"
+            placeholder="Your full name"
+          >
+
+        </div>
+
+        <!-- Department -->
+        <div class="form-group">
+
+          <label>
+            Department <span class="required">*</span>
+          </label>
+
+          <select id="bookerDept">
+
+            <option value="">
+              -- Select Department --
+            </option>
+
+            <option>PJU</option>
+            <option>Farm - Development</option>
+            <option>Factory</option>
+            <option>BEET</option>
+            <option>ABF</option>
+            <option>Marketing</option>
+            <option>HRAISC</option>
+            <option>Farm - Flock Health</option>
+            <option>Farm - Technical</option>
+            <option>Fresh Frozen Chicken (FFC)</option>
+            <option>Farm - Planning</option>
+            <option>Naka Biolife</option>
+            <option>Sales</option>
+            <option>Logistic</option>
+            <option>Outlet Operation</option>
+            <option>Finance And Account</option>
+            <option>M & F</option>
+            <option>Business Development & IT</option>
+            <option>QC</option>
+
+          </select>
+
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+
+          <label>
+            Phone Number <span class="required">*</span>
+          </label>
+
+          <input
+            type="tel"
+            id="bookerPhone"
+            placeholder="e.g. 0123456789"
+          >
+
+        </div>
+
+      </div>
+
+      <button
+        class="btn-submit"
+        onclick="submitBooking()"
+      >
+        <i class="fa-solid fa-paper-plane"></i>
+        Submit Booking
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- TAB: MY BOOKINGS -->
+  <!-- ========================= -->
+
+  <div
+    id="myBookingsTab"
+    style="display:none;"
+  >
+
+    <div class="card">
+
+      <h3>
+        <i
+          class="fa-solid fa-list"
+          style="color:#3b82f6;margin-right:8px;"
+        ></i>
+
+        My Bookings
+      </h3>
+
+      <div class="table-container">
+
+        <table id="myBookingsTable">
+
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
 
     </div>
 
@@ -156,135 +336,5 @@
 
 </div>
 
-</div>
-
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
-
-<script>
-
-/* ========================= */
-/* SWITCH TABS */
-/* ========================= */
-
-function showBookingForm() {
-
-  document.getElementById("bookingFormSection")
-    .style.display = "block";
-
-  document.getElementById("bookingHistorySection")
-    .style.display = "none";
-
-  document.getElementById("newBookingBtn")
-    .classList.add("active");
-
-  document.getElementById("historyBtn")
-    .classList.remove("active");
-}
-
-function showBookingHistory() {
-
-  document.getElementById("bookingFormSection")
-    .style.display = "none";
-
-  document.getElementById("bookingHistorySection")
-    .style.display = "block";
-
-  document.getElementById("historyBtn")
-    .classList.add("active");
-
-  document.getElementById("newBookingBtn")
-    .classList.remove("active");
-
-  loadBookingHistory();
-}
-
-/* ========================= */
-/* LOAD BOOKING HISTORY */
-/* ========================= */
-
-async function loadBookingHistory() {
-
-  const historyContainer =
-    document.getElementById("bookingHistoryList");
-
-  historyContainer.innerHTML = `
-    <tr>
-      <td colspan="5" class="empty">
-        Loading booking history...
-      </td>
-    </tr>
-  `;
-
-  try {
-
-    const userData =
-      localStorage.getItem("user") ||
-      sessionStorage.getItem("user");
-
-    const user = JSON.parse(userData);
-
-    const res =
-      await fetch(`${API}/api/bookings/user/${user.id}`);
-
-    const bookings = await res.json();
-
-    if (!Array.isArray(bookings) || bookings.length === 0) {
-
-      historyContainer.innerHTML = `
-        <tr>
-          <td colspan="5" class="empty">
-            No booking history found
-          </td>
-        </tr>
-      `;
-
-      return;
-    }
-
-    historyContainer.innerHTML = "";
-
-    bookings.forEach(item => {
-
-      historyContainer.innerHTML += `
-
-        <tr>
-
-          <td>${item.room_name || "-"}</td>
-
-          <td>${item.event_name || "-"}</td>
-
-          <td>${item.booking_date || "-"}</td>
-
-          <td>
-            ${item.start_time || "-"}
-            -
-            ${item.end_time || "-"}
-          </td>
-
-          <td>
-            <span class="status-badge">
-              ${item.status || "Approved"}
-            </span>
-          </td>
-
-        </tr>
-
-      `;
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    historyContainer.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty">
-          Failed to load booking history
-        </td>
-      </tr>
-    `;
-  }
-}
-
-</script>
