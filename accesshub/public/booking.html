@@ -1,3 +1,6 @@
+<!-- booking.html -->
+<!-- Paste this as your booking tab content (inside your existing card/page wrapper) -->
+
 <style>
 
 /* ========================= */
@@ -6,48 +9,48 @@
 
 .top-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 1.5rem;
 }
 
 .tab-btn {
-  border: none;
-  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
   border-radius: 10px;
+  border: none;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   background: #e2e8f0;
   color: #1e293b;
   transition: 0.2s;
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .tab-btn.active {
-  background: #3b82f6;
-  color: white;
+  background: #2563eb;
+color: white;
 }
 
-.tab-btn:hover {
-  opacity: 0.9;
+.tab-btn:hover:not(.active) {
+  opacity: 0.85;
 }
 
 /* ========================= */
-/* FORM */
+/* FORM GRID */
 /* ========================= */
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .form-group.full {
@@ -55,9 +58,13 @@
 }
 
 .form-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  line-height: 1.4 !important;
+  display: block !important;
 }
 
 .form-group label span.required {
@@ -71,43 +78,22 @@
 
 .form-group input,
 .form-group select {
-
   width: 100%;
-  padding: 10px 14px;
-
+  padding: 10px 12px;
   border: 1.5px solid #e2e8f0;
   border-radius: 8px;
-
   font-size: 14px;
   color: #1e293b;
-
   background: #f8fafc;
-
   transition: border 0.2s;
   outline: none;
 }
 
-/* ========================= */
-/* SELECT */
-/* ========================= */
-
-.form-group select {
-  cursor: pointer;
-}
-
-/* ========================= */
-/* FOCUS */
-/* ========================= */
-
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #3b82f6;
+  border-color: #2563eb;
   background: white;
 }
-
-/* ========================= */
-/* READ ONLY */
-/* ========================= */
 
 .form-group input:read-only {
   background: #f1f5f9;
@@ -116,12 +102,12 @@
 }
 
 /* ========================= */
-/* DURATION */
+/* DURATION ROW */
 /* ========================= */
 
 .duration-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .duration-row select {
@@ -129,263 +115,505 @@
 }
 
 /* ========================= */
-/* HISTORY */
+/* DIVIDER */
 /* ========================= */
 
-.history-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 16px;
+.form-divider {
+  grid-column: 1 / -1;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 4px 0;
+}
+
+/* ========================= */
+/* SUBMIT BUTTON */
+/* ========================= */
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
   border-radius: 10px;
-  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: 0.2s;
 }
 
-.history-card h4 {
-  margin: 0 0 10px;
-}
-
-.history-card p {
-  margin: 6px 0;
-  color: #475569;
-}
-
-.empty {
-  text-align: center;
-  color: #64748b;
-  padding: 20px;
+.submit-btn:hover {
+  background: #1d4ed8;
 }
 
 /* ========================= */
-/* LIVE AVAILABILITY */
+/* CHECK AVAILABILITY */
 /* ========================= */
 
 .check-btn {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #111827;
-  background: #2563eb;
-  color: white;
-  border-radius: 10px;
+  padding: 11px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #1e293b;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 8px;
-  margin-bottom: 14px;
-}
-
-.check-btn:hover {
-  background: #1d4ed8;
-}
-
-.availability-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.time-slot-btn {
-  padding: 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   transition: 0.2s;
 }
 
+.check-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.check-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.avail-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+/* ========================= */
+/* LEGEND */
+/* ========================= */
+
+.avail-legend {
+  display: none;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.swatch.selected { background: #f472b6; }
+.swatch.booked   { background: #ef4444; }
+.swatch.avail    { background: #fff; border: 1px solid #d1d5db; }
+
+/* ========================= */
+/* AVAILABILITY GRID */
+/* ========================= */
+
+.availability-grid {
+  display: none;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.time-slot-btn {
+  padding: 11px 4px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  transition: 0.15s;
+}
+
 .time-slot-btn.available {
-  background: #dcfce7;
-  color: #166534;
+  background: #ffffff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.time-slot-btn.available:hover {
+  background: #fdf2f8;
+  border-color: #f9a8d4;
 }
 
 .time-slot-btn.booked {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
   cursor: not-allowed;
 }
 
 .time-slot-btn.selected {
-  background: #2563eb;
-  color: white;
+  background: #f472b6;
+  color: #ffffff;
+  border-color: #ec4899;
 }
+
+/* ========================= */
+/* HISTORY */
+/* ========================= */
+
+.inner-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.inner-tab {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: #ffffff;
+  color: #64748b;
+  transition: 0.15s;
+  border-right: 1px solid #e2e8f0;
+}
+
+.inner-tab:last-child {
+  border-right: none;
+}
+
+.inner-tab.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.inner-tab:hover:not(.active) {
+  background: #f8fafc;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.stat-val {
+  font-size: 22px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.hist-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+}
+
+.hist-search i {
+  font-size: 16px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.hist-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: #1e293b;
+  width: 100%;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.filter-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.filter-btn:hover:not(.active) {
+  background: #f8fafc;
+}
+
+.room-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.room-pill.active {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+}
+
+.room-pill:hover:not(.active) {
+  background: #f8fafc;
+}
+
+.booking-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: 0.15s;
+}
+
+.booking-card:hover {
+  border-color: #cbd5e1;
+}
+
+.date-block {
+  min-width: 48px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px 6px;
+  flex-shrink: 0;
+}
+
+.date-day {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.date-mon {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.booking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.booking-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.meta-item i {
+  font-size: 14px;
+}
+
+.status-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-upcoming  { background: #eff6ff; color: #1d4ed8; }
+.badge-completed { background: #f0fdf4; color: #15803d; }
+.badge-cancelled { background: #fef2f2; color: #b91c1c; }
+
+.booker-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.hist-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+}
+
+.hist-empty i {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 10px;
+  opacity: 0.4;
+}
+
+.hist-empty p {
+  font-size: 14px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+.inner-section { display: none; }
+.inner-section.active { display: block; }
+
 </style>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- ========================= -->
 <!-- TOP BUTTONS -->
 <!-- ========================= -->
 
 <div class="top-actions">
-
-  <button
-    class="tab-btn active"
-    id="newBookingBtn"
-    onclick="showBookingForm()"
-  >
-    <i class="fas fa-plus"></i>
-    New Booking
+  <button class="tab-btn active" id="newBookingBtn" onclick="showSection('form')">
+    <i class="fas fa-plus"></i> New Booking
   </button>
-
-  <button
-    class="tab-btn"
-    id="historyBtn"
-    onclick="showBookingHistory()"
-  >
-    <i class="fas fa-list"></i>
-    My Bookings
+  <button class="tab-btn" id="historyBtn" onclick="showSection('history')">
+    <i class="fas fa-list"></i> My Bookings
   </button>
-
 </div>
 
 <!-- ========================= -->
 <!-- BOOKING FORM -->
 <!-- ========================= -->
 
-<div id="bookingFormSection">
-
+<div id="sectionForm" class="section active">
 <div class="form-grid">
 
   <!-- Room Type -->
   <div class="form-group full">
-
-    <label>
-      Room Type <span class="required">*</span>
-    </label>
-
-    <select id="roomSelect" onchange="onRoomOrDateChange()">
-
-      <option value="">
-        -- Select Room --
-      </option>
-
-      <option value="1">
-        Meeting Room Pejabat Urusan
-      </option>
-
-      <option value="2">
-        Meeting Room Director
-      </option>
-
-      <option value="3">
-        The Nest
-      </option>
-
+    <label>Room Type <span class="required">*</span></label>
+    <select id="roomSelect" onchange="onFieldChange()">
+      <option value="">-- Select Room --</option>
+      <option value="1">Meeting Room Pejabat Urusan</option>
+      <option value="2">Meeting Room Director</option>
+      <option value="3">The Nest</option>
     </select>
-
-  </div>
-
-  <!-- Event Name -->
-  <div class="form-group full">
-
-    <label>
-      Event Name <span class="required">*</span>
-    </label>
-
-    <input
-      type="text"
-      id="eventName"
-      placeholder="e.g. Q3 Planning Meeting"
-    >
-
   </div>
 
   <!-- Date -->
   <div class="form-group">
-
-    <label>
-      Date <span class="required">*</span>
-    </label>
-
-    <input
-      type="date"
-      id="bookingDate"
-      onchange="onRoomOrDateChange()"
-    >
-
+    <label>Date <span class="required">*</span></label>
+    <input type="date" id="bookingDate" onchange="onFieldChange()">
   </div>
 
- <!-- Start Time -->
-<div class="form-group">
-
-  <label>
-    Start Time <span class="required">*</span>
-  </label>
-
-  <select id="startTime" onchange="updateEndTime()">
-
-    <option value="">
-      -- Select Time --
-    </option>
-
-    <option value="08:00">8:00 AM</option>
-    <option value="08:30">8:30 AM</option>
-
-    <option value="09:00">9:00 AM</option>
-    <option value="09:30">9:30 AM</option>
-
-    <option value="10:00">10:00 AM</option>
-    <option value="10:30">10:30 AM</option>
-
-    <option value="11:00">11:00 AM</option>
-    <option value="11:30">11:30 AM</option>
-
-    <option value="12:00">12:00 PM</option>
-    <option value="12:30">12:30 PM</option>
-
-    <option value="13:00">1:00 PM</option>
-    <option value="13:30">1:30 PM</option>
-
-    <option value="14:00">2:00 PM</option>
-    <option value="14:30">2:30 PM</option>
-
-    <option value="15:00">3:00 PM</option>
-    <option value="15:30">3:30 PM</option>
-
-    <option value="16:00">4:00 PM</option>
-    <option value="16:30">4:30 PM</option>
-
-    <option value="17:00">5:00 PM</option>
-    <option value="17:30">5:30 PM</option>
-
-    <option value="18:00">6:00 PM</option>
-    <option value="18:30">6:30 PM</option>
-
-    <option value="19:00">7:00 PM</option>
-    <option value="19:30">7:30 PM</option>
-
-    <option value="20:00">8:00 PM</option>
-    <option value="20:30">8:30 PM</option>
-
-    <option value="21:00">9:00 PM</option>
-    <option value="21:30">9:30 PM</option>
-
-    <option value="22:00">10:00 PM</option>
-
-  </select>
-
-</div>
-
-  <!-- LIVE AVAILABILITY -->
-<div class="form-group full">
-
-  <button
-    type="button"
-    class="check-btn"
-    onclick="checkAvailability()"
-  >
-    Check Live Availability
-  </button>
-
-  <div id="availabilityGrid" class="availability-grid"></div>
-
-</div>
+  <!-- Start Time -->
+  <div class="form-group">
+    <label>Start Time <span class="required">*</span></label>
+    <select id="startTime" onchange="updateEndTime()">
+      <option value="">-- Select Time --</option>
+      <option value="08:00">8:00 AM</option>
+      <option value="08:30">8:30 AM</option>
+      <option value="09:00">9:00 AM</option>
+      <option value="09:30">9:30 AM</option>
+      <option value="10:00">10:00 AM</option>
+      <option value="10:30">10:30 AM</option>
+      <option value="11:00">11:00 AM</option>
+      <option value="11:30">11:30 AM</option>
+      <option value="12:00">12:00 PM</option>
+      <option value="12:30">12:30 PM</option>
+      <option value="13:00">1:00 PM</option>
+      <option value="13:30">1:30 PM</option>
+      <option value="14:00">2:00 PM</option>
+      <option value="14:30">2:30 PM</option>
+      <option value="15:00">3:00 PM</option>
+      <option value="15:30">3:30 PM</option>
+      <option value="16:00">4:00 PM</option>
+      <option value="16:30">4:30 PM</option>
+      <option value="17:00">5:00 PM</option>
+      <option value="17:30">5:30 PM</option>
+      <option value="18:00">6:00 PM</option>
+      <option value="18:30">6:30 PM</option>
+      <option value="19:00">7:00 PM</option>
+      <option value="19:30">7:30 PM</option>
+      <option value="20:00">8:00 PM</option>
+      <option value="20:30">8:30 PM</option>
+      <option value="21:00">9:00 PM</option>
+      <option value="21:30">9:30 PM</option>
+      <option value="22:00">10:00 PM</option>
+      <option value="22:30">10:30 PM</option>
+      <option value="23:00">11:00 PM</option>
+    </select>
+    <div class="avail-hint" id="startHint" style="display:none">
+      <i class="fas fa-info-circle"></i> Or pick a slot from availability below
+    </div>
+  </div>
 
   <!-- Duration -->
   <div class="form-group">
-
-    <label>
-      Duration <span class="required">*</span>
-    </label>
-
+    <label>Duration <span class="required">*</span></label>
     <div class="duration-row">
-
       <select id="durationHours" onchange="updateEndTime()">
         <option value="0">0 hr</option>
         <option value="1">1 hr</option>
@@ -393,65 +621,57 @@
         <option value="3">3 hr</option>
         <option value="4">4 hr</option>
       </select>
-
       <select id="durationMins" onchange="updateEndTime()">
         <option value="0">0 min</option>
         <option value="30">30 min</option>
       </select>
-
     </div>
-
   </div>
 
   <!-- End Time -->
   <div class="form-group">
-
-    <label>
-      End Time
-    </label>
-
-    <input
-      type="text"
-      id="endTime"
-      placeholder="Auto-calculated"
-      readonly
-    >
-
+    <label>End Time</label>
+    <input type="text" id="endTime" placeholder="Auto-calculated" readonly>
   </div>
 
-  <!-- Booked Slots -->
+  <!-- Check Live Availability -->
   <div class="form-group full">
-    <div class="slots-info" id="slotsInfo"></div>
+    <button type="button" class="check-btn" id="checkBtn" onclick="checkAvailability()" disabled>
+      <i class="fas fa-calendar-check"></i>
+      <span id="checkBtnText">Check Live Availability</span>
+    </button>
+    <div class="avail-hint" id="checkHint">
+      <i class="fas fa-lock"></i> Select room and date first
+    </div>
+
+    <div class="avail-legend" id="availLegend">
+      <div class="legend-item"><div class="swatch selected"></div> Selected</div>
+      <div class="legend-item"><div class="swatch booked"></div> Unavailable</div>
+      <div class="legend-item"><div class="swatch avail"></div> Available</div>
+    </div>
+
+    <div class="availability-grid" id="availabilityGrid"></div>
+  </div>
+
+  <hr class="form-divider">
+
+  <!-- Event Name -->
+  <div class="form-group full">
+    <label>Event Name <span class="required">*</span></label>
+    <input type="text" id="eventName" placeholder="e.g. Q3 Planning Meeting">
   </div>
 
   <!-- Full Name -->
   <div class="form-group">
-
-    <label>
-      Full Name <span class="required">*</span>
-    </label>
-
-    <input
-      type="text"
-      id="bookerName"
-      placeholder="Your full name"
-    >
-
+    <label>Full Name <span class="required">*</span></label>
+    <input type="text" id="bookerName" placeholder="Your full name">
   </div>
 
   <!-- Department -->
   <div class="form-group">
-
-    <label>
-      Department <span class="required">*</span>
-    </label>
-
+    <label>Department <span class="required">*</span></label>
     <select id="bookerDept">
-
-      <option value="">
-        -- Select Department --
-      </option>
-
+      <option value="">-- Select Department --</option>
       <option>PJU</option>
       <option>Farm - Development</option>
       <option>Factory</option>
@@ -471,50 +691,81 @@
       <option>M & F</option>
       <option>Business Development & IT</option>
       <option>QC</option>
-
     </select>
-
   </div>
 
   <!-- Phone Number -->
   <div class="form-group">
-
-    <label>
-      Phone Number <span class="required">*</span>
-    </label>
-
-    <input
-      type="tel"
-      id="bookerPhone"
-      placeholder="e.g. 0123456789"
-    >
-
+    <label>Phone Number <span class="required">*</span></label>
+    <input type="tel" id="bookerPhone" placeholder="e.g. 0123456789">
   </div>
 
 </div>
 
+<button type="button" class="submit-btn" onclick="submitBooking()">
+  <i class="fas fa-check"></i> Confirm Booking
+</button>
 </div>
 
 <!-- ========================= -->
-<!-- BOOKING HISTORY -->
+<!-- HISTORY SECTION -->
 <!-- ========================= -->
 
-<div id="bookingHistorySection" style="display:none;">
+<div id="sectionHistory" class="section">
 
-  <div class="history-card">
+  <div class="inner-tabs">
+    <button class="inner-tab active" id="tabMine" onclick="switchInner('mine')">
+      <i class="fas fa-user" style="margin-right:5px;font-size:12px"></i>My Bookings
+    </button>
+    <button class="inner-tab" id="tabRoom" onclick="switchInner('room')">
+      <i class="fas fa-building" style="margin-right:5px;font-size:12px"></i>Room Schedule
+    </button>
+  </div>
 
-    <h3 style="margin-bottom:20px;">
-      My Booking History
-    </h3>
+  <!-- MY BOOKINGS -->
+  <div id="innerMine" class="inner-section active">
 
-    <div id="bookingHistoryList">
-
-      <div class="empty">
-        No booking history found
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-val" id="myTotal">0</div>
       </div>
-
+      <div class="stat-card">
+        <div class="stat-label">Upcoming</div>
+        <div class="stat-val" id="myUpcoming" style="color:#1d4ed8">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-val" id="myCompleted" style="color:#15803d">0</div>
+      </div>
     </div>
 
+    <div class="hist-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="mySearch" placeholder="Search event or room..." oninput="renderMine()">
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setMyFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setMyFilter('upcoming', this)">Upcoming</button>
+      <button class="filter-btn" onclick="setMyFilter('completed', this)">Completed</button>
+      <button class="filter-btn" onclick="setMyFilter('cancelled', this)">Cancelled</button>
+    </div>
+
+    <div id="myList"></div>
+  </div>
+
+  <!-- ROOM SCHEDULE -->
+  <div id="innerRoom" class="inner-section">
+
+    <div class="hist-search">
+      <i class="fas fa-search"></i>
+      <input type="text" id="roomSearch" placeholder="Search event or person..." oninput="renderRoom()">
+    </div>
+
+    <div class="filter-row" id="roomPills"></div>
+
+    <div id="roomList"></div>
   </div>
 
 </div>
@@ -525,211 +776,411 @@
 
 <script>
 
-function showBookingForm() {
+/* ---------- TAB SWITCHING ---------- */
 
-  document.getElementById("bookingFormSection")
-    .style.display = "block";
-
-  document.getElementById("bookingHistorySection")
-    .style.display = "none";
-
-  document.getElementById("newBookingBtn")
-    .classList.add("active");
-
-  document.getElementById("historyBtn")
-    .classList.remove("active");
-}
-
-function showBookingHistory() {
-
-  document.getElementById("bookingFormSection")
-    .style.display = "none";
-
-  document.getElementById("bookingHistorySection")
-    .style.display = "block";
-
-  document.getElementById("historyBtn")
-    .classList.add("active");
-
-  document.getElementById("newBookingBtn")
-    .classList.remove("active");
-
-  loadBookingHistory();
-}
-
-async function loadBookingHistory() {
-
-  const historyContainer =
-    document.getElementById("bookingHistoryList");
-
-  historyContainer.innerHTML = `
-    <div class="empty">
-      Loading booking history...
-    </div>
-  `;
-
-  try {
-
-    const userData =
-      localStorage.getItem("user") ||
-      sessionStorage.getItem("user");
-
-    const user = JSON.parse(userData);
-
-    const res =
-      await fetch(`${API}/api/bookings/user/${user.id}`);
-
-    const bookings = await res.json();
-
-    if (!Array.isArray(bookings) || bookings.length === 0) {
-
-      historyContainer.innerHTML = `
-        <div class="empty">
-          No booking history found
-        </div>
-      `;
-
-      return;
-    }
-
-    historyContainer.innerHTML = "";
-
-    bookings.forEach(item => {
-
-      historyContainer.innerHTML += `
-
-        <div class="history-card">
-
-          <h4>${item.event_name}</h4>
-
-          <p>
-            <strong>Room:</strong>
-            ${item.room_name}
-          </p>
-
-          <p>
-            <strong>Date:</strong>
-            ${item.booking_date}
-          </p>
-
-          <p>
-            <strong>Time:</strong>
-            ${item.start_time} - ${item.end_time}
-          </p>
-
-        </div>
-
-      `;
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    historyContainer.innerHTML = `
-      <div class="empty">
-        Failed to load booking history
-      </div>
-    `;
+function showSection(s) {
+  document.getElementById('sectionForm').classList.toggle('active', s === 'form');
+  document.getElementById('sectionHistory').classList.toggle('active', s === 'history');
+  document.getElementById('newBookingBtn').classList.toggle('active', s === 'form');
+  document.getElementById('historyBtn').classList.toggle('active', s === 'history');
+  if (s === 'history') {
+    loadMyBookings();
+    loadRoomSchedule();
   }
 }
 
-async function checkAvailability() {
+function switchInner(t) {
+  document.getElementById('innerMine').classList.toggle('active', t === 'mine');
+  document.getElementById('innerRoom').classList.toggle('active', t === 'room');
+  document.getElementById('tabMine').classList.toggle('active', t === 'mine');
+  document.getElementById('tabRoom').classList.toggle('active', t === 'room');
+}
 
-  const room =
-    document.getElementById("roomSelect").value;
+/* ---------- FORM LOGIC ---------- */
 
-  const date =
-    document.getElementById("bookingDate").value;
+function onFieldChange() {
+  const room = document.getElementById('roomSelect').value;
+  const date = document.getElementById('bookingDate').value;
+  const ready = room && date;
 
-  if (!room || !date) {
+  document.getElementById('checkBtn').disabled = !ready;
+  document.getElementById('checkHint').style.display = ready ? 'none' : 'flex';
+  document.getElementById('startHint').style.display = ready ? 'flex' : 'none';
 
-    showToast(
-      "Please select room and date first",
-      "error"
-    );
+  if (!ready) {
+    document.getElementById('availabilityGrid').style.display = 'none';
+    document.getElementById('availLegend').style.display = 'none';
+  }
+}
 
+function updateEndTime() {
+  const start = document.getElementById('startTime').value;
+  const hrs   = parseInt(document.getElementById('durationHours').value) || 0;
+  const mins  = parseInt(document.getElementById('durationMins').value)  || 0;
+
+  if (!start || (hrs === 0 && mins === 0)) {
+    document.getElementById('endTime').value = '';
     return;
   }
 
-  const grid =
-    document.getElementById("availabilityGrid");
+  const [h, m] = start.split(':').map(Number);
+  const total  = h * 60 + m + hrs * 60 + mins;
+  const eh     = Math.floor(total / 60) % 24;
+  const em     = total % 60;
+  const ap     = eh >= 12 ? 'PM' : 'AM';
+  const dh     = eh > 12 ? eh - 12 : (eh === 0 ? 12 : eh);
 
-  grid.innerHTML = "";
+  document.getElementById('endTime').value =
+    `${dh}:${String(em).padStart(2, '0')} ${ap}`;
+}
+
+async function checkAvailability() {
+  const room = document.getElementById('roomSelect').value;
+  const date = document.getElementById('bookingDate').value;
+
+  if (!room || !date) {
+    showToast('Please select room and date first', 'error');
+    return;
+  }
+
+  const grid   = document.getElementById('availabilityGrid');
+  const legend = document.getElementById('availLegend');
+  const btnTxt = document.getElementById('checkBtnText');
+
+  grid.style.display   = 'none';
+  legend.style.display = 'none';
+  btnTxt.textContent   = 'Checking...';
 
   try {
-
-    const res =
-      await fetch(
-        `${API}/api/bookings/slots?room_id=${room}&date=${date}`
-      );
-
+    const res    = await fetch(`${API}/api/bookings/slots?room_id=${room}&date=${date}`);
     const booked = await res.json();
 
-    const bookedTimes = [];
-
-    booked.forEach(item => {
-
-      bookedTimes.push(
-        item.start_time.slice(0,5)
-      );
-    });
-
-    const slots = [
-
-      "08:00","09:00","10:00","11:00",
-      "12:00","13:00","14:00","15:00",
-      "16:00","17:00","18:00","19:00",
-      "20:00","21:00","22:00"
-
-    ];
-
-    slots.forEach(time => {
-
-      const btn =
-        document.createElement("button");
-
-      btn.innerText = time;
-
-      btn.classList.add("time-slot-btn");
-
-      if (bookedTimes.includes(time)) {
-
-        btn.classList.add("booked");
-
-      } else {
-
-        btn.classList.add("available");
-
-        btn.onclick = () => {
-
-          document
-            .querySelectorAll(".time-slot-btn")
-            .forEach(b =>
-              b.classList.remove("selected")
-            );
-
-          btn.classList.add("selected");
-
-          document.getElementById("startTime")
-            .value = time;
-
-          updateEndTime();
-        };
-      }
-
-      grid.appendChild(btn);
-    });
+    const bookedTimes = booked.map(b => b.start_time.slice(0, 5));
+    renderSlots(grid, legend, bookedTimes);
 
   } catch (err) {
-
     console.error(err);
-
-    showToast(
-      "Failed to check availability",
-      "error"
-    );
+    showToast('Failed to check availability', 'error');
+  } finally {
+    btnTxt.textContent = 'Check Live Availability';
   }
+}
+
+function renderSlots(grid, legend, bookedTimes) {
+  const slots = [
+    '08:00','09:00','10:00','11:00',
+    '12:00','13:00','14:00','15:00',
+    '16:00','17:00','18:00','19:00',
+    '20:00','21:00','22:00','23:00'
+  ];
+
+  grid.innerHTML = '';
+  grid.style.display  = 'grid';
+  legend.style.display = 'flex';
+
+  slots.forEach(time => {
+    const btn = document.createElement('button');
+    btn.innerText  = time;
+    btn.type       = 'button';
+    btn.classList.add('time-slot-btn');
+
+    if (bookedTimes.includes(time)) {
+      btn.classList.add('booked');
+      btn.disabled = true;
+    } else {
+      btn.classList.add('available');
+      btn.onclick = () => {
+        document.querySelectorAll('.time-slot-btn')
+          .forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('startTime').value = time;
+        updateEndTime();
+      };
+    }
+
+    grid.appendChild(btn);
+  });
+}
+
+async function submitBooking() {
+  const room  = document.getElementById('roomSelect').value;
+  const date  = document.getElementById('bookingDate').value;
+  const start = document.getElementById('startTime').value;
+  const hrs   = document.getElementById('durationHours').value;
+  const mins  = document.getElementById('durationMins').value;
+  const event = document.getElementById('eventName').value.trim();
+  const name  = document.getElementById('bookerName').value.trim();
+  const dept  = document.getElementById('bookerDept').value;
+  const phone = document.getElementById('bookerPhone').value.trim();
+
+  if (!room || !date || !start || (!hrs && !mins) || !event || !name || !dept || !phone) {
+    showToast('Please fill in all required fields', 'error');
+    return;
+  }
+
+  try {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const user = JSON.parse(userData);
+
+    const res = await fetch(`${API}/api/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id:      user.id,
+        room_id:      room,
+        booking_date: date,
+        start_time:   start,
+        duration_hrs: hrs,
+        duration_mins: mins,
+        event_name:   event,
+        booker_name:  name,
+        department:   dept,
+        phone:        phone
+      })
+    });
+
+    if (res.ok) {
+      showToast('Booking confirmed!', 'success');
+      resetForm();
+    } else {
+      showToast('Booking failed. Please try again.', 'error');
+    }
+
+  } catch (err) {
+    console.error(err);
+    showToast('Something went wrong.', 'error');
+  }
+}
+
+function resetForm() {
+  ['roomSelect','startTime','durationHours','durationMins','bookerDept'].forEach(id => {
+    document.getElementById(id).selectedIndex = 0;
+  });
+  ['bookingDate','eventName','bookerName','bookerPhone','endTime'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('availabilityGrid').style.display = 'none';
+  document.getElementById('availLegend').style.display      = 'none';
+  document.getElementById('checkHint').style.display        = 'flex';
+  document.getElementById('startHint').style.display        = 'none';
+  document.getElementById('checkBtn').disabled              = true;
+}
+
+/* ---------- AVATAR COLOR HELPER ---------- */
+
+const avatarPalette = [
+  { color:'#dbeafe', textColor:'#1e40af' },
+  { color:'#fce7f3', textColor:'#9d174d' },
+  { color:'#d1fae5', textColor:'#065f46' },
+  { color:'#fef3c7', textColor:'#92400e' },
+  { color:'#ede9fe', textColor:'#5b21b6' },
+  { color:'#fee2e2', textColor:'#991b1b' },
+  { color:'#ecfdf5', textColor:'#064e3b' },
+  { color:'#fff7ed', textColor:'#9a3412' },
+];
+
+function getAvatarStyle(name) {
+  const idx = (name || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % avatarPalette.length;
+  return avatarPalette[idx];
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ');
+  return parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : parts[0].slice(0, 2).toUpperCase();
+}
+
+function getBookingStatus(dateStr) {
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const bookDate = new Date(dateStr);
+  return bookDate >= today ? 'upcoming' : 'completed';
+}
+
+/* ---------- MY BOOKINGS ---------- */
+
+let myFilter   = 'all';
+let myData     = [];
+
+async function loadMyBookings() {
+  const list = document.getElementById('myList');
+  list.innerHTML = `<div class="hist-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
+
+  try {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    const user     = JSON.parse(userData);
+
+    const res  = await fetch(`${API}/api/bookings/user/${user.id}`);
+    const data = await res.json();
+
+    myData = Array.isArray(data) ? data.map(b => ({
+      id:     b.id,
+      event:  b.event_name,
+      room:   b.room_name,
+      date:   b.booking_date,
+      start:  b.start_time ? b.start_time.slice(0,5) : '',
+      end:    b.end_time   ? b.end_time.slice(0,5)   : '',
+      dept:   b.department,
+      status: b.status || getBookingStatus(b.booking_date),
+    })) : [];
+
+  } catch (err) {
+    console.error('loadMyBookings error:', err);
+    myData = [];
+  }
+
+  renderMine();
+}
+
+function setMyFilter(f, el) {
+  myFilter = f;
+  document.querySelectorAll('#innerMine .filter-btn')
+    .forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderMine();
+}
+
+function renderMine() {
+  const search   = (document.getElementById('mySearch').value || '').toLowerCase();
+  const filtered = myData.filter(b => {
+    const mf = myFilter === 'all' || b.status === myFilter;
+    const ms = !search
+      || b.event.toLowerCase().includes(search)
+      || b.room.toLowerCase().includes(search);
+    return mf && ms;
+  });
+
+  document.getElementById('myTotal').textContent     = myData.length;
+  document.getElementById('myUpcoming').textContent  = myData.filter(b => b.status === 'upcoming').length;
+  document.getElementById('myCompleted').textContent = myData.filter(b => b.status === 'completed').length;
+
+  const list = document.getElementById('myList');
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="hist-empty"><i class="fas fa-calendar-times"></i><p>No bookings found</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const d   = new Date(b.date);
+    const day = d.getDate();
+    const mon = d.toLocaleDateString('en', { month: 'short' });
+    const bc  = b.status === 'upcoming'  ? 'badge-upcoming'
+              : b.status === 'completed' ? 'badge-completed'
+              : 'badge-cancelled';
+    const bl  = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+    return `
+      <div class="booking-card">
+        <div class="date-block">
+          <div class="date-day">${day}</div>
+          <div class="date-mon">${mon}</div>
+        </div>
+        <div class="booking-info">
+          <div class="booking-title">${b.event}</div>
+          <div class="booking-meta">
+            <span class="meta-item"><i class="fas fa-door-open"></i> ${b.room}</span>
+            <span class="meta-item"><i class="fas fa-clock"></i> ${b.start} – ${b.end}</span>
+            <span class="meta-item"><i class="fas fa-building"></i> ${b.dept}</span>
+          </div>
+        </div>
+        <span class="status-badge ${bc}">${bl}</span>
+      </div>`;
+  }).join('');
+}
+
+/* ---------- ROOM SCHEDULE ---------- */
+
+const roomsList = ['All rooms', 'Meeting Room Pejabat Urusan', 'Meeting Room Director', 'The Nest'];
+let roomFilter  = 'All rooms';
+let roomData    = [];
+
+async function loadRoomSchedule() {
+  const list = document.getElementById('roomList');
+  list.innerHTML = `<div class="hist-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
+
+  try {
+    const res  = await fetch(`${API}/api/bookings/all`);
+    const data = await res.json();
+
+    roomData = Array.isArray(data) ? data.map(b => ({
+      id:     b.id,
+      event:  b.event_name,
+      room:   b.room_name,
+      date:   b.booking_date,
+      start:  b.start_time ? b.start_time.slice(0,5) : '',
+      end:    b.end_time   ? b.end_time.slice(0,5)   : '',
+      booker: b.booker_name || b.full_name || 'Unknown',
+      dept:   b.department,
+    })) : [];
+
+  } catch (err) {
+    console.error('loadRoomSchedule error:', err);
+    roomData = [];
+  }
+
+  buildRoomPills();
+  renderRoom();
+}
+
+function buildRoomPills() {
+  document.getElementById('roomPills').innerHTML = roomsList.map(r =>
+    `<button class="room-pill${r === roomFilter ? ' active' : ''}" onclick="setRoomFilter('${r}', this)">${r}</button>`
+  ).join('');
+}
+
+function setRoomFilter(f, el) {
+  roomFilter = f;
+  document.querySelectorAll('.room-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRoom();
+}
+
+function renderRoom() {
+  const search   = (document.getElementById('roomSearch').value || '').toLowerCase();
+  const filtered = roomData.filter(b => {
+    const rf = roomFilter === 'All rooms' || b.room === roomFilter;
+    const rs = !search
+      || b.event.toLowerCase().includes(search)
+      || (b.booker || '').toLowerCase().includes(search)
+      || (b.dept  || '').toLowerCase().includes(search);
+    return rf && rs;
+  });
+
+  const list = document.getElementById('roomList');
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="hist-empty"><i class="fas fa-calendar-times"></i><p>No bookings found</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const d        = new Date(b.date);
+    const day      = d.getDate();
+    const mon      = d.toLocaleDateString('en', { month: 'short' });
+    const av       = getAvatarStyle(b.booker);
+    const initials = getInitials(b.booker);
+    const firstName = (b.booker || 'Unknown').split(' ')[0];
+    return `
+      <div class="booking-card">
+        <div class="date-block">
+          <div class="date-day">${day}</div>
+          <div class="date-mon">${mon}</div>
+        </div>
+        <div class="booking-info">
+          <div class="booking-title">${b.event}</div>
+          <div class="booking-meta">
+            <span class="meta-item"><i class="fas fa-door-open"></i> ${b.room}</span>
+            <span class="meta-item"><i class="fas fa-clock"></i> ${b.start} – ${b.end}</span>
+            <span class="meta-item"><i class="fas fa-building"></i> ${b.dept}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
+          <div class="booker-avatar" style="background:${av.color};color:${av.textColor}">${initials}</div>
+          <span style="font-size:11px;color:#94a3b8;white-space:nowrap">${firstName}</span>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 </script>
