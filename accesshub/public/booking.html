@@ -1,13 +1,13 @@
-
 <style>
-  /* ========================= */
-/* TOP ACTIONS */
+
+/* ========================= */
+/* TOP ACTION BUTTONS */
 /* ========================= */
 
 .top-actions {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .tab-btn {
@@ -30,39 +30,123 @@
   color: white;
 }
 
-/* ========================= */
-/* TABLE */
-/* ========================= */
-
-.table-container {
-  overflow-x: auto;
-  margin-top: 20px;
+.tab-btn:hover {
+  opacity: 0.9;
 }
 
-#myBookingsTable {
+/* ========================= */
+/* FORM */
+/* ========================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group label span.required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* ========================= */
+/* INPUT + SELECT */
+/* ========================= */
+
+.form-group input,
+.form-group select {
+
   width: 100%;
-  border-collapse: collapse;
+  padding: 10px 14px;
+
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+
+  font-size: 14px;
+  color: #1e293b;
+
+  background: #f8fafc;
+
+  transition: border 0.2s;
+  outline: none;
 }
 
-#myBookingsTable th {
+/* ========================= */
+/* SELECT */
+/* ========================= */
+
+.form-group select {
+  cursor: pointer;
+}
+
+/* ========================= */
+/* FOCUS */
+/* ========================= */
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #3b82f6;
+  background: white;
+}
+
+/* ========================= */
+/* READ ONLY */
+/* ========================= */
+
+.form-group input:read-only {
   background: #f1f5f9;
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
+  color: #64748b;
+  cursor: not-allowed;
 }
 
-#myBookingsTable td {
-  padding: 12px;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 14px;
+/* ========================= */
+/* DURATION */
+/* ========================= */
+
+.duration-row {
+  display: flex;
+  gap: 10px;
 }
 
-.status-badge {
-  background: #dcfce7;
-  color: #166534;
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+.duration-row select {
+  flex: 1;
+}
+
+/* ========================= */
+/* HISTORY */
+/* ========================= */
+
+.history-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.history-card h4 {
+  margin: 0 0 10px;
+}
+
+.history-card p {
+  margin: 6px 0;
+  color: #475569;
 }
 
 .empty {
@@ -70,9 +154,11 @@
   color: #64748b;
   padding: 20px;
 }
+
 </style>
+
 <!-- ========================= -->
-<!-- TOP ACTION BUTTONS -->
+<!-- TOP BUTTONS -->
 <!-- ========================= -->
 
 <div class="top-actions">
@@ -103,7 +189,199 @@
 
 <div id="bookingFormSection">
 
-  <!-- EXISTING BOOKING FORM HERE -->
+<div class="form-grid">
+
+  <!-- Room Type -->
+  <div class="form-group full">
+
+    <label>
+      Room Type <span class="required">*</span>
+    </label>
+
+    <select id="roomSelect" onchange="onRoomOrDateChange()">
+
+      <option value="">
+        -- Select Room --
+      </option>
+
+      <option value="1">
+        Meeting Room Pejabat Urusan
+      </option>
+
+      <option value="2">
+        Meeting Room Director
+      </option>
+
+      <option value="3">
+        The Nest
+      </option>
+
+    </select>
+
+  </div>
+
+  <!-- Event Name -->
+  <div class="form-group full">
+
+    <label>
+      Event Name <span class="required">*</span>
+    </label>
+
+    <input
+      type="text"
+      id="eventName"
+      placeholder="e.g. Q3 Planning Meeting"
+    >
+
+  </div>
+
+  <!-- Date -->
+  <div class="form-group">
+
+    <label>
+      Date <span class="required">*</span>
+    </label>
+
+    <input
+      type="date"
+      id="bookingDate"
+      onchange="onRoomOrDateChange()"
+    >
+
+  </div>
+
+  <!-- Start Time -->
+  <div class="form-group">
+
+    <label>
+      Start Time <span class="required">*</span>
+    </label>
+
+    <select id="startTime" onchange="updateEndTime()">
+
+      <option value="">
+        -- Select Time --
+      </option>
+
+    </select>
+
+  </div>
+
+  <!-- Duration -->
+  <div class="form-group">
+
+    <label>
+      Duration <span class="required">*</span>
+    </label>
+
+    <div class="duration-row">
+
+      <select id="durationHours" onchange="updateEndTime()">
+        <option value="0">0 hr</option>
+        <option value="1">1 hr</option>
+        <option value="2">2 hr</option>
+        <option value="3">3 hr</option>
+        <option value="4">4 hr</option>
+      </select>
+
+      <select id="durationMins" onchange="updateEndTime()">
+        <option value="0">0 min</option>
+        <option value="30">30 min</option>
+      </select>
+
+    </div>
+
+  </div>
+
+  <!-- End Time -->
+  <div class="form-group">
+
+    <label>
+      End Time
+    </label>
+
+    <input
+      type="text"
+      id="endTime"
+      placeholder="Auto-calculated"
+      readonly
+    >
+
+  </div>
+
+  <!-- Booked Slots -->
+  <div class="form-group full">
+    <div class="slots-info" id="slotsInfo"></div>
+  </div>
+
+  <!-- Full Name -->
+  <div class="form-group">
+
+    <label>
+      Full Name <span class="required">*</span>
+    </label>
+
+    <input
+      type="text"
+      id="bookerName"
+      placeholder="Your full name"
+    >
+
+  </div>
+
+  <!-- Department -->
+  <div class="form-group">
+
+    <label>
+      Department <span class="required">*</span>
+    </label>
+
+    <select id="bookerDept">
+
+      <option value="">
+        -- Select Department --
+      </option>
+
+      <option>PJU</option>
+      <option>Farm - Development</option>
+      <option>Factory</option>
+      <option>BEET</option>
+      <option>ABF</option>
+      <option>Marketing</option>
+      <option>HRAISC</option>
+      <option>Farm - Flock Health</option>
+      <option>Farm - Technical</option>
+      <option>Fresh Frozen Chicken (FFC)</option>
+      <option>Farm - Planning</option>
+      <option>Naka Biolife</option>
+      <option>Sales</option>
+      <option>Logistic</option>
+      <option>Outlet Operation</option>
+      <option>Finance And Account</option>
+      <option>M & F</option>
+      <option>Business Development & IT</option>
+      <option>QC</option>
+
+    </select>
+
+  </div>
+
+  <!-- Phone Number -->
+  <div class="form-group">
+
+    <label>
+      Phone Number <span class="required">*</span>
+    </label>
+
+    <input
+      type="tel"
+      id="bookerPhone"
+      placeholder="e.g. 0123456789"
+    >
+
+  </div>
+
+</div>
 
 </div>
 
@@ -113,42 +391,17 @@
 
 <div id="bookingHistorySection" style="display:none;">
 
-  <div class="card">
+  <div class="history-card">
 
-    <h3>
-      <i
-        class="fa-solid fa-list"
-        style="color:#3b82f6;margin-right:8px;"
-      ></i>
-
-      My Bookings
+    <h3 style="margin-bottom:20px;">
+      My Booking History
     </h3>
 
-    <div class="table-container">
+    <div id="bookingHistoryList">
 
-      <table id="myBookingsTable">
-
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-
-        <tbody id="bookingHistoryList">
-
-          <tr>
-            <td colspan="5" class="empty">
-              No booking history found
-            </td>
-          </tr>
-
-        </tbody>
-
-      </table>
+      <div class="empty">
+        No booking history found
+      </div>
 
     </div>
 
@@ -156,16 +409,11 @@
 
 </div>
 
-</div>
-
-<!-- TOAST -->
-<div id="toast" class="toast"></div>
+<!-- ========================= -->
+<!-- SCRIPT -->
+<!-- ========================= -->
 
 <script>
-
-/* ========================= */
-/* SWITCH TABS */
-/* ========================= */
 
 function showBookingForm() {
 
@@ -199,21 +447,15 @@ function showBookingHistory() {
   loadBookingHistory();
 }
 
-/* ========================= */
-/* LOAD BOOKING HISTORY */
-/* ========================= */
-
 async function loadBookingHistory() {
 
   const historyContainer =
     document.getElementById("bookingHistoryList");
 
   historyContainer.innerHTML = `
-    <tr>
-      <td colspan="5" class="empty">
-        Loading booking history...
-      </td>
-    </tr>
+    <div class="empty">
+      Loading booking history...
+    </div>
   `;
 
   try {
@@ -232,11 +474,9 @@ async function loadBookingHistory() {
     if (!Array.isArray(bookings) || bookings.length === 0) {
 
       historyContainer.innerHTML = `
-        <tr>
-          <td colspan="5" class="empty">
-            No booking history found
-          </td>
-        </tr>
+        <div class="empty">
+          No booking history found
+        </div>
       `;
 
       return;
@@ -248,27 +488,26 @@ async function loadBookingHistory() {
 
       historyContainer.innerHTML += `
 
-        <tr>
+        <div class="history-card">
 
-          <td>${item.room_name || "-"}</td>
+          <h4>${item.event_name}</h4>
 
-          <td>${item.event_name || "-"}</td>
+          <p>
+            <strong>Room:</strong>
+            ${item.room_name}
+          </p>
 
-          <td>${item.booking_date || "-"}</td>
+          <p>
+            <strong>Date:</strong>
+            ${item.booking_date}
+          </p>
 
-          <td>
-            ${item.start_time || "-"}
-            -
-            ${item.end_time || "-"}
-          </td>
+          <p>
+            <strong>Time:</strong>
+            ${item.start_time} - ${item.end_time}
+          </p>
 
-          <td>
-            <span class="status-badge">
-              ${item.status || "Approved"}
-            </span>
-          </td>
-
-        </tr>
+        </div>
 
       `;
     });
@@ -278,11 +517,9 @@ async function loadBookingHistory() {
     console.error(err);
 
     historyContainer.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty">
-          Failed to load booking history
-        </td>
-      </tr>
+      <div class="empty">
+        Failed to load booking history
+      </div>
     `;
   }
 }
