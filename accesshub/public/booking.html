@@ -615,6 +615,7 @@ color: white;
     <label>Duration <span class="required">*</span></label>
     <div class="duration-row">
       <select id="durationHours" onchange="updateEndTime()">
+        <option value="">-- hrs --</option>
         <option value="0">0 hr</option>
         <option value="1">1 hr</option>
         <option value="2">2 hr</option>
@@ -622,6 +623,7 @@ color: white;
         <option value="4">4 hr</option>
       </select>
       <select id="durationMins" onchange="updateEndTime()">
+        <option value="">-- min --</option>
         <option value="0">0 min</option>
         <option value="30">30 min</option>
       </select>
@@ -815,8 +817,8 @@ function onFieldChange() {
 
 function updateEndTime() {
   const start = document.getElementById('startTime').value;
-  const hrs   = parseInt(document.getElementById('durationHours').value) || 0;
-  const mins  = parseInt(document.getElementById('durationMins').value)  || 0;
+  const hrs   = parseInt(document.getElementById('durationHours').value)  || 0;
+  const mins  = parseInt(document.getElementById('durationMins').value)   || 0;
 
   if (!start || (hrs === 0 && mins === 0)) {
     document.getElementById('endTime').value = '';
@@ -847,23 +849,34 @@ async function checkAvailability() {
   const legend = document.getElementById('availLegend');
   const btnTxt = document.getElementById('checkBtnText');
 
-  grid.style.display   = 'none';
+  grid.innerHTML   = '';
+  grid.style.display   = 'grid';
   legend.style.display = 'none';
   btnTxt.textContent   = 'Checking...';
 
+  /* show a loading skeleton row */
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:14px;color:#94a3b8;font-size:13px;">
+    <i class="fas fa-spinner fa-spin"></i> Loading slots...
+  </div>`;
+
+  let bookedTimes = [];
+
   try {
-    const res    = await fetch(`${API}/api/bookings/slots?room_id=${room}&date=${date}`);
-    const booked = await res.json();
-
-    const bookedTimes = booked.map(b => b.start_time.slice(0, 5));
-    renderSlots(grid, legend, bookedTimes);
-
+    const res = await fetch(`${API}/api/bookings/slots?room_id=${room}&date=${date}`);
+    if (res.ok) {
+      const booked = await res.json();
+      bookedTimes  = Array.isArray(booked)
+        ? booked.map(b => (b.start_time || '').slice(0, 5)).filter(Boolean)
+        : [];
+    }
   } catch (err) {
-    console.error(err);
-    showToast('Failed to check availability', 'error');
+    console.error('checkAvailability error:', err);
+    /* still render grid — just treat all slots as available */
   } finally {
     btnTxt.textContent = 'Check Live Availability';
   }
+
+  renderSlots(grid, legend, bookedTimes);
 }
 
 function renderSlots(grid, legend, bookedTimes) {
