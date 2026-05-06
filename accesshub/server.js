@@ -115,6 +115,17 @@ async function setupDatabase() {
 const bookingRoutes = require("./routes/booking");
 app.use("/api/bookings", bookingRoutes);
 
+
+// Keep DB alive
+setInterval(async () => {
+  try {
+    await db.query("SELECT 1");
+    console.log("🏓 DB ping OK");
+  } catch (err) {
+    console.error("🏓 DB ping failed:", err.message);
+  }
+}, 5 * 60 * 1000); // every 5 minutes
+
 // ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
