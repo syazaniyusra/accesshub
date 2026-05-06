@@ -15,13 +15,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}                                                                                                     
+}
 
 /* ========================= */
 /* LAYOUT - BODY */
 /* ========================= */
 body {
-  font-family: "Segoe UI", sans-serif;                                                                                                                                                                                                                                                                    
+  font-family: "Segoe UI", sans-serif;
   background: #f1f5f9;
   display: flex;
 }
@@ -36,49 +36,36 @@ body {
   padding: 20px;
   position: fixed;
   height: 100vh;
-
-  display: flex;              
-  flex-direction: column;     
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar button {
   width: 100%;
   padding: 12px 16px;
   margin-bottom: 12px;
-
   border: none;
   border-radius: 10px;
-
   background: #334155;
   color: #e2e8f0;
-
   font-size: 14px;
   font-weight: 500;
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
   transition: all 0.25s ease;
 }
 
 .sidebar button:hover {
   background: #475569;
-  transform: translateX(3px);  
+  transform: translateX(3px);
 }
 
 .sidebar button.active {
   background: #3b82f6;
   color: white;
-
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.2); /* soft outline */
-}
-
-.sidebar button.active {
-  background: #3b82f6;
   border: 2px solid rgba(255,255,255,0.6);
 }
 
@@ -88,13 +75,37 @@ body {
 }
 
 /* ========================= */
-/* LOGOUT BUTTON STYLE */
+/* LOGOUT BUTTON */
 /* ========================= */
-
-.logout-btn:hover {
-  background: #ef4444;   /* red */
-  color: white;
+.logout-btn {
+  margin-top: auto;
+  background: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 15px;
+  transition: all 0.25s ease;
 }
+
+.sidebar .logout-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateX(3px);
+}
+
+.sidebar .logout-btn:active {
+  transform: scale(0.97);
+}
+
 /* ========================= */
 /* MAIN CONTENT */
 /* ========================= */
@@ -129,6 +140,7 @@ button.primary {
   padding: 10px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 /* ========================= */
@@ -174,104 +186,35 @@ th {
 /* ========================= */
 /* USERS TABLE */
 /* ========================= */
-
-/* Name */
 #userTable th:nth-child(1),
-#userTable td:nth-child(1) {
-  text-align: left;
-}
-
-/* Email */
+#userTable td:nth-child(1) { text-align: left; }
 #userTable th:nth-child(2),
-#userTable td:nth-child(2) {
-  text-align: left;
-}
-
-/* Role */
+#userTable td:nth-child(2) { text-align: left; }
 #userTable th:nth-child(3),
-#userTable td:nth-child(3) {
-  text-align: left;
-  width: 120px;
-}
-
-/* Departments */
+#userTable td:nth-child(3) { text-align: left; width: 120px; }
 #userTable th:nth-child(4),
-#userTable td:nth-child(4) {
-  text-align: left;
-  padding-left: 40px;
-}
-
-/* Action */
-#userTable td:last-child {
-  text-align: center;
-}
+#userTable td:nth-child(4) { text-align: left; padding-left: 40px; }
+#userTable th:last-child,
+#userTable td:last-child { text-align: center; }
 
 /* ========================= */
 /* LINKS TABLE */
 /* ========================= */
-
-/* name */
 #linkTable th:nth-child(1),
-#linkTable td:nth-child(1) {
-  text-align: left;
-}
-
-/* URL */
+#linkTable td:nth-child(1) { text-align: left; }
 #linkTable th:nth-child(2),
-#linkTable td:nth-child(2) {
-  text-align: center;
-}
-
-/* Department */
+#linkTable td:nth-child(2) { text-align: center; }
 #linkTable th:nth-child(3),
-#linkTable td:nth-child(3) {
-  text-align: left;
-}
+#linkTable td:nth-child(3) { text-align: left; }
+#linkTable th:last-child,
+#linkTable td:last-child { text-align: center; }
 
-/* Action */
-#linkTable td:last-child {
-  text-align: center;
-}
-
-/* link styling */
 #linkTable a {
   color: #3b82f6;
   text-decoration: none;
   font-weight: 500;
 }
-
-#linkTable a:hover {
-  text-decoration: underline;
-}
-
-/* ========================= */
-/* USERS TABLE */
-/* ========================= */
-
-/* Email */
-#userTable th:nth-child(1),
-#userTable td:nth-child(1) {
-  text-align: left;
-}
-
-/* Role */
-#userTable th:nth-child(2),
-#userTable td:nth-child(2) {
-  text-align: left;
-  width: 120px;
-}
-
-/* Departments */
-#userTable th:nth-child(3),
-#userTable td:nth-child(3) {
-  text-align: left;
-  padding-left: 40px;
-}
-
-/* Action */
-#userTable td:last-child {
-  text-align: center;
-}
+#linkTable a:hover { text-decoration: underline; }
 
 /* ========================= */
 /* BADGES */
@@ -285,67 +228,56 @@ th {
 }
 
 /* ========================= */
-/* ACTION BUTTONS - PRO */
+/* ACTION BUTTONS */
 /* ========================= */
-
 .action-buttons {
   display: flex;
   justify-content: center;
   gap: 10px;
 }
 
-/* BASE BUTTON */
 .action-buttons button {
   display: flex;
   align-items: center;
   gap: 6px;
-
   padding: 6px 14px;
-
   border: none;
   border-radius: 8px;
-
   font-size: 13px;
   font-weight: 500;
-
   cursor: pointer;
-
   transition: all 0.25s ease;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* EDIT BUTTON */
-.edit-btn {
-  background: #facc15;
-  color: #1e293b;
-}
-
+.edit-btn { background: #facc15; color: #1e293b; }
 .edit-btn:hover {
   background: #eab308;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
-/* DELETE BUTTON */
-.delete-btn {
-  background: #ef4444;
-  color: white;
-}
-
+.delete-btn { background: #ef4444; color: white; }
 .delete-btn:hover {
   background: #dc2626;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
-/* CLICK EFFECT */
-.action-buttons button:active {
-  transform: scale(0.95);
+.approve-btn { background: #22c55e; color: white; }
+.approve-btn:hover {
+  background: #16a34a;
+  transform: translateY(-2px);
 }
 
-.action-buttons i {
-  font-size: 12px;
+.reject-btn { background: #ef4444; color: white; }
+.reject-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
+
+.action-buttons button:active { transform: scale(0.95); }
+.action-buttons i { font-size: 12px; }
 
 .icon-only {
   padding: 8px;
@@ -354,23 +286,15 @@ th {
   justify-content: center;
 }
 
-#userTable th:last-child,
-#userTable td:last-child,
-#linkTable th:last-child,
-#linkTable td:last-child {
-  text-align: center;
-}
-
 /* ========================= */
 /* MODAL */
 /* ========================= */
 .modal {
-  display: none;              
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 999;
   background: rgba(0,0,0,0.4);
-
   justify-content: center;
   align-items: center;
 }
@@ -384,42 +308,8 @@ th {
   overflow-y: auto;
 }
 
-/* ========================= */
-/* MODAL COMPONENTS */
-/* ========================= */
-.modal-content h3 {
-  margin-bottom: 5px;
-}
+.modal-content h3 { margin-bottom: 5px; }
 
-.user-role {
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 15px;
-}
-
-.dept-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.dept-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  background: #f8fafc;
-  cursor: pointer;
-}
-
-.dept-item:hover {
-  background: #e2e8f0;
-}
-
-/* ========================= */
-/* MODAL BUTTONS */
-/* ========================= */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -432,6 +322,7 @@ th {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 .btn-update {
@@ -440,6 +331,7 @@ th {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 .btn-delete {
@@ -448,106 +340,37 @@ th {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 /* ========================= */
-/* MODERN TOAST */
+/* TOAST */
 /* ========================= */
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
-
   background: #ffffff;
   color: #1e293b;
-
   padding: 12px 16px;
   border-radius: 10px;
-
   font-size: 14px;
   font-weight: 500;
-
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-
-  /* 🔥 ADD THESE */
   width: auto;
-  max-width: 300px;        /* control length */
-  display: inline-block;   /* prevent full width */
-
+  max-width: 300px;
+  display: inline-block;
   opacity: 0;
   transform: translateY(-20px);
   transition: all 0.3s ease;
-
   z-index: 1000;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.toast {
   word-wrap: break-word;
 }
 
+.toast.show { opacity: 1; transform: translateY(0); }
 
 /* ========================= */
-/* FIX ACTION COLUMN */
-/* ========================= */
-
-/* apply to BOTH tables */
-#userTable th:last-child,
-#userTable td:last-child,
-#linkTable th:last-child,
-#linkTable td:last-child {
-  text-align: center;
-}
-
-/* ========================= */
-/* LOGOUT BUTTON */
-/* ========================= */
-
-.logout-btn {
-  margin-top: auto;   /* push to bottom */
-
-  background: #334155;   /* same as other buttons initially */
-  color: #e2e8f0;
-
-  border: none;
-  border-radius: 10px;
-
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 500;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  cursor: pointer;
-
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: auto;
-  padding-top: 15px;
-
-  transition: all 0.25s ease;
-}
-
-/* 🔥 HOVER (RED) */
-.sidebar .logout-btn:hover {
-  background: #ef4444;
-  color: white;
-  transform: translateX(3px);
-}
-
-/* OPTIONAL: ACTIVE CLICK EFFECT */
-.sidebar .logout-btn:active {
-  transform: scale(0.97);
-}
-
-/* ========================= */
-/* EDIT DEPARTMENTS FIX */
+/* EDIT DEPARTMENTS */
 /* ========================= */
 #editDepartments {
   display: flex;
@@ -568,9 +391,7 @@ th {
   cursor: pointer;
 }
 
-#editDepartments label:hover {
-  background: #e2e8f0;
-}
+#editDepartments label:hover { background: #e2e8f0; }
 
 #editDepartments input[type="checkbox"] {
   width: 16px;
@@ -580,11 +401,67 @@ th {
 }
 
 /* ========================= */
+/* BOOKING STATUS BADGES */
+/* ========================= */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-pending  { background: #fef9c3; color: #854d0e; }
+.status-approved { background: #dcfce7; color: #166534; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+/* ========================= */
+/* BOOKING FILTER BAR */
+/* ========================= */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-bar select,
+.filter-bar input {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  color: #1e293b;
+  background: #f8fafc;
+  margin: 0;
+}
+
+.filter-bar select:focus,
+.filter-bar input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* ========================= */
+/* BOOKINGS TABLE */
+/* ========================= */
+#bookingsTable th:last-child,
+#bookingsTable td:last-child { text-align: center; }
+
+.booking-detail {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ========================= */
 /* ANIMATION */
 /* ========================= */
 @keyframes pop {
   from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  to   { transform: scale(1);   opacity: 1; }
 }
 </style>
 </head>
@@ -592,7 +469,7 @@ th {
 <body>
 
 <!-- ========================= -->
-<!--  EDIT USER MODAL -->
+<!-- EDIT USER MODAL -->
 <!-- ========================= -->
 <div id="editModal" class="modal">
   <div class="modal-content">
@@ -600,10 +477,8 @@ th {
     <input type="text" id="editName" placeholder="Name">
     <input type="email" id="editEmail" placeholder="Email">
     <input type="password" id="editPassword" placeholder="New Password (optional)">
-
     <h4>Departments</h4>
     <div id="editDepartments"></div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="btn-update" onclick="confirmEdit()">Update</button>
@@ -611,21 +486,77 @@ th {
   </div>
 </div>
 
-
 <!-- ========================= -->
-<!--  DELETE MODAL (FIXED POSITION) -->
+<!-- DELETE MODAL -->
 <!-- ========================= -->
 <div id="deleteModal" class="modal">
-  <div class="modal-content delete-box">
-
+  <div class="modal-content">
     <h3>Confirm Delete</h3>
     <p id="deleteMessage">Are you sure you want to delete this?</p>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
       <button class="btn-delete" onclick="confirmDelete()">Delete</button>
     </div>
+  </div>
+</div>
 
+<!-- ========================= -->
+<!-- EDIT LINK MODAL -->
+<!-- ========================= -->
+<div id="editLinkModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Link</h3>
+    <input type="text" id="editLinkName" placeholder="Link Name">
+    <input type="text" id="editLinkURL" placeholder="URL">
+    <select id="editLinkDepartment"></select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditLinkModal()">Cancel</button>
+      <button class="btn-update" onclick="updateLink()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- LOGOUT MODAL -->
+<!-- ========================= -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn-delete" onclick="confirmLogout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- BOOKING DETAIL MODAL -->
+<!-- ========================= -->
+<div id="bookingDetailModal" class="modal">
+  <div class="modal-content" style="width:480px;">
+    <h3>Booking Details</h3>
+    <table style="width:100%; margin:16px 0; border-collapse:collapse;">
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px; width:40%;">Room</td>       <td id="dRoom"    style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Event</td>      <td id="dEvent"   style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Date</td>       <td id="dDate"    style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Time</td>       <td id="dTime"    style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Duration</td>   <td id="dDuration" style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Name</td>       <td id="dName"    style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Department</td> <td id="dDept"    style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Phone</td>      <td id="dPhone"   style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Status</td>     <td id="dStatus"  style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Submitted</td>  <td id="dCreated" style="font-size:13px; font-weight:500;"></td></tr>
+    </table>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBookingDetailModal()">Close</button>
+      <button class="btn-update approve-btn" id="detailApproveBtn" onclick="approveFromDetail()">
+        <i class="fa-solid fa-check"></i> Approve
+      </button>
+      <button class="btn-delete reject-btn" id="detailRejectBtn" onclick="rejectFromDetail()">
+        <i class="fa-solid fa-xmark"></i> Reject
+      </button>
+    </div>
   </div>
 </div>
 
@@ -634,12 +565,10 @@ th {
 <!-- ========================= -->
 <div class="sidebar">
   <h2>Admin Panel</h2>
-  <button onclick="showSection('usersSection')">Users</button>
-  <button onclick="showSection('linksSection')">Links</button>
-  <button onclick="showSection('bookingsSection')">
-  <i class="fa-solid fa-door-open"></i> Bookings
-    </button>
-  <button class="logout-btn" onclick="openLogoutModal()">Logout</button>
+  <button onclick="showSection('usersSection')"><i class="fa-solid fa-users"></i> Users</button>
+  <button onclick="showSection('linksSection')"><i class="fa-solid fa-link"></i> Links</button>
+  <button onclick="showSection('bookingsSection')"><i class="fa-solid fa-door-open"></i> Bookings</button>
+  <button class="logout-btn" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 </div>
 
 <!-- ========================= -->
@@ -647,32 +576,27 @@ th {
 <!-- ========================= -->
 <div class="main">
 
+<div id="toast" class="toast"></div>
+
 <!-- ========================= -->
 <!-- USERS SECTION -->
 <!-- ========================= -->
 <div id="usersSection">
-
   <div class="card">
     <h3>Create User</h3>
-
     <input id="name" placeholder="Name">
     <input id="email" placeholder="Email">
     <input id="password" placeholder="Password">
-
     <select id="role">
       <option value="user">User</option>
       <option value="admin">Admin</option>
     </select>
-
     <div id="departmentCheckboxes"></div>
-    
-
     <button class="primary" onclick="createUser()">Create User</button>
   </div>
 
   <div class="card">
     <h3>Users List</h3>
-
     <div class="table-container">
       <table id="userTable">
         <thead>
@@ -688,30 +612,22 @@ th {
       </table>
     </div>
   </div>
-
 </div>
-
-<div id="toast" class="toast"></div>
 
 <!-- ========================= -->
 <!-- LINKS SECTION -->
 <!-- ========================= -->
 <div id="linksSection" style="display:none;">
-
   <div class="card">
     <h3>Add Link</h3>
-
     <input id="linkName" placeholder="Link Name">
     <input id="linkURL" placeholder="URL">
-
     <select id="linkDepartment"></select>
-
     <button class="primary" onclick="createLink()">Add Link</button>
   </div>
 
   <div class="card">
     <h3>Links List</h3>
-
     <div class="table-container">
       <table id="linkTable">
         <thead>
@@ -725,71 +641,76 @@ th {
         <tbody></tbody>
       </table>
     </div>
-
   </div>
-
-</div>
-
 </div>
 
 <!-- ========================= -->
-<!-- EDIT LINK MODAL -->
+<!-- BOOKINGS SECTION -->
 <!-- ========================= -->
-<div id="editLinkModal" class="modal">
-  <div class="modal-content">
-   
-  <i class="fa-solid fa-pen"></i>
-</button>
+<div id="bookingsSection" style="display:none;">
+  <div class="card">
+    <h3>Room Bookings</h3>
 
-    <h3>Edit Link</h3>
+    <div class="filter-bar">
+      <select id="filterStatus" onchange="filterBookings()">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
 
-    <input type="text" id="editLinkName" placeholder="Link Name">
-    <input type="text" id="editLinkURL" placeholder="URL">
-    <select id="editLinkDepartment"></select>
+      <select id="filterRoom" onchange="filterBookings()">
+        <option value="">All Rooms</option>
+      </select>
 
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeEditLinkModal()">Cancel</button>
-      <button class="btn-update" onclick="updateLink()">Update</button>
+      <input type="date" id="filterDate" onchange="filterBookings()">
+
+      <button class="primary" onclick="clearBookingFilters()" style="width:auto; padding:8px 14px; border-radius:8px;">
+        Clear
+      </button>
     </div>
 
-  </div>
-</div>
-
-<!-- ========================= -->
-<!-- LOGOUT MODAL -->
-<!-- ========================= -->
-<div id="logoutModal" class="modal">
-  <div class="modal-content">
-
-    <h3>Confirm Logout</h3>
-    <p>Are you sure you want to logout?</p>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-      <button class="btn-delete" onclick="confirmLogout()">Logout</button>
+    <div class="table-container">
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Booked By</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
-
   </div>
 </div>
 
+</div><!-- end .main -->
 
 <script>
 
 /* ===================================================== */
 /* GLOBAL VARIABLES */
 /* ===================================================== */
-let editingUserId = null;
-let editingLinkId = null;
-
-let deleteType = null;
-let deleteId = null;
+let editingUserId  = null;
+let editingLinkId  = null;
+let deleteType     = null;
+let deleteId       = null;
+let allBookings    = [];
+let viewingBookingId = null;
 
 /* ===================================================== */
 /* SECTION SWITCHING */
 /* ===================================================== */
 function showSection(id) {
-  document.getElementById("usersSection").style.display = "none";
-  document.getElementById("linksSection").style.display = "none";
+  ["usersSection", "linksSection", "bookingsSection"].forEach(s => {
+    document.getElementById(s).style.display = "none";
+  });
   document.getElementById(id).style.display = "block";
 }
 
@@ -798,21 +719,12 @@ function showSection(id) {
 /* ===================================================== */
 function showToast(message, type = "default") {
   const toast = document.getElementById("toast");
-
   toast.classList.remove("show");
   void toast.offsetWidth;
-
   toast.innerText = message;
-
-  if (type === "error") {
-    toast.style.borderLeft = "4px solid #ef4444";
-  }
-
+  toast.style.borderLeft = type === "error" ? "4px solid #ef4444" : "4px solid #22c55e";
   toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2500);
+  setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
 /* ===================================================== */
@@ -821,34 +733,23 @@ function showToast(message, type = "default") {
 async function loadDepartments() {
   const res = await fetch(`${API}/api/departments`);
   const data = await res.json();
-
   const checkbox = document.getElementById("departmentCheckboxes");
   checkbox.innerHTML = "";
-
   data.forEach(dep => {
     checkbox.innerHTML += `
       <label class="checkbox-card">
-        <input type="checkbox" value="${dep.id}">
-        ${dep.name}
-      </label>
-    `;
+        <input type="checkbox" value="${dep.id}"> ${dep.name}
+      </label>`;
   });
 }
 
-/* ===================================================== */
-/* LOAD LINK DROPDOWN */
-/* ===================================================== */
 async function loadLinkDepartments() {
   const res = await fetch(`${API}/api/departments`);
   const data = await res.json();
-
   const dropdown = document.getElementById("linkDepartment");
   dropdown.innerHTML = "<option value=''>Select Department</option>";
-
   data.forEach(dep => {
-    dropdown.innerHTML += `
-      <option value="${dep.id}">${dep.name}</option>
-    `;
+    dropdown.innerHTML += `<option value="${dep.id}">${dep.name}</option>`;
   });
 }
 
@@ -858,44 +759,26 @@ async function loadLinkDepartments() {
 async function loadUsers() {
   const res = await fetch(`${API}/api/users`);
   const users = await res.json();
-
   const tbody = document.querySelector("#userTable tbody");
   tbody.innerHTML = "";
-
   users.forEach(user => {
     tbody.innerHTML += `
       <tr>
         <td>${user.name || "-"}</td>
         <td>${user.email}</td>
         <td>${user.role}</td>
-
-        <td>
-          ${
-            user.departments?.map(d =>
-              `<span class="badge">${d.name}</span>`
-            ).join("") || "-"
-          }
-        </td>
-
+        <td>${user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "-"}</td>
         <td>
           <div class="action-buttons">
-
-            <button 
-              class="edit-btn icon-only"
-              onclick="editUser(${user.id})">
+            <button class="edit-btn icon-only" onclick="editUser(${user.id})">
               <i class="fa-solid fa-pen"></i>
             </button>
-
-            <button 
-              class="delete-btn icon-only"
-              onclick="openDeleteModal('user', ${user.id})">
+            <button class="delete-btn icon-only" onclick="openDeleteModal('user', ${user.id})">
               <i class="fa-solid fa-trash"></i>
             </button>
-
           </div>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
@@ -903,19 +786,14 @@ async function loadUsers() {
 /* CREATE USER */
 /* ===================================================== */
 async function createUser() {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
+  const name     = document.getElementById("name").value;
+  const email    = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const role = document.getElementById("role").value;
-
+  const role     = document.getElementById("role").value;
   const deps = [];
-  document.querySelectorAll("#departmentCheckboxes input:checked")
-    .forEach(cb => deps.push(cb.value));
+  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
 
-  if (!name || !email || !password) {
-    showToast("Please fill all fields", "error");
-    return;
-  }
+  if (!name || !email || !password) { showToast("Please fill all fields", "error"); return; }
 
   const res = await fetch(`${API}/api/users`, {
     method: "POST",
@@ -923,21 +801,14 @@ async function createUser() {
     body: JSON.stringify({ name, email, password, role, departments: deps })
   });
 
-  if (!res.ok) {
-    showToast("Failed to create user", "error");
-    return;
-  }
+  if (!res.ok) { showToast("Failed to create user", "error"); return; }
 
   showToast("User created!");
-
-  // Clear form
   document.getElementById("name").value = "";
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
   document.getElementById("role").value = "user";
-  document.querySelectorAll("#departmentCheckboxes input:checked")
-    .forEach(cb => cb.checked = false);
-
+  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => cb.checked = false);
   loadUsers();
 }
 
@@ -947,10 +818,8 @@ async function createUser() {
 async function loadLinks() {
   const res = await fetch(`${API}/api/links`);
   const links = await res.json();
-
   const tbody = document.querySelector("#linkTable tbody");
   tbody.innerHTML = "";
-
   links.forEach(link => {
     tbody.innerHTML += `
       <tr>
@@ -959,19 +828,15 @@ async function loadLinks() {
         <td>${link.department_name}</td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only"
-              onclick="editLink(${link.id}, '${link.name}', '${link.url}', ${link.department_id})">
+            <button class="edit-btn icon-only" onclick="editLink(${link.id}, '${link.name}', '${link.url}', ${link.department_id})">
               <i class="fa-solid fa-pen"></i>
             </button>
-
-            <button class="delete-btn icon-only"
-              onclick="openDeleteModal('link', ${link.id})">
+            <button class="delete-btn icon-only" onclick="openDeleteModal('link', ${link.id})">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
@@ -979,14 +844,11 @@ async function loadLinks() {
 /* CREATE LINK */
 /* ===================================================== */
 async function createLink() {
-  const name = document.getElementById("linkName").value;
-  const url = document.getElementById("linkURL").value;
+  const name          = document.getElementById("linkName").value;
+  const url           = document.getElementById("linkURL").value;
   const department_id = document.getElementById("linkDepartment").value;
 
-  if (!name || !url || !department_id) {
-    showToast("Please fill all fields", "error");
-    return;
-  }
+  if (!name || !url || !department_id) { showToast("Please fill all fields", "error"); return; }
 
   const res = await fetch(`${API}/api/links`, {
     method: "POST",
@@ -994,18 +856,12 @@ async function createLink() {
     body: JSON.stringify({ name, url, department_id })
   });
 
-  if (!res.ok) {
-    showToast("Failed to add link", "error");
-    return;
-  }
+  if (!res.ok) { showToast("Failed to add link", "error"); return; }
 
   showToast("Link added!");
-
-  // Clear form
   document.getElementById("linkName").value = "";
   document.getElementById("linkURL").value = "";
   document.getElementById("linkDepartment").value = "";
-
   loadLinks();
 }
 
@@ -1014,29 +870,24 @@ async function createLink() {
 /* ===================================================== */
 async function editLink(id, name, url, department_id) {
   editingLinkId = id;
-
   document.getElementById("editLinkName").value = name;
-  document.getElementById("editLinkURL").value = url;
+  document.getElementById("editLinkURL").value  = url;
 
-  // Load departments into edit dropdown
-  const res = await fetch(`${API}/api/departments`);
+  const res  = await fetch(`${API}/api/departments`);
   const deps = await res.json();
   const dropdown = document.getElementById("editLinkDepartment");
   dropdown.innerHTML = "";
   deps.forEach(dep => {
     dropdown.innerHTML += `<option value="${dep.id}" ${dep.id == department_id ? "selected" : ""}>${dep.name}</option>`;
   });
-
   document.getElementById("editLinkModal").style.display = "flex";
 }
 
-function closeEditLinkModal() {
-  document.getElementById("editLinkModal").style.display = "none";
-}
+function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
 
 async function updateLink() {
-  const name = document.getElementById("editLinkName").value;
-  const url = document.getElementById("editLinkURL").value;
+  const name          = document.getElementById("editLinkName").value;
+  const url           = document.getElementById("editLinkURL").value;
   const department_id = document.getElementById("editLinkDepartment").value;
 
   await fetch(`${API}/api/links/${editingLinkId}`, {
@@ -1055,16 +906,14 @@ async function updateLink() {
 /* ===================================================== */
 function openDeleteModal(type, id) {
   deleteType = type;
-  deleteId = id;
+  deleteId   = id;
   document.getElementById("deleteModal").style.display = "flex";
 }
 
-function closeDeleteModal() {
-  document.getElementById("deleteModal").style.display = "none";
-}
+function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; }
 
 async function confirmDelete() {
-  let url = deleteType === "link"
+  const url = deleteType === "link"
     ? `${API}/api/links/${deleteId}`
     : deleteType === "booking"
     ? `${API}/api/bookings/${deleteId}`
@@ -1074,9 +923,242 @@ async function confirmDelete() {
   showToast("Deleted!");
   closeDeleteModal();
 
-  if (deleteType === "link") loadLinks();
+  if (deleteType === "link")    loadLinks();
   else if (deleteType === "booking") loadBookings();
   else loadUsers();
+}
+
+/* ===================================================== */
+/* EDIT USER */
+/* ===================================================== */
+async function editUser(id) {
+  const resUser = await fetch(`${API}/api/users/${id}`);
+  const user    = await resUser.json();
+  const resDep  = await fetch(`${API}/api/departments`);
+  const departments = await resDep.json();
+
+  editingUserId = id;
+  document.getElementById("editModal").style.display = "flex";
+  document.getElementById("editName").value  = user.name  || "";
+  document.getElementById("editEmail").value = user.email || "";
+
+  const container = document.getElementById("editDepartments");
+  container.innerHTML = "";
+  departments.forEach(dep => {
+    const checked = user.departments?.some(d => d.id === dep.id);
+    container.innerHTML += `
+      <label class="checkbox-card">
+        <input type="checkbox" value="${dep.id}" ${checked ? "checked" : ""}>
+        <span>${dep.name}</span>
+      </label>`;
+  });
+}
+
+function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
+
+async function confirmEdit() {
+  const name     = document.getElementById("editName").value;
+  const email    = document.getElementById("editEmail").value;
+  const password = document.getElementById("editPassword").value;
+  const deps = [];
+  document.querySelectorAll("#editDepartments input:checked").forEach(cb => deps.push(cb.value));
+
+  const body = { name, email, departments: deps };
+  if (password) body.password = password;
+
+  await fetch(`${API}/api/users/${editingUserId}`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  showToast("User updated!");
+  closeEditModal();
+  loadUsers();
+}
+
+/* ===================================================== */
+/* LOGOUT */
+/* ===================================================== */
+function openLogoutModal()  { document.getElementById("logoutModal").style.display = "flex"; }
+function closeLogoutModal() { document.getElementById("logoutModal").style.display = "none"; }
+
+function confirmLogout() {
+  localStorage.clear();
+  sessionStorage.clear();
+  showToast("Logged out successfully");
+  setTimeout(() => window.location.href = "login.html", 800);
+}
+
+/* ===================================================== */
+/* LOAD BOOKINGS */
+/* ===================================================== */
+async function loadBookings() {
+  const res = await fetch(`${API}/api/bookings`);
+  allBookings = await res.json();
+  renderBookings(allBookings);
+  loadBookingRoomFilter();
+}
+
+async function loadBookingRoomFilter() {
+  const res   = await fetch(`${API}/api/bookings/rooms`);
+  const rooms = await res.json();
+  const sel   = document.getElementById("filterRoom");
+  sel.innerHTML = `<option value="">All Rooms</option>`;
+  rooms.forEach(r => {
+    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+  });
+}
+
+/* ===================================================== */
+/* RENDER BOOKINGS */
+/* ===================================================== */
+function renderBookings(bookings) {
+  const tbody = document.querySelector("#bookingsTable tbody");
+  tbody.innerHTML = "";
+
+  if (!Array.isArray(bookings) || bookings.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:30px;">No bookings found</td></tr>`;
+    return;
+  }
+
+  bookings.forEach(b => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${b.room_name}</td>
+        <td>${b.event_name}</td>
+        <td>${formatBookingDate(b.date)}</td>
+        <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
+        <td>
+          ${b.name}
+          <div class="booking-detail">${b.department}</div>
+        </td>
+        <td>${b.phone}</td>
+        <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
+        <td>
+          <div class="action-buttons">
+            <button class="edit-btn icon-only" title="View Details" onclick="viewBookingDetail(${b.id})">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            ${b.status === "pending" ? `
+              <button class="approve-btn icon-only" title="Approve" onclick="updateBookingStatus(${b.id}, 'approved')">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <button class="reject-btn icon-only" title="Reject" onclick="updateBookingStatus(${b.id}, 'rejected')">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            ` : `
+              <button class="edit-btn icon-only" title="Reset to Pending" onclick="updateBookingStatus(${b.id}, 'pending')">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            `}
+            <button class="delete-btn icon-only" title="Delete" onclick="openDeleteModal('booking', ${b.id})">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+/* ===================================================== */
+/* FILTER BOOKINGS */
+/* ===================================================== */
+function filterBookings() {
+  const status = document.getElementById("filterStatus").value;
+  const roomId = document.getElementById("filterRoom").value;
+  const date   = document.getElementById("filterDate").value;
+
+  const filtered = allBookings.filter(b => {
+    const matchStatus = !status || b.status === status;
+    const matchRoom   = !roomId || String(b.room_id) === roomId;
+    const matchDate   = !date   || b.date.slice(0,10) === date;
+    return matchStatus && matchRoom && matchDate;
+  });
+
+  renderBookings(filtered);
+}
+
+function clearBookingFilters() {
+  document.getElementById("filterStatus").value = "";
+  document.getElementById("filterRoom").value   = "";
+  document.getElementById("filterDate").value   = "";
+  renderBookings(allBookings);
+}
+
+/* ===================================================== */
+/* UPDATE BOOKING STATUS */
+/* ===================================================== */
+async function updateBookingStatus(id, status) {
+  const res = await fetch(`${API}/api/bookings/${id}/status`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ status })
+  });
+
+  if (res.ok) {
+    showToast(capitalize(status) + " successfully!");
+    loadBookings();
+  } else {
+    showToast("Failed to update status", "error");
+  }
+}
+
+/* ===================================================== */
+/* VIEW BOOKING DETAIL MODAL */
+/* ===================================================== */
+function viewBookingDetail(id) {
+  const b = allBookings.find(x => x.id === id);
+  if (!b) return;
+  viewingBookingId = id;
+
+  document.getElementById("dRoom").textContent     = b.room_name;
+  document.getElementById("dEvent").textContent    = b.event_name;
+  document.getElementById("dDate").textContent     = formatBookingDate(b.date);
+  document.getElementById("dTime").textContent     = formatBookingTime(b.start_time) + " – " + formatBookingTime(b.end_time);
+  document.getElementById("dDuration").textContent = (b.duration_hours > 0 ? b.duration_hours + " hr " : "") + (b.duration_minutes > 0 ? b.duration_minutes + " min" : "");
+  document.getElementById("dName").textContent     = b.name;
+  document.getElementById("dDept").textContent     = b.department;
+  document.getElementById("dPhone").textContent    = b.phone;
+  document.getElementById("dStatus").innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
+  document.getElementById("dCreated").textContent  = new Date(b.created_at).toLocaleString("en-MY");
+
+  document.getElementById("detailApproveBtn").style.display = b.status !== "approved" ? "inline-flex" : "none";
+  document.getElementById("detailRejectBtn").style.display  = b.status !== "rejected"  ? "inline-flex" : "none";
+
+  document.getElementById("bookingDetailModal").style.display = "flex";
+}
+
+function closeBookingDetailModal() { document.getElementById("bookingDetailModal").style.display = "none"; }
+
+async function approveFromDetail() {
+  await updateBookingStatus(viewingBookingId, "approved");
+  closeBookingDetailModal();
+}
+
+async function rejectFromDetail() {
+  await updateBookingStatus(viewingBookingId, "rejected");
+  closeBookingDetailModal();
+}
+
+/* ===================================================== */
+/* HELPERS */
+/* ===================================================== */
+function formatBookingDate(d) {
+  return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
+}
+
+function formatBookingTime(t) {
+  if (!t) return "";
+  const [h, m] = t.slice(0,5).split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour  = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2,"0")} ${ampm}`;
+}
+
+function capitalize(s) {
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /* ===================================================== */
@@ -1084,7 +1166,6 @@ async function confirmDelete() {
 /* ===================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("INIT RUNNING...");
-
   try {
     await loadDepartments();
     await loadLinkDepartments();
@@ -1098,98 +1179,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-/* ===================================================== */
-/* EDIT USER */
-/* ===================================================== */
-async function editUser(id) {
-
-  const resUser = await fetch(`${API}/api/users/${id}`);
-  const user = await resUser.json();
-
-  const resDep = await fetch(`${API}/api/departments`);
-  const departments = await resDep.json();
-
-  editingUserId = id;
-
-  document.getElementById("editModal").style.display = "flex";
-
-  document.getElementById("editName").value = user.name || "";
-  document.getElementById("editEmail").value = user.email || "";
-
-  const container = document.getElementById("editDepartments");
-  container.innerHTML = "";
-
-  departments.forEach(dep => {
-
-    const checked = user.departments?.some(d => d.id === dep.id);
-
-    container.innerHTML += `
-      <label class="checkbox-card">
-        <input type="checkbox" value="${dep.id}" ${checked ? "checked" : ""}>
-        <span>${dep.name}</span>
-      </label>
-    `;
-  });
-}
-
-function closeEditModal() {
-  document.getElementById("editModal").style.display = "none";
-}
-
-/* ===================================================== */
-/* UPDATE USER */
-/* ===================================================== */
-async function confirmEdit() {
-
-  const name = document.getElementById("editName").value;
-  const email = document.getElementById("editEmail").value;
-  const password = document.getElementById("editPassword").value;
-
-  const deps = [];
-  document.querySelectorAll("#editDepartments input:checked")
-    .forEach(cb => deps.push(cb.value));
-
-  const body = { name, email, departments: deps };
-
-  if (password) {
-    body.password = password;
-  }
-
-  await fetch(`${API}/api/users/${editingUserId}`, {
-    method: "PUT",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(body)
-  });
-
-  showToast("User updated!");
-
-  closeEditModal();
-  loadUsers();
-}
-
-/* ===================================================== */
-/* LOGOUT */
-/* ===================================================== */
-function openLogoutModal() {
-  document.getElementById("logoutModal").style.display = "flex";
-}
-
-function closeLogoutModal() {
-  document.getElementById("logoutModal").style.display = "none";
-}
-
-function confirmLogout() {
-  localStorage.clear();
-  sessionStorage.clear();
-
-  showToast("Logged out successfully");
-
-  setTimeout(() => {
-    window.location.href = "login.html";
-  }, 800);
-}
-
 </script>
-
 </body>
 </html>
