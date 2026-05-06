@@ -1,119 +1,251 @@
-<!-- Room Type -->
-<div class="form-group full">
-  <label>Room Type <span class="required">*</span></label>
+<!-- ========================= -->
+<!-- FORM -->
+<!-- ========================= -->
 
-  <select id="roomSelect" onchange="onRoomOrDateChange()">
+<div class="form-grid">
 
-    <option value="">-- Select Room --</option>
+  <!-- Room Type -->
+  <div class="form-group full">
 
-    <option value="1">
-      Meeting Room Pejabat Urusan
-    </option>
+    <label>
+      Room Type <span class="required">*</span>
+    </label>
 
-    <option value="2">
-      Meeting Room Director
-    </option>
+    <select id="roomSelect" onchange="onRoomOrDateChange()">
 
-    <option value="3">
-      The Nest
-    </option>
+      <option value="">
+        -- Select Room --
+      </option>
 
-  </select>
-</div>
+      <option value="1">
+        Meeting Room Pejabat Urusan
+      </option>
 
-<!-- Event Name -->
-<div class="form-group full">
-  <label>Event Name <span class="required">*</span></label>
-  <input type="text" id="eventName" placeholder="e.g. Q3 Planning Meeting">
-</div>
+      <option value="2">
+        Meeting Room Director
+      </option>
 
-<!-- Date -->
-<div class="form-group">
-  <label>Date <span class="required">*</span></label>
-  <input type="date" id="bookingDate" onchange="onRoomOrDateChange()">
-</div>
+      <option value="3">
+        The Nest
+      </option>
 
-<!-- Time -->
-<div class="form-group">
-  <label>Start Time <span class="required">*</span></label>
-
-  <select id="startTime" onchange="updateEndTime()">
-    <option value="">-- Select Time --</option>
-  </select>
-</div>
-
-<!-- Duration -->
-<div class="form-group">
-  <label>Duration <span class="required">*</span></label>
-
-  <div class="duration-row">
-
-    <select id="durationHours" onchange="updateEndTime()">
-      <option value="0">0 hr</option>
-      <option value="1">1 hr</option>
-      <option value="2">2 hr</option>
-      <option value="3">3 hr</option>
-      <option value="4">4 hr</option>
-    </select>
-
-    <select id="durationMins" onchange="updateEndTime()">
-      <option value="0">0 min</option>
-      <option value="30">30 min</option>
     </select>
 
   </div>
-</div>
 
-<!-- End Time -->
-<div class="form-group">
-  <label>End Time</label>
-  <input type="text" id="endTime" placeholder="Auto-calculated" readonly>
-</div>
+  <!-- Event Name -->
+  <div class="form-group full">
 
-<!-- Booked slots -->
-<div class="form-group full">
-  <div class="slots-info" id="slotsInfo"></div>
-</div>
+    <label>
+      Event Name <span class="required">*</span>
+    </label>
 
-<!-- Name -->
-<div class="form-group">
-  <label>Full Name <span class="required">*</span></label>
-  <input type="text" id="bookerName" placeholder="Your full name">
-</div>
+    <input
+      type="text"
+      id="eventName"
+      placeholder="e.g. Q3 Planning Meeting"
+    >
 
-<!-- Department -->
-<div class="form-group">
-  <label>Department <span class="required">*</span></label>
+  </div>
 
-  <select id="bookerDept">
+  <!-- Date -->
+  <div class="form-group">
 
-    <option value="">-- Select Department --</option>
+    <label>
+      Date <span class="required">*</span>
+    </label>
 
-    <option>PJU</option>
-    <option>Farm - Development</option>
-    <option>Factory</option>
-    <option>BEET</option>
-    <option>ABF</option>
-    <option>Marketing</option>
-    <option>HRAISC</option>
-    <option>Farm - Flock Health</option>
-    <option>Farm - Technical</option>
-    <option>Fresh Frozen Chicken (FFC)</option>
-    <option>Farm - Planning</option>
-    <option>Naka Biolife</option>
-    <option>Sales</option>
-    <option>Logistic</option>
-    <option>Outlet Operation</option>
-    <option>Finance And Account</option>
-    <option>M & F</option>
-    <option>Business Development & IT</option>
-    <option>QC</option>
+    <input
+      type="date"
+      id="bookingDate"
+      onchange="onRoomOrDateChange()"
+    >
 
-  </select>
-</div>
+  </div>
 
-<!-- Phone -->
-<div class="form-group">
-  <label>Phone Number <span class="required">*</span></label>
-  <input type="tel" id="bookerPhone" placeholder="e.g. 0123456789">
+  <!-- Start Time -->
+  <div class="form-group">
+
+    <label>
+      Start Time <span class="required">*</span>
+    </label>
+
+    <select id="startTime" onchange="updateEndTime()">
+
+      <option value="">
+        -- Select Time --
+      </option>
+
+    </select>
+
+  </div>
+
+  <!-- Duration -->
+  <div class="form-group">
+
+    <label>
+      Duration <span class="required">*</span>
+    </label>
+
+    <div class="duration-row">
+
+      <select id="durationHours" onchange="updateEndTime()">
+        <option value="0">0 hr</option>
+        <option value="1">1 hr</option>
+        <option value="2">2 hr</option>
+        <option value="3">3 hr</option>
+        <option value="4">4 hr</option>
+      </select>
+
+      <select id="durationMins" onchange="updateEndTime()">
+        <option value="0">0 min</option>
+        <option value="30">30 min</option>
+      </select>
+
+    </div>
+
+  </div>
+
+  <!-- End Time -->
+  <div class="form-group">
+
+    <label>
+      End Time
+    </label>
+
+    <input
+      type="text"
+      id="endTime"
+      placeholder="Auto-calculated"
+      readonly
+    >
+
+  </div>
+
+  <!-- Booked Slots -->
+  <div class="form-group full">
+    <div class="slots-info" id="slotsInfo"></div>
+  </div>
+
+  <!-- Full Name -->
+  <div class="form-group">
+
+    <label>
+      Full Name <span class="required">*</span>
+    </label>
+
+    <input
+      type="text"
+      id="bookerName"
+      placeholder="Your full name"
+    >
+
+  </div>
+
+  <!-- Department -->
+  <div class="form-group">
+
+    <label>
+      Department <span class="required">*</span>
+    </label>
+
+    <select id="bookerDept">
+
+      <option value="">
+        -- Select Department --
+      </option>
+
+      <option value="PJU">PJU</option>
+
+      <option value="Farm - Development">
+        Farm - Development
+      </option>
+
+      <option value="Factory">
+        Factory
+      </option>
+
+      <option value="BEET">
+        BEET
+      </option>
+
+      <option value="ABF">
+        ABF
+      </option>
+
+      <option value="Marketing">
+        Marketing
+      </option>
+
+      <option value="HRAISC">
+        HRAISC
+      </option>
+
+      <option value="Farm - Flock Health">
+        Farm - Flock Health
+      </option>
+
+      <option value="Farm - Technical">
+        Farm - Technical
+      </option>
+
+      <option value="Fresh Frozen Chicken (FFC)">
+        Fresh Frozen Chicken (FFC)
+      </option>
+
+      <option value="Farm - Planning">
+        Farm - Planning
+      </option>
+
+      <option value="Naka Biolife">
+        Naka Biolife
+      </option>
+
+      <option value="Sales">
+        Sales
+      </option>
+
+      <option value="Logistic">
+        Logistic
+      </option>
+
+      <option value="Outlet Operation">
+        Outlet Operation
+      </option>
+
+      <option value="Finance And Account">
+        Finance And Account
+      </option>
+
+      <option value="M & F">
+        M & F
+      </option>
+
+      <option value="Business Development & IT">
+        Business Development & IT
+      </option>
+
+      <option value="QC">
+        QC
+      </option>
+
+    </select>
+
+  </div>
+
+  <!-- Phone Number -->
+  <div class="form-group">
+
+    <label>
+      Phone Number <span class="required">*</span>
+    </label>
+
+    <input
+      type="tel"
+      id="bookerPhone"
+      placeholder="e.g. 0123456789"
+    >
+
+  </div>
+
 </div>
