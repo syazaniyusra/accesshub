@@ -1,4 +1,39 @@
 <style>
+
+/* ========================= */
+/* TOP ACTION BUTTONS */
+/* ========================= */
+
+.top-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  background: #e2e8f0;
+  color: #1e293b;
+  transition: 0.2s;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.tab-btn:hover {
+  opacity: 0.9;
+}
+
 /* ========================= */
 /* FORM */
 /* ========================= */
@@ -50,26 +85,13 @@
 
   transition: border 0.2s;
   outline: none;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
 /* ========================= */
-/* SELECT DROPDOWN ARROW */
+/* SELECT */
 /* ========================= */
 
 .form-group select {
-
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 8 10 12 14 8'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-
-  padding-right: 40px;
-
   cursor: pointer;
 }
 
@@ -79,7 +101,6 @@
 
 .form-group input:focus,
 .form-group select:focus {
-
   border-color: #3b82f6;
   background: white;
 }
@@ -107,10 +128,66 @@
   flex: 1;
 }
 
+/* ========================= */
+/* HISTORY */
+/* ========================= */
+
+.history-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.history-card h4 {
+  margin: 0 0 10px;
+}
+
+.history-card p {
+  margin: 6px 0;
+  color: #475569;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 20px;
+}
+
 </style>
+
 <!-- ========================= -->
-<!-- FORM -->
+<!-- TOP BUTTONS -->
 <!-- ========================= -->
+
+<div class="top-actions">
+
+  <button
+    class="tab-btn active"
+    id="newBookingBtn"
+    onclick="showBookingForm()"
+  >
+    <i class="fas fa-plus"></i>
+    New Booking
+  </button>
+
+  <button
+    class="tab-btn"
+    id="historyBtn"
+    onclick="showBookingHistory()"
+  >
+    <i class="fas fa-list"></i>
+    My Bookings
+  </button>
+
+</div>
+
+<!-- ========================= -->
+<!-- BOOKING FORM -->
+<!-- ========================= -->
+
+<div id="bookingFormSection">
 
 <div class="form-grid">
 
@@ -265,79 +342,25 @@
         -- Select Department --
       </option>
 
-      <option value="PJU">PJU</option>
-
-      <option value="Farm - Development">
-        Farm - Development
-      </option>
-
-      <option value="Factory">
-        Factory
-      </option>
-
-      <option value="BEET">
-        BEET
-      </option>
-
-      <option value="ABF">
-        ABF
-      </option>
-
-      <option value="Marketing">
-        Marketing
-      </option>
-
-      <option value="HRAISC">
-        HRAISC
-      </option>
-
-      <option value="Farm - Flock Health">
-        Farm - Flock Health
-      </option>
-
-      <option value="Farm - Technical">
-        Farm - Technical
-      </option>
-
-      <option value="Fresh Frozen Chicken (FFC)">
-        Fresh Frozen Chicken (FFC)
-      </option>
-
-      <option value="Farm - Planning">
-        Farm - Planning
-      </option>
-
-      <option value="Naka Biolife">
-        Naka Biolife
-      </option>
-
-      <option value="Sales">
-        Sales
-      </option>
-
-      <option value="Logistic">
-        Logistic
-      </option>
-
-      <option value="Outlet Operation">
-        Outlet Operation
-      </option>
-
-      <option value="Finance And Account">
-        Finance And Account
-      </option>
-
-      <option value="M & F">
-        M & F
-      </option>
-
-      <option value="Business Development & IT">
-        Business Development & IT
-      </option>
-
-      <option value="QC">
-        QC
-      </option>
+      <option>PJU</option>
+      <option>Farm - Development</option>
+      <option>Factory</option>
+      <option>BEET</option>
+      <option>ABF</option>
+      <option>Marketing</option>
+      <option>HRAISC</option>
+      <option>Farm - Flock Health</option>
+      <option>Farm - Technical</option>
+      <option>Fresh Frozen Chicken (FFC)</option>
+      <option>Farm - Planning</option>
+      <option>Naka Biolife</option>
+      <option>Sales</option>
+      <option>Logistic</option>
+      <option>Outlet Operation</option>
+      <option>Finance And Account</option>
+      <option>M & F</option>
+      <option>Business Development & IT</option>
+      <option>QC</option>
 
     </select>
 
@@ -359,3 +382,146 @@
   </div>
 
 </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- BOOKING HISTORY -->
+<!-- ========================= -->
+
+<div id="bookingHistorySection" style="display:none;">
+
+  <div class="history-card">
+
+    <h3 style="margin-bottom:20px;">
+      My Booking History
+    </h3>
+
+    <div id="bookingHistoryList">
+
+      <div class="empty">
+        No booking history found
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- SCRIPT -->
+<!-- ========================= -->
+
+<script>
+
+function showBookingForm() {
+
+  document.getElementById("bookingFormSection")
+    .style.display = "block";
+
+  document.getElementById("bookingHistorySection")
+    .style.display = "none";
+
+  document.getElementById("newBookingBtn")
+    .classList.add("active");
+
+  document.getElementById("historyBtn")
+    .classList.remove("active");
+}
+
+function showBookingHistory() {
+
+  document.getElementById("bookingFormSection")
+    .style.display = "none";
+
+  document.getElementById("bookingHistorySection")
+    .style.display = "block";
+
+  document.getElementById("historyBtn")
+    .classList.add("active");
+
+  document.getElementById("newBookingBtn")
+    .classList.remove("active");
+
+  loadBookingHistory();
+}
+
+async function loadBookingHistory() {
+
+  const historyContainer =
+    document.getElementById("bookingHistoryList");
+
+  historyContainer.innerHTML = `
+    <div class="empty">
+      Loading booking history...
+    </div>
+  `;
+
+  try {
+
+    const userData =
+      localStorage.getItem("user") ||
+      sessionStorage.getItem("user");
+
+    const user = JSON.parse(userData);
+
+    const res =
+      await fetch(`${API}/api/bookings/user/${user.id}`);
+
+    const bookings = await res.json();
+
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+
+      historyContainer.innerHTML = `
+        <div class="empty">
+          No booking history found
+        </div>
+      `;
+
+      return;
+    }
+
+    historyContainer.innerHTML = "";
+
+    bookings.forEach(item => {
+
+      historyContainer.innerHTML += `
+
+        <div class="history-card">
+
+          <h4>${item.event_name}</h4>
+
+          <p>
+            <strong>Room:</strong>
+            ${item.room_name}
+          </p>
+
+          <p>
+            <strong>Date:</strong>
+            ${item.booking_date}
+          </p>
+
+          <p>
+            <strong>Time:</strong>
+            ${item.start_time} - ${item.end_time}
+          </p>
+
+        </div>
+
+      `;
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    historyContainer.innerHTML = `
+      <div class="empty">
+        Failed to load booking history
+      </div>
+    `;
+  }
+}
+
+</script>
