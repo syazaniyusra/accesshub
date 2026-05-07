@@ -666,8 +666,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!token || !userData) { window.location.href = "login.html"; return; }
 
-  // Show admin section immediately if role is admin
-  if (role === "admin") {
+  // Show admin section for admin and superadmin
+  if (role === "admin" || role === "superadmin") {
     document.getElementById("adminSectionLabel").style.display = "block";
     document.getElementById("adminPanelBtn").style.display     = "block";
   }
