@@ -38,6 +38,9 @@
     <button class="booking-btn" onclick="loadBookingPage(this)">
       <i class="fas fa-door-open"></i> Room Booking
     </button>
+    <button class="booking-btn" onclick="loadTrainingPage(this)">
+      <i class="fas fa-graduation-cap"></i> Training Module
+    </button>
   </nav>
 
   <!-- Footer -->
@@ -186,6 +189,14 @@ function setActive(btn) {
 function showDashboard() {
   document.getElementById("dashboardPage").style.display = "block";
   document.getElementById("bookingPage").style.display   = "none";
+}
+
+async function loadTrainingPage(button) {
+  setActive(button);
+  document.getElementById("dashboardPage").style.display = "none";
+  const bc = document.getElementById("bookingPage");
+  bc.style.display = "block";
+  bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
 }
 
 async function loadBookingPage(button) {
