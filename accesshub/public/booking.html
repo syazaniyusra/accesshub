@@ -366,6 +366,7 @@
 .badge-upcoming  { background: #eff6ff; color: #1d4ed8; }
 .badge-completed { background: #f0fdf4; color: #15803d; }
 .badge-cancelled { background: #fef2f2; color: #b91c1c; }
+.badge-confirmed { background: #f0fdf4; color: #15803d; }
 
 .booker-avatar {
   width: 36px;
@@ -462,27 +463,20 @@
     </div>
   </div>
 
-  <!-- Duration: removed 0hr/0min nonsense -->
   <div class="form-group">
-  <label>Select Duration <span class="required">*</span></label>
-
-  <select id="duration" onchange="updateEndTime()">
-    <option value="">-- Select Duration --</option>
-
-    <option value="30">30 Minutes</option>
-
-    <option value="60">1 Hour</option>
-    <option value="90">1 Hour 30 Minutes</option>
-
-    <option value="120">2 Hours</option>
-    <option value="150">2 Hours 30 Minutes</option>
-
-    <option value="180">3 Hours</option>
-    <option value="210">3 Hours 30 Minutes</option>
-
-    <option value="240">4 Hours</option>
-  </select>
-</div>
+    <label>Select Duration <span class="required">*</span></label>
+    <select id="duration" onchange="updateEndTime()">
+      <option value="">-- Select Duration --</option>
+      <option value="30">30 Minutes</option>
+      <option value="60">1 Hour</option>
+      <option value="90">1 Hour 30 Minutes</option>
+      <option value="120">2 Hours</option>
+      <option value="150">2 Hours 30 Minutes</option>
+      <option value="180">3 Hours</option>
+      <option value="210">3 Hours 30 Minutes</option>
+      <option value="240">4 Hours</option>
+    </select>
+  </div>
 
   <div class="form-group">
     <label>End Time</label>
@@ -545,7 +539,6 @@
     </select>
   </div>
 
-  <!-- Phone: numbers only, max 14 digits -->
   <div class="form-group">
     <label>Phone Number <span class="required">*</span></label>
     <input
@@ -662,7 +655,7 @@ function onFieldChange() {
 /* ---- END TIME CALC ---- */
 function updateEndTime() {
 
-  const start = document.getElementById('startTime').value;
+  const start    = document.getElementById('startTime').value;
   const duration = parseInt(document.getElementById('duration').value) || 0;
 
   if (!start || !duration) {
@@ -672,17 +665,11 @@ function updateEndTime() {
   }
 
   const [h, m] = start.split(':').map(Number);
-
-  const total = (h * 60) + m + duration;
-
-  const eh = Math.floor(total / 60) % 24;
-  const em = total % 60;
-
-  const ap = eh >= 12 ? 'PM' : 'AM';
-
-  const dh = eh > 12
-    ? eh - 12
-    : (eh === 0 ? 12 : eh);
+  const total  = (h * 60) + m + duration;
+  const eh     = Math.floor(total / 60) % 24;
+  const em     = total % 60;
+  const ap     = eh >= 12 ? 'PM' : 'AM';
+  const dh     = eh > 12 ? eh - 12 : (eh === 0 ? 12 : eh);
 
   document.getElementById('endTime').value =
     `${dh}:${String(em).padStart(2,'0')} ${ap}`;
@@ -693,40 +680,26 @@ function updateEndTime() {
 /* ---- HIGHLIGHT DURATION RANGE ---- */
 function highlightSelectedSlots() {
 
-  const startTime = document.getElementById('startTime').value;
-
-  const totalMins =
-    parseInt(document.getElementById('duration').value) || 0;
-
+  const startTime  = document.getElementById('startTime').value;
+  const totalMins  = parseInt(document.getElementById('duration').value) || 0;
   const bookedTimes = Array.from(
     document.querySelectorAll('.time-slot-btn.booked')
   ).map(b => b.dataset.time);
 
   document.querySelectorAll('.time-slot-btn:not(.booked)')
-    .forEach(b => {
-      b.classList.remove('selected');
-      b.classList.add('available');
-    });
+    .forEach(b => { b.classList.remove('selected'); b.classList.add('available'); });
 
   if (!startTime || totalMins === 0) return;
 
   const [sh, sm] = startTime.split(':').map(Number);
-
   const startMins = sh * 60 + sm;
   const endMins   = startMins + totalMins;
 
   ALL_SLOTS.forEach(slot => {
-
-    const [h, m] = slot.split(':').map(Number);
-
+    const [h, m]   = slot.split(':').map(Number);
     const slotStart = h * 60 + m;
-
     if (slotStart >= startMins && slotStart < endMins) {
-
-      const btn = document.querySelector(
-        `.time-slot-btn[data-time="${slot}"]`
-      );
-
+      const btn = document.querySelector(`.time-slot-btn[data-time="${slot}"]`);
       if (btn && !bookedTimes.includes(slot)) {
         btn.classList.remove('available');
         btn.classList.add('selected');
@@ -800,16 +773,15 @@ function renderSlots(grid, legend, bookedTimes) {
 
 /* ---- SUBMIT ---- */
 async function submitBooking() {
-  const room  = document.getElementById('roomSelect').value;
-  const date  = document.getElementById('bookingDate').value;
-  const start = document.getElementById('startTime').value;
+  const room     = document.getElementById('roomSelect').value;
+  const date     = document.getElementById('bookingDate').value;
+  const start    = document.getElementById('startTime').value;
   const duration = document.getElementById('duration').value;
-  const event = document.getElementById('eventName').value.trim();
-  const name  = document.getElementById('bookerName').value.trim();
-  const dept  = document.getElementById('bookerDept').value;
-  const phone = document.getElementById('bookerPhone').value.trim();
+  const event    = document.getElementById('eventName').value.trim();
+  const name     = document.getElementById('bookerName').value.trim();
+  const dept     = document.getElementById('bookerDept').value;
+  const phone    = document.getElementById('bookerPhone').value.trim();
 
-  /* hrs must be a real selection (not empty string) */
   if (!room || !date || !start || !duration || !event || !name || !dept || !phone) {
     _toast('Please fill in all required fields', 'error');
     return;
@@ -842,11 +814,16 @@ async function submitBooking() {
     });
 
     if (res.ok) {
-      _toast('Booking confirmed!', 'success');
+      _toast('✅ Booking confirmed!', 'success');
       resetForm();
     } else {
       const err = await res.json().catch(() => ({}));
-      _toast(err.message || err.error || 'Booking failed. Please try again.', 'error');
+      // 409 = conflict / room not available
+      if (res.status === 409) {
+        _toast('⚠️ Room not available for this time slot. Please choose another time.', 'error');
+      } else {
+        _toast(err.error || err.message || 'Booking failed. Please try again.', 'error');
+      }
     }
   } catch (e) {
     console.error('submitBooking:', e);
@@ -897,9 +874,12 @@ function getInitials(name) {
   return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : p[0].slice(0,2).toUpperCase();
 }
 
-function getBookingStatus(dateStr) {
+/* ---- BOOKING STATUS HELPER ---- */
+// Uses the actual DB status; falls back to date-based logic for display
+function getBookingStatus(b) {
+  if (b.status === 'cancelled') return 'cancelled';
   const today = new Date(); today.setHours(0,0,0,0);
-  return new Date(dateStr) >= today ? 'upcoming' : 'completed';
+  return new Date(b.booking_date || b.date) >= today ? 'upcoming' : 'completed';
 }
 
 /* ---- MY BOOKINGS ---- */
@@ -912,10 +892,14 @@ async function loadMyBookings() {
     const u    = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user'));
     const data = await fetch(`${API}/api/bookings/user/${u.id}`).then(r => r.json());
     myData = Array.isArray(data) ? data.map(b => ({
-      id: b.id, event: b.event_name, room: b.room_name,
-      date: b.booking_date,
-      start: (b.start_time||'').slice(0,5), end: (b.end_time||'').slice(0,5),
-      dept: b.department, status: b.status || getBookingStatus(b.booking_date),
+      id:     b.id,
+      event:  b.event_name,
+      room:   b.room_name,
+      date:   b.booking_date || b.date,
+      start:  (b.start_time||'').slice(0,5),
+      end:    (b.end_time||'').slice(0,5),
+      dept:   b.department,
+      status: getBookingStatus(b),       // ← uses real DB status
     })) : [];
   } catch(e) { console.error(e); myData = []; }
   renderMine();
@@ -944,9 +928,10 @@ function renderMine() {
     return;
   }
   list.innerHTML = filtered.map(b => {
-    const d   = new Date(b.date);
-    const bc  = b.status==='upcoming' ? 'badge-upcoming' : b.status==='completed' ? 'badge-completed' : 'badge-cancelled';
-    const bl  = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+    const d  = new Date(b.date);
+    const bc = b.status === 'upcoming'  ? 'badge-upcoming'  :
+               b.status === 'completed' ? 'badge-completed' : 'badge-cancelled';
+    const bl = b.status.charAt(0).toUpperCase() + b.status.slice(1);
     return `<div class="booking-card">
       <div class="date-block">
         <div class="date-day">${d.getDate()}</div>
@@ -975,11 +960,14 @@ async function loadRoomSchedule() {
   try {
     const data = await fetch(`${API}/api/bookings/all`).then(r => r.json());
     roomData = Array.isArray(data) ? data.map(b => ({
-      id: b.id, event: b.event_name, room: b.room_name,
-      date: b.booking_date,
-      start: (b.start_time||'').slice(0,5), end: (b.end_time||'').slice(0,5),
-      booker: b.booker_name || b.full_name || 'Unknown',
-      dept: b.department,
+      id:     b.id,
+      event:  b.event_name,
+      room:   b.room_name,
+      date:   b.booking_date || b.date,
+      start:  (b.start_time||'').slice(0,5),
+      end:    (b.end_time||'').slice(0,5),
+      booker: b.booker_name || b.name || 'Unknown',
+      dept:   b.department,
     })) : [];
   } catch(e) { console.error(e); roomData = []; }
   buildRoomPills(); renderRoom();
