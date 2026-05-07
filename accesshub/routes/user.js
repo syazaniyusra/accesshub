@@ -2,7 +2,29 @@ const express = require("express");
 const router  = express.Router();
 const db      = require("../db");
 const bcrypt  = require("bcryptjs");
-const { verifyToken, requireRole } = require(require('path').resolve(__dirname, '../middleware/auth'));
+const jwt     = require("jsonwebtoken");
+
+// ── INLINE MIDDLEWARE (avoids path resolution issues) ──
+const SECRET_KEY = "accesshub_secret";
+
+function verifyToken(req, res, next) {
+  const token = (req.headers["authorization"] || "").split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+  try {
+    req.user = jwt.verify(token, SECRET_KEY);
+    next();
+  } catch {
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+}
+
+function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role))
+      return res.status(403).json({ message: "Access denied" });
+    next();
+  };
+}
 
 // =====================================
 // GET ALL USERS
@@ -43,7 +65,6 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
       `, [deptIds]);
     }
 
-    // Group work departments per user
     const usersMap = {};
     rows.forEach(row => {
       if (!usersMap[row.id]) {
@@ -58,7 +79,6 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
       }
     });
 
-    // Fetch link access for all returned users
     const userIds = Object.keys(usersMap);
     if (userIds.length > 0) {
       const [accessRows] = await db.query(`
@@ -94,7 +114,6 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
       return res.status(400).json({ message: "Email & password required" });
     }
 
-    // Admins can only create users in their own dept
     if (req.user.role === "admin") {
       role = "user";
       const [adminDepts] = await db.query(
@@ -119,7 +138,6 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
 
     const userId = result.insertId;
 
-    // Save work departments
     if (departments && departments.length > 0) {
       for (const depId of departments) {
         await db.query(
@@ -129,7 +147,6 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
       }
     }
 
-    // Save link access
     if (link_access && link_access.length > 0) {
       for (const depId of link_access) {
         await db.query(
@@ -166,8 +183,7 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
         [userId]
       );
       const targetIds = targetDepts.map(d => String(d.department_id));
-      const hasOverlap = targetIds.some(id => allowedIds.includes(id));
-      if (!hasOverlap) {
+      if (!targetIds.some(id => allowedIds.includes(id))) {
         return res.status(403).json({ message: "You can only edit users in your department" });
       }
       departments = (departments || []).filter(id => allowedIds.includes(String(id)));
@@ -183,7 +199,6 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
         [name || "", email, userId]);
     }
 
-    // Update work departments
     await db.query("DELETE FROM user_departments WHERE user_id = ?", [userId]);
     if (departments && departments.length > 0) {
       for (const depId of departments) {
@@ -191,7 +206,6 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
       }
     }
 
-    // Update link access
     await db.query("DELETE FROM user_link_access WHERE user_id = ?", [userId]);
     if (link_access && link_access.length > 0) {
       for (const depId of link_access) {
