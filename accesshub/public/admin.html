@@ -50,6 +50,27 @@ body {
 .sidebar button.active { background: #3b82f6; color: white; border: 2px solid rgba(255,255,255,0.6); }
 .sidebar h2 { text-align: center; margin-bottom: 20px; }
 
+/* BACK TO DASHBOARD BUTTON */
+.back-dashboard-btn {
+  background: rgba(212, 24, 108, 0.15) !important;
+  color: #f9a8d4 !important;
+  border: 1px solid rgba(212, 24, 108, 0.3) !important;
+  margin-bottom: 20px !important;
+}
+.back-dashboard-btn:hover {
+  background: rgba(212, 24, 108, 0.28) !important;
+  color: #fff !important;
+  transform: translateX(-3px) !important;
+}
+.back-dashboard-btn i { color: inherit !important; }
+
+/* SIDEBAR DIVIDER */
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 4px 0 16px;
+}
+
 .logout-btn {
   margin-top: auto;
   background: #334155;
@@ -349,7 +370,6 @@ th { background: #e2e8f0; }
     </table>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeBookingDetailModal()">Close</button>
-      <!-- Admin can cancel a confirmed booking or restore a cancelled one -->
       <button class="btn-delete"  id="detailCancelBtn"  onclick="cancelFromDetail()">
         <i class="fa-solid fa-ban"></i> Cancel Booking
       </button>
@@ -363,6 +383,14 @@ th { background: #e2e8f0; }
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h2>Admin Panel</h2>
+
+  <!-- Back to Dashboard -->
+  <button class="back-dashboard-btn" onclick="goBackToDashboard()">
+    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+  </button>
+
+  <hr class="sidebar-divider">
+
   <button onclick="showSection('usersSection')"><i class="fa-solid fa-users"></i> Users</button>
   <button onclick="showSection('linksSection')"><i class="fa-solid fa-link"></i> Links</button>
   <button onclick="showSection('bookingsSection')"><i class="fa-solid fa-door-open"></i> Bookings</button>
@@ -475,12 +503,21 @@ let deleteId         = null;
 let allBookings      = [];
 let viewingBookingId = null;
 
+/* ── BACK TO DASHBOARD ── */
+function goBackToDashboard() {
+  window.location.href = "index.html";
+}
+
 /* ---- SECTION SWITCHING ---- */
 function showSection(id) {
   ["usersSection","linksSection","bookingsSection"].forEach(s => {
     document.getElementById(s).style.display = "none";
   });
   document.getElementById(id).style.display = "block";
+
+  // Highlight active sidebar button
+  document.querySelectorAll(".sidebar button:not(.back-dashboard-btn):not(.logout-btn)").forEach(b => b.classList.remove("active"));
+  event.currentTarget.classList.add("active");
 }
 
 /* ---- TOAST ---- */
@@ -848,7 +885,6 @@ function viewBookingDetail(id) {
   document.getElementById("dStatus").innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
   document.getElementById("dCreated").textContent  = new Date(b.created_at).toLocaleString("en-MY");
 
-  // Show Cancel or Restore depending on current status
   document.getElementById("detailCancelBtn").style.display  = b.status === 'confirmed' ? 'inline-flex' : 'none';
   document.getElementById("detailRestoreBtn").style.display = b.status === 'cancelled'  ? 'inline-flex' : 'none';
 
