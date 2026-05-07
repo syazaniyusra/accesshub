@@ -463,3 +463,199 @@ body {
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 18px; }
 }
+
+/* ══════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════ */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 860px;
+}
+
+@media (max-width: 780px) {
+  .profile-grid { grid-template-columns: 1fr; }
+}
+
+.profile-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Avatar circle */
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--pink-soft);
+  color: var(--pink);
+  font-family: var(--font);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  border: 2px solid var(--pink-pill);
+  flex-shrink: 0;
+}
+
+.profile-info { display: flex; flex-direction: column; gap: 0; }
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-field:last-child { border-bottom: none; padding-bottom: 0; }
+.profile-field:first-child { padding-top: 0; }
+
+.profile-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ink-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-label i { font-size: 11px; color: var(--pink); }
+
+.profile-value {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Department tags */
+.profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+
+.dept-tag {
+  background: var(--pink-soft);
+  color: var(--pink);
+  border: 1px solid var(--pink-pill);
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Password card */
+.profile-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-card-title i { color: var(--pink); }
+
+.pw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.pw-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  letter-spacing: 0.2px;
+}
+
+.pw-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.pw-input-wrap:focus-within {
+  border-color: var(--pink);
+  box-shadow: var(--shadow-focus);
+}
+
+.pw-input-wrap input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-family: var(--font);
+  background: transparent;
+  color: var(--ink);
+  margin-bottom: 0;
+  width: auto;
+}
+
+.pw-input-wrap input::placeholder { color: var(--ink-faint); }
+
+.pw-input-wrap button {
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  cursor: pointer;
+  color: var(--ink-light);
+  font-size: 13px;
+  height: 42px;
+  width: auto;
+  border-radius: 0;
+  transition: color var(--t) var(--ease);
+}
+
+.pw-input-wrap button:hover { color: var(--pink); }
+
+.pw-save-btn {
+  width: 100%;
+  padding: 11px;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  transition: background var(--t) var(--ease), transform var(--t) var(--ease);
+}
+
+.pw-save-btn:hover {
+  background: var(--pink-hover);
+  transform: translateY(-1px);
+}
+
+/* Messages */
+.pw-msg {
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.pw-msg.success { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+.pw-msg.error   { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
