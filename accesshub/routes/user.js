@@ -1,5 +1,35 @@
+const express  = require("express");
+const router   = express.Router();
+const db       = require("../db");
+const bcrypt   = require("bcryptjs");
+const jwt      = require("jsonwebtoken");
 
-const { verifyToken, requireRole } = require("../middleware/auth");
+const SECRET_KEY = process.env.JWT_SECRET || "accesshub_secret";
+
+// =====================================
+// INLINE AUTH MIDDLEWARE
+// =====================================
+function verifyToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+  try {
+    req.user = jwt.verify(token, SECRET_KEY);
+    next();
+  } catch {
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+}
+
+function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+  };
+}
+
 // =====================================
 // GET ALL USERS
 // superadmin → all users
@@ -10,7 +40,6 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
     let rows;
 
     if (req.user.role === "superadmin") {
-      // Return all users
       [rows] = await db.query(`
         SELECT
           u.id, u.name, u.email, u.role,
@@ -22,18 +51,13 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
         ORDER BY u.id
       `);
     } else {
-      // Admin: get their own department ids first
       const [adminDepts] = await db.query(
         "SELECT department_id FROM user_departments WHERE user_id = ?",
         [req.user.id]
       );
       const deptIds = adminDepts.map(d => d.department_id);
+      if (deptIds.length === 0) return res.json([]);
 
-      if (deptIds.length === 0) {
-        return res.json([]);
-      }
-
-      // Return only users who belong to at least one of admin's departments
       [rows] = await db.query(`
         SELECT
           u.id, u.name, u.email, u.role,
@@ -51,23 +75,13 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
       `, [deptIds]);
     }
 
-    // Group departments per user
     const usersMap = {};
     rows.forEach(row => {
       if (!usersMap[row.id]) {
-        usersMap[row.id] = {
-          id: row.id,
-          name: row.name,
-          email: row.email,
-          role: row.role,
-          departments: []
-        };
+        usersMap[row.id] = { id: row.id, name: row.name, email: row.email, role: row.role, departments: [] };
       }
       if (row.department_id) {
-        usersMap[row.id].departments.push({
-          id: row.department_id,
-          name: row.department_name
-        });
+        usersMap[row.id].departments.push({ id: row.department_id, name: row.department_name });
       }
     });
 
@@ -81,8 +95,6 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
 
 // =====================================
 // CREATE USER
-// superadmin → can create any role, any dept
-// admin      → can only create 'user' role, only their own dept
 // =====================================
 router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
@@ -92,11 +104,8 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
       return res.status(400).json({ message: "Email & password required" });
     }
 
-    // Admins can only create users, not other admins
     if (req.user.role === "admin") {
       role = "user";
-
-      // Restrict departments to only admin's own departments
       const [adminDepts] = await db.query(
         "SELECT department_id FROM user_departments WHERE user_id = ?",
         [req.user.id]
@@ -105,24 +114,18 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
       departments = (departments || []).filter(id => allowedIds.includes(String(id)));
     }
 
-    const [existing] = await db.query(
-      "SELECT id FROM users WHERE email = ?",
-      [email]
-    );
-
+    const [existing] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
     if (existing.length > 0) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const [result] = await db.query(
       "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
       [name || "", email, hashedPassword, role || "user"]
     );
 
     const userId = result.insertId;
-
     if (departments && departments.length > 0) {
       for (const depId of departments) {
         await db.query(
@@ -142,15 +145,12 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
 
 // =====================================
 // UPDATE USER
-// superadmin → can update anyone
-// admin      → can only update users in their department
 // =====================================
 router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
     const userId = req.params.id;
     let { name, email, password, departments } = req.body;
 
-    // Admin: verify target user is in their department
     if (req.user.role === "admin") {
       const [adminDepts] = await db.query(
         "SELECT department_id FROM user_departments WHERE user_id = ?",
@@ -163,13 +163,11 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
         [userId]
       );
       const targetIds = targetDepts.map(d => String(d.department_id));
-
       const hasOverlap = targetIds.some(id => allowedIds.includes(id));
       if (!hasOverlap) {
         return res.status(403).json({ message: "You can only edit users in your department" });
       }
 
-      // Restrict departments to admin's own
       departments = (departments || []).filter(id => allowedIds.includes(String(id)));
     }
 
@@ -187,7 +185,6 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
     }
 
     await db.query("DELETE FROM user_departments WHERE user_id = ?", [userId]);
-
     if (departments && departments.length > 0) {
       for (const depId of departments) {
         await db.query(
@@ -207,8 +204,6 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
 
 // =====================================
 // DELETE USER
-// superadmin → anyone
-// admin      → only users in their department
 // =====================================
 router.delete("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
@@ -226,7 +221,6 @@ router.delete("/:id", verifyToken, requireRole("superadmin", "admin"), async (re
         [userId]
       );
       const targetIds = targetDepts.map(d => String(d.department_id));
-
       const hasOverlap = targetIds.some(id => allowedIds.includes(id));
       if (!hasOverlap) {
         return res.status(403).json({ message: "You can only delete users in your department" });
@@ -310,7 +304,7 @@ router.get("/:id/departments", async (req, res) => {
 // =====================================
 router.post("/:id/change-password", verifyToken, async (req, res) => {
   try {
-    const userId          = req.params.id;
+    const userId = req.params.id;
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -346,4 +340,7 @@ router.post("/:id/change-password", verifyToken, async (req, res) => {
   }
 });
 
+// =====================================
+// EXPORT
+// =====================================
 module.exports = router;
