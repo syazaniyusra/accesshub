@@ -1,760 +1,1679 @@
+
+Claude finished the response
+You said: Help me debug a stack trace — I'll paste it below.
+Help me debug a stack trace — I'll paste it below. Walk through it and point to the likely root cause.
+
+10:30
+Claude responded: Sure, paste the stack trace and I'll walk through it with you.
+Sure, paste the stack trace and I'll walk through it with you.
+
+You said: Here's a full prompt you can use to continue this project in a new chat:
+1778121057938_image.png
+1778121205527_image.png
+Here's a full prompt you can use to continue this project in a new chat:
+---
+**Project: Bismi AccessHub — Internal Web Dashboard**
+I'm building an internal web dashboard called **AccessHub** for **Bismi** (a halal chicken brand from Malaysia). The stack is:
+- **Frontend**: Vanilla HTML, CSS, JS — separated into public/index.html and public/styles.css
+- **Backend**: Node.js + Express (server.js)
+- **Database**: MySQL (via mysql2/promise pool in db.js)
+- **Auth**: bcryptjs, JWT stored in localStorage/sessionStorage
+- **File structure**:
+
+accesshub/
+├── public/
+│   ├── index.html
+│   ├── styles.css
+│   ├── login.html
+│   ├── booking.html
+│   ├── admin.html
+│   └── bismi_jpg__2_.jpeg
+├── routes/
+│   ├── auth.js
+│   ├── user.js
+│   ├── departments.js
+│   ├── links.js
+│   └── booking.js
+├── db.js
+├── server.js
+└── package.json
+
+**Design style**: Clean, minimal, white-dominant dashboard. Warm off-white page bg (#F5F4F2), white cards/sidebar, pink accent #D4186C used sparingly. Fonts: **Plus Jakarta Sans** + **DM Serif Display**. Inspired by clean SaaS dashboards (GoMeal, Taskly references).
+**Brand colors**:
+- --pink: #D4186C
+- --pink-soft: #FCE8F3
+- --surface-2: #F5F4F2 (page bg)
+- --ink: #1C1C1E
+**Sidebar sections**:
+1. **Link Management** — All, HRAISC, Finance & Account, Logistics, Maintenance & Facility (department ids 1–4, loaded dynamically from API)
+2. **Others** — Room Booking, Training Module
+3. **General** — Profile
+**Database departments table**:
+| id | name |
+|----|------|
+| 1 | HRAISC |
+| 2 | Finance & Account |
+| 3 | Logistics |
+| 4 | Maintenance & Facility |
+| 5 | Room Booking |
+| 6 | Training Module |
+**Key API routes** (all under /api):
+- POST /auth/login — returns { token, user, role }
+- GET /users/:id/departments — returns user's departments
+- GET /links — returns all links with department_id
+- POST /users/:id/change-password — { currentPassword, newPassword }
+**Current pages**:
+- index.html — main user dashboard with sidebar, link cards, search, profile page (name, email, departments as pink tags, change password form)
+- login.html — login page
+- booking.html — room booking page (loaded inline)
+- admin.html — admin panel
+**Profile page** (inside index.html as a div, not separate file):
+- Shows user name, email, departments (pink pill tags), role
+- Change password form with current/new/confirm fields, show/hide toggle, calls POST /api/users/:id/change-password
+**Session storage pattern**:
+js
+const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
+const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
+const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
+const user     = JSON.parse(userData);
+
+**Important notes**:
+- module.exports = router must always be at the **very end** of route files
+- Sidebar department buttons are injected dynamically, filtered by user's assigned departments
+- Room Booking and Training Module are excluded from the Link Management filter
+- Cards use staggered fadeUp animation on load
+- Active sidebar state uses pink soft background pill style
+
+this is my project
+
+now pic 1 is my user dashboard will be use by staff (only click link) not crud
+
+i have another dashboard for admin   ( which is staff too but can add link and file)
+
+which admin have to access the user part to 
+
+what if i add admin section to the user dashboard but add any credential or security like passkey or anything ( inspire by pic 2)
+
+you think ok ke this way??
+
+Show more
+10:33
+Claude responded: Great question!
+Great question! Let me break down your options clearly.
+
+Your idea: add an admin section inside the user dashboard, locked behind extra auth — this is actually a solid pattern. Here's my honest take:
+
+✅ Pros of your approach
+
+One codebase, one login — staff don't need two separate URLs
+Admin section stays hidden unless credentials are verified
+Simpler to maintain than two completely separate apps
+⚠️ Things to think about
+
+The "passkey/extra credential" idea is good, but you have a few options with different trade-offs:
+
+Method	How it works	Security level	Effort
+Role-based (simplest)	Admin role already in JWT — just show/hide the tab	Medium	Low
+PIN prompt	Admin enters a 4–6 digit PIN before accessing admin tab	Medium	Low
+Re-enter password	Admin re-authenticates with their password on demand	Medium-High	Medium
+Separate passkey/2FA	TOTP (like Google Authenticator) or hardware key	High	High
+My recommendation for your scale (internal halal brand dashboard):
+
+Go with role check + re-enter password prompt when clicking into the Admin section. It's the sweet spot — not overkill, but meaningfully more secure than just showing a tab. Something like:
+
+Only users with role = admin see the Admin tab in sidebar
+Clicking it triggers a modal: "Re-enter your password to continue"
+Verified → admin section unlocks for the session
+Session expires or page refreshes → they have to re-verify
+This is exactly how tools like Shopify, Stripe, and similar dashboards handle sensitive sections.
+
+On the Pic 2 (Xpend-R) inspiration — that dark theme expense table style would work nicely as a contrast for the admin section. You could keep the user side light/white (current style) and make the admin section dark-themed, which visually signals "you're in a more powerful area." Want me to go that direction?
+
+So to answer your question — yes, your idea is good. Want me to start implementing it? I'd need to know: do you want me to modify your existing index.html/server.js, or sketch the plan first?
+
+You said: pic 2 is where i got the idea to put admin button at same dashboard
+pic 2 is where i got the idea to put admin button at same dashboard
+
+10:34
+Claude responded: Ah got it!
+Ah got it! So you're inspired by how Pic 2 has the Personal / Approver / Controller / Finance tabs at the top — same dashboard, different role views.
+
+So for your case it would be something like:
+
+User (default) → Admin (locked tab, only visible to admins)
+
+That's actually a cleaner approach than a separate page. Here's how I'd map it to your dashboard:
+
+Top nav or sidebar toggle:
+[ User View ]  [ Admin ⚿ ]  ← only appears if role = admin
+Clicking Admin triggers a re-auth modal → unlocks the admin section for that session.
+
+Before I build it, quick questions:
+
+Should the admin tab appear in the top navbar (like Pic 2's tabs) or as a toggle in the sidebar?
+What should the admin section actually contain — is it just add/edit/delete links, or more than that (manage users, departments, etc.)?
+Do you want the re-enter password security check, or keep it simple with just role-based access since login already handles that?
+Once you confirm I'll go straight into the code.
+
+You said: sidebar
+sidebar
+i already have admin part (admn.html)
+yes
+but now can we settle on dashboard first (index.html)
+
+10:36
+Claude responded: Sure!
+Sure! What specifically needs fixing or improving on the current index.html dashboard? Paste the code or describe the issue and we'll sort it out.
+
+You said: index.
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Bismi AccessHub</title> <script>const API = window.location.origin;</script> <link href="https://fonts.googleapis.com/css2?family=Plus
+
+pasted
+
+index.html:
+
+10:36
+Claude responded: Okay I can see the full code.
+Okay I can see the full code. What specifically do you want to fix or improve on the dashboard? For example:
+
+Bug — something broken or not working
+UI/design — something looks off
+Feature — add something new
+Refactor — clean up the code
+What's the issue or goal right now?
+
+You said: to add the admin, the feature
+to add the admin, the feature
+
+10:37
+Claude responded: Got it.
+Got it. So the plan is:
+
+Admin staff log in → land on user dashboard (same as everyone)
+They see an extra "Admin Panel" button in the sidebar under a new section
+Clicking it triggers a re-enter password modal for security
+Verified → redirects to admin.html
+Before I code it, just confirm a few things:
+
+Right now your code does if (role === "admin") { redirect to admin.html } — so admins can't use the user dashboard at all currently. You want to remove that redirect and let admins stay on the user dashboard, right?
+The re-auth check — should it call your existing /api/auth/login endpoint to verify the password, or do you have a separate verify-password route?
+After passing the modal, should it open admin.html in a new tab or replace the current page?
+You said: admin.
+1778121463264_image.png
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <script> const API = window.location.origin; </script> <title>Admin Dashboard</title> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> <style> * { margin: 0; paddi
+
+pasted
+
+admin.html:
+
+what file copy you want more?
+
+10:37
+Claude responded: Perfect, I have both files and the full project structure.
+Perfect, I have both files and the full project structure. Let me plan exactly what needs to change before touching any code.
+
+Here's what I'll do:
+
+index.html changes:
+
+Remove the if (role === "admin") redirect to admin.html — admins stay on user dashboard
+Add an "Admin Panel" button in sidebar under a new Admin section label — only visible if role === admin
+Add a re-enter password modal that triggers when clicking Admin Panel
+On successful verification → redirect to admin.html
+admin.html changes:
+
+Add a "← Back to Dashboard" button in the sidebar so admin can return to index.html
+Password verification will reuse your existing POST /api/auth/login endpoint — simplest approach, no new backend needed.
+
+Before I write the code, just confirm:
+
+The re-auth modal — should it ask for password only (email pre-filled from session), or both email + password?
+After admin goes back to index.html from admin panel, should they land on the dashboard as normal user view, or does it matter?
+You said: password only
+password only
+yes as normal user
+10:40
+Claude responded: Perfect.
+Perfect. Writing the code now.
+
+
+Read frontend design skill
+Read frontend design skill
+Now I'll make the targeted changes to both files.
+
+
+Ran a command, created a file
+Ran a command, created a file
+Now update admin.html to add the Back to Dashboard button:
+
+
+Created a file, read a file
+Created a file, read a file
+Here's what changed in both files:
+
+index.html
+
+Removed the if (role === "admin") redirect — admins now land on the user dashboard like everyone else
+Added Admin Panel button in sidebar under a new Admin section label — only rendered if role === admin
+Added a re-auth modal that pops up when clicking Admin Panel — password only, email pulled silently from session
+Modal calls POST /api/auth/login to verify — on success redirects to admin.html, on failure shows an inline error and clears the field
+Enter key works in the password field, clicking outside the modal closes it
+admin.html
+
+Added ← Back to Dashboard button at the top of the sidebar — styled in pink to visually stand out from the dark nav
+Clicking it goes straight to index.html — no logout, session stays intact
+
+Index
+Code · HTML 
+
+Admin
+Code · HTML 
+You said: no admin button on side bar
+1778122053937_image.png
+no admin button on side bar
+
+i want it to below others section before general
+
+10:50
+Claude responded: The issue is clear — the admin button is only shown inside generateSidebar() which runs after departments load.
+The issue is clear — the admin button is only shown inside generateSidebar() which runs after departments load. But more importantly, the button needs to appear at the right position in the sidebar HTML.
+
+The fix: move the Admin section HTML to the correct spot in the sidebar (between Others and General), and show/hide it via CSS based on role — not injected dynamically.
+
+
+Viewed a file, edited a file
+Viewed a file, edited a file
+Now make the admin button visible on DOMContentLoaded directly, not inside generateSidebar:
+
+
+Edited 2 files, read a file
+Edited 2 files, read a file
+Two things were wrong before:
+
+Wrong position — the Admin section HTML was placed after General in the sidebar, now it's correctly between Others and General
+Wrong timing — the button was only shown inside generateSidebar() which depends on the departments API call finishing. Now it's shown immediately in DOMContentLoaded before any async calls, so it appears instantly on page load
+
+Index
+Code · HTML 
+1778122613504_image.png
+10:56
+Claude responded: This is a Railway deployment issue, not a code bug.
+This is a Railway deployment issue, not a code bug. The "Failed to build an image" error happens at the Docker/build stage, not in your HTML/JS.
+
+The fact that admin.html deployed fine but index.html failed suggests the build broke between those two commits.
+
+To diagnose, click "View logs" on the failed deployment and look for one of these common causes:
+
+1. package.json script issue Check if your start script in package.json is correct:
+
+json
+"scripts": {
+  "start": "node server.js"
+}
+2. Missing package-lock.json Railway needs it for npm ci. If you .gitignore'd it, that can cause build failure.
+
+3. A syntax error in server.js or a route file If you edited any backend file alongside index.html in the same commit, a JS syntax error would fail the build.
+
+4. Missing dependency Check package.json has all required packages — express, mysql2, bcryptjs, jsonwebtoken etc.
+
+Quick fix to try: Since admin.html deploy was successful, Railway is still running that. Just re-push only index.html without touching any other file — if it deploys clean, the issue was something else in that commit.
+
+Can you click View logs and paste what the build log says? That will pinpoint the exact cause.
+
+You said: i change file of logo
+i change file of logo
+
+new file name bismi_logo.jpeg
+
+10:57
+Claude responded: Quick fix — just update the logo filename reference in index.
+Quick fix — just update the logo filename reference in index.html:
+
+
+Edited a file, read a file
+Edited a file, read a file
+Done. Also make sure the old bismi_jpg__2_.jpeg file is removed from your public/ folder and replaced with bismi_logo.jpeg — Railway will fail to find it if both names mismatch.
+
+
+Index
+Code · HTML 
+You said: still no admin sidebar
+1778122768872_image.png
+still no admin sidebar
+
+10:59
+Claude responded: The dashboard is working and logo is showing — good progress!
+The dashboard is working and logo is showing — good progress!
+
+This is a user account issue. The account you're logged in with has role = "user", not role = "admin". The admin button only shows when role === "admin" in localStorage/sessionStorage.
+
+To verify — open browser Console and run:
+
+js
+localStorage.getItem("role") || sessionStorage.getItem("role")
+If it returns "user", that's why. You need to log in with your admin account, not the test user account.
+
+If you ARE logged in as admin and it still shows "user", the issue is that your login API is returning the wrong role — check your POST /api/auth/login response to make sure it's returning role: "admin" correctly and that the frontend is storing it properly.
+
+You said: so mean when admin click user they can see the admin section
+so mean when admin click user they can see the admin section
+
+11:00
+Claude responded: Yes exactly!
+Yes exactly! That's how it works now:
+
+Login as user → no Admin section, just normal dashboard
+Login as admin → same dashboard but with the Admin section visible in sidebar
+So right now you're logged in as the user test account — that's why no admin button. Log in with your admin credentials and it will appear.
+
+You said: they should see all department too under link management
+1778122886776_image.png
+they should see all department too under link management
+
+11:01
+Claude responded: The admin has no departments assigned in the database, so the sidebar only shows "All" with no department filters.
+The admin has no departments assigned in the database, so the sidebar only shows "All" with no department filters. Two ways to fix this:
+
+Option A — Assign all departments to the admin account via your admin panel (Users → Edit → check all departments). Quick fix, no code change.
+
+Option B — In the code, if role === admin, automatically load and show ALL departments in the sidebar regardless of what's assigned.
+
+Which do you prefer?
+
+You said: option b
+option b
+
+11:02
+
+Viewed 2 files, edited a file
+Viewed 2 files, edited a file
+Claude's response was interrupted
+You said: i want option a
+i want option a
+
+11:03
+Claude responded: Go to your Admin Panel → Users → edit your admin account and check all departments, then save.
+Go to your Admin Panel → Users → edit your admin account and check all departments, then save.
+
+No code change needed — once the admin account has all departments assigned, the sidebar will show them all automatically.
+
+You said: okayy now lets us fix the admin part
+okayy now lets us fix the admin part
+
+currently on admin.html, under user section,
+
+admin enter
+name
+email
+password
+confirm password
+department
+role: admin or staff(user)
+(admin can enter staff part too)
+which department they can access ( for user part)
+
+HRAISC
+Finance & Account
+Logistics
+Maintenance & Facility
+Training Module
+i have issue right i dont the admin to access all link to because i will assign one admin for one department, i dont  they can see other department link too
+
+how ehh?
+
+Show more
+11:10
+Claude responded: Okay so let me understand your setup correctly:
+Okay so let me understand your setup correctly:
+
+Current situation:
+
+One admin manages everything
+You want to change to one admin per department
+Each admin should only see links from their own department
+So the flow would be:
+
+Admin is assigned to e.g. Finance & Account only
+They log in → user dashboard shows only Finance & Account links
+They go to Admin Panel → they can only manage Finance & Account links and users
+Is that right?
+
+And for creating users in the admin panel — should an admin only be able to assign departments they themselves belong to? So a Finance admin can't assign HRAISC to a new user?
+
+You said: And for creating users in the admin panel — should an admin only be able to assign departments they themselves belong to?
+And for creating users in the admin panel — should an admin only be able to assign departments they themselves belong to? So a Finance admin can't assign HRAISC to a new user?
+
+yes okay then for user part also must be selected i work on acc department but this staff get access to enter logistics link
+
+11:13
+Claude responded: So to confirm the full picture:
+So to confirm the full picture:
+
+Admin (per department):
+
+Sees only their department's links on user dashboard
+In Admin Panel → can only create/edit users within their department
+Can only assign their own department to users
+User (staff):
+
+Can be assigned to multiple departments by admin
+Only sees links from their assigned departments
+So the real question is — who creates the admins? Because if Finance admin can only manage Finance, someone needs to be a super admin to create other admins and assign them to departments.
+
+Do you want:
+
+A) Keep one super admin account (full access, sees everything) + department admins (limited to their dept)
+
+B) All admins are equal, just limited to their assigned department — no super admin
+
+You said: super admin who can hnadle is hod of all departent
+super admin who can hnadle is hod of all departent
+
+give access for admin each department to add their staff
+
+11:15
+Claude responded: Perfect.
+Perfect. So the structure is:
+
+Super Admin (HOD):
+
+Sees all departments, all links
+Can create admins and assign them to any department
+Full access to everything in Admin Panel
+Department Admin:
+
+Sees only their department's links
+Can only create/edit users (not admins) within their department
+Can only assign their own department to those users
+User (Staff):
+
+Sees only their assigned department links
+No admin access
+This means you need a new role in your system. Right now you have user and admin. You need:
+
+Role	Label
+superadmin	HOD / Super Admin
+admin	Department Admin
+user	Staff
+Before I touch any code — confirm:
+
+Is the super admin account already created in your DB, or do you need that too?
+Should department admin see the Bookings and Users sections in Admin Panel, or just Links?
+Should super admin have a different login redirect or same admin.html but with more access?
+You said: super admin user curent account, admin@gmail.
+super admin user curent account, admin@gmail.com password 123456
+only can see users and links
+same
+11:20
+Claude responded: Got it.
+Got it. So the plan is:
+
+Database change needed: Update admin@gmail.com role from admin to superadmin in your DB:
+
+sql
+UPDATE users SET role = 'superadmin' WHERE email = 'admin@gmail.com';
+Run that first before we touch any code.
+
+Code changes needed across 3 files:
+
+server.js / auth.js — return superadmin role in login response
+
+index.html — admin button shows for both admin and superadmin
+
+admin.html —
+
+superadmin → sees Users, Links, Bookings, can create admins/users, all departments
+admin → sees Users and Links only, can only create users (not admins), only their department
+Before I write the code, paste me your routes/auth.js and routes/user.js so I can see how login and user creation currently work — I need to make sure the role is returned correctly and user creation is properly restricted.
+
+You said: auth.
+
+const express = require("express"); const router = express.Router(); const db = require("../db"); const bcrypt = require("bcryptjs"); // ===================================== // GET ALL USERS + DEPARTMENTS // ===================================== router.get("/", async (req, res) => { try
+
+pasted
+
+auth.js:
+const express = require("express");
+const router = express.Router();
+const db = require("../db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "accesshub_secret"; // can move to .env later
+// LOGIN
+router.post("/login", async (req, res) => {
+  try {
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+    console.log("👉 EMAIL FROM FRONTEND:", "${email}");
+    const [users] = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    console.log("👉 QUERY RESULT:", users);
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const user = users[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Wrong password" });
+    }
+    // 🔥 CREATE TOKEN
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
+      SECRET_KEY,
+      { expiresIn: "2h" }
+    );
+    // ✅ SEND TOKEN + USER
+    res.json({
+      message: "Login success",
+      token,
+      user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+module.exports = router;
+
+user.js:
+
+Show more
+11:23
+Claude responded: Good.
+Good. I can see everything clearly. Here's what needs to change across all files:
+
+Backend (auth.js) — add role separately in response so frontend stores it cleanly
+
+Backend (user.js) — restrict GET /users, POST /users based on caller's role/department
+
+Frontend (admin.html) — filter UI based on role (superadmin vs admin)
+
+Frontend (index.html) — handle superadmin role same as admin for sidebar button
+
+But first — your backend routes have no auth middleware. Anyone can call GET /api/users or POST /api/users without a token right now. To properly restrict department admins, I need to read the caller's identity from the JWT.
+
+Do you have a middleware file already (e.g. middleware/auth.js or similar), or should I write one from scratch as part of this change?
+
+You said: yes write one
+yes write one
+
+11:25
+Claude responded: Perfect.
+Perfect. I'll write everything in one go. Here's all the files:
+
+
+Created 3 files
+Created 3 files
+Now update admin.html to handle role differences in the UI, and update index.html to handle superadmin:
+
+
+Update index.html to show admin button for both admin and superadmin, and pass token in re-auth fetch
+Update index.html to show admin button for both admin and superadmin, and pass token in re-auth fetch
+Now update admin.html — restrict UI based on role and pass token in all API calls:
+
+
+Update admin sidebar to hide Bookings for dept admin, and show role label
+Update admin sidebar to hide Bookings for dept admin, and show role label
+Now update the showSection, role dropdown, and INIT in admin.html:
+
+
+Update showSection to accept button param and fix active state
+Update showSection to accept button param and fix active state
+Now update the INIT block in admin.html to set up role-based UI and pass tokens:
+
+
+Update INIT to handle superadmin vs admin roles, hide bookings for admin, restrict dept dropdown
+Update INIT to handle superadmin vs admin roles, hide bookings for admin, restrict dept dropdown
+Now update all fetch calls in admin.html to pass the auth token:
+
+
+Edited 4 files
+Edited 4 files
+Now update loadDepartments in admin.html so dept admins only see their own departments in the dropdown:
+
+
+Edited a file, read a file
+Edited a file, read a file
+Here's a summary of everything changed:
+
+New file — middleware/auth.js
+
+verifyToken — reads JWT from Authorization header, attaches decoded user to req.user
+requireRole(...roles) — blocks access if caller's role isn't in the allowed list
+routes/auth.js
+
+Now explicitly returns role in the login response so frontend stores it cleanly
+Strips password from user object before sending
+routes/user.js
+
+All routes now protected by verifyToken
+GET /users — superadmin sees all, admin sees only users in their department
+POST /users — admin forced to role=user, departments restricted to their own
+PUT/:id and DELETE/:id — admin can only touch users in their department
+admin.html
+
+Bookings nav hidden for admin role
+Role dropdown replaced with disabled "User" field for dept admins
+Department dropdowns only show admin's own departments
+All fetch calls now send Authorization: Bearer <token>
+index.html
+
+Admin sidebar button now shows for both admin and superadmin
+One thing you need to do manually — run this SQL to upgrade your HOD account:
+
+sql
+UPDATE users SET role = 'superadmin' WHERE email = 'admin@gmail.com';
+
+Auth
+JS 
+
+Auth
+JS 
+
+User
+JS 
+
+Admin
+Code · HTML 
+
+Index
+Code · HTML 
+You said: why have two Auth.
+why have two Auth.js
+
+11:28
+Claude responded: You're right!
+You're right! The routes/auth.js I output is the updated one to replace your existing routes/auth.js. There should only ever be one.
+
+Your file structure stays the same:
+
+routes/
+├── auth.js        ← replace with the new one I gave
+├── user.js        ← replace with the new one I gave
+├── departments.js ← unchanged
+├── links.js       ← unchanged
+└── booking.js     ← unchanged
+
+middleware/
+└── auth.js        ← new file, create this folder and file
+The middleware/auth.js and routes/auth.js are different files in different folders — one is the JWT middleware, the other is the login route. Just make sure you create the middleware/ folder in your project root alongside routes/.
+
+You said: prompt this chat
+prompt this chat
+
+11:31
+Claude responded: Here's the full continuation prompt:
+Here's the full continuation prompt:
+
+Project: Bismi AccessHub — Internal Web Dashboard
+
+I'm building an internal web dashboard called AccessHub for Bismi (a halal chicken brand from Malaysia). The stack is:
+
+Frontend: Vanilla HTML, CSS, JS — separated into public/index.html and public/styles.css
+Backend: Node.js + Express (server.js)
+Database: MySQL (via mysql2/promise pool in db.js)
+Auth: bcryptjs, JWT stored in localStorage/sessionStorage
+File structure:
+accesshub/
+├── public/
+│   ├── index.html
+│   ├── styles.css
+│   ├── login.html
+│   ├── booking.html
+│   ├── admin.html
+│   └── bismi_logo.jpeg
+├── routes/
+│   ├── auth.js
+│   ├── user.js
+│   ├── departments.js
+│   ├── links.js
+│   └── booking.js
+├── middleware/
+│   └── auth.js
+├── db.js
+├── server.js
+└── package.json
+Design style: Clean, minimal, white-dominant dashboard. Warm off-white page bg (
+#F5F4F2), white cards/sidebar, pink accent 
+#D4186C used sparingly. Fonts: Plus Jakarta Sans + DM Serif Display.
+
+Brand colors:
+
+--pink: #D4186C
+--pink-soft: #FCE8F3
+--surface-2: #F5F4F2
+--ink: #1C1C1E
+Roles (3 levels):
+
+Role	Access
+superadmin	Full access, all departments, all admin features
+admin	Department admin — limited to their own dept only
+user	Staff — read only, sees assigned dept links
+Super admin account: admin@gmail.com / 123456 (role must be superadmin in DB)
+
+Sidebar sections (index.html):
+
+Link Management — All + department buttons (dynamic)
+Others — Room Booking, Training Module
+Admin — Admin Panel button (only visible for admin and superadmin, triggers re-auth modal)
+General — Profile
+Admin Panel button behaviour:
+
+Only shown if role === admin or role === superadmin
+Clicking opens a re-auth modal (password only, email from session)
+Calls POST /api/auth/login to verify
+On success → redirects to admin.html
+admin.html sections:
+
+superadmin → sees Users, Links, Bookings
+admin → sees Users and Links only (Bookings nav hidden)
+Both have ← Back to Dashboard button in sidebar
+Department restrictions:
+
+superadmin → sees all departments, can create admin or user roles
+admin → sees only their assigned departments, can only create user role, restricted to their own departments
+user → sees only assigned department links on dashboard
+Key API routes (all under /api):
+
+POST /api/auth/login → returns { token, role, user }
+GET /api/users → protected, superadmin gets all, admin gets only their dept users
+POST /api/users → protected, admin forced to role=user and own depts only
+PUT /api/users/:id → protected, admin restricted to own dept users
+DELETE /api/users/:id → protected, admin restricted to own dept users
+GET /api/users/:id/departments → returns user's departments
+POST /api/users/:id/change-password → { currentPassword, newPassword }
+GET /api/departments → all departments
+GET /api/links → all links with department_id
+middleware/auth.js exports:
+
+verifyToken — reads JWT from Bearer header, attaches to req.user
+requireRole(...roles) — blocks if role not in allowed list
+Session storage pattern:
+
+js
+const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
+const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
+const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
+const user     = JSON.parse(userData);
+Database departments table:
+
+id	name
+1	HRAISC
+2	Finance & Account
+3	Logistics
+4	Maintenance & Facility
+5	Room Booking
+6	Training Module
+Important notes:
+
+module.exports = router must always be at the very end of route files
+Sidebar department buttons injected dynamically, filtered by user's assigned departments
+Admin sees all departments on user dashboard (loaded from GET /api/departments)
+Room Booking and Training Module excluded from Link Management filter
+superadmin role must be set manually in DB: UPDATE users SET role = 'superadmin' WHERE email = 'admin@gmail.com';
+All admin API calls send Authorization: Bearer <token> header
+You said: railway crash
+1778124738769_image.png
+1778124745401_image.png
+railway crash
+
+11:32
+Claude responded: I can see the problem clearly from Image 2.
+I can see the problem clearly from Image 2.
+
+You accidentally put auth.js in the root of your project instead of inside the middleware/ folder. So now you have:
+
+accesshub/
+├── auth.js          ← ❌ wrong location (this is the middleware)
+├── routes/
+│   └── auth.js      ← ✅ correct
+And user.js is requiring it from the wrong path:
+
+js
+const { verifyToken, requireRole } = require("../middleware/auth");
+But the middleware/ folder doesn't exist in your repo — so it crashes.
+
+Fix — two options:
+
+Option A (recommended): Create the middleware/ folder in your repo and move auth.js into it so the path matches the code.
+
+Option B (quick fix): Keep auth.js in the root and update the require path in user.js to:
+
+js
+const { verifyToken, requireRole } = require("../auth");
+Go with Option A — just create a middleware folder in your GitHub repo, move the auth.js file into it, and delete the one in the root. That matches exactly what the code expects.
+
+You said: Option A (recommended): Create the middleware/ folder in your repo and move auth.
+Option A (recommended): Create the middleware/ folder in your repo and move auth.js into it so the path matches the code.
+
+how to add folder inside railway
+
+11:38
+Claude responded: You can't create folders directly in Railway — Railway just deploys whatever is in your GitHub repo.
+You can't create folders directly in Railway — Railway just deploys whatever is in your GitHub repo. You need to do it in GitHub.
+
+Steps:
+
+Go to your GitHub repo
+Click "Add file" → "Create new file"
+In the filename box type:
+   middleware/auth.js
+— typing the / automatically creates the folder 4. Paste the middleware/auth.js content I gave you 5. Click Commit changes 6. Then go to the root auth.js (the wrong one) → open it → click the trash icon to delete it 7. Commit that deletion
+
+Railway will auto-redeploy from GitHub and it should work.
+
+You said: railway crash
+1778125217011_image.png
+1778125227817_image.png
+1778125241522_image.png
+railway crash
+
+11:40
+Claude responded: The error is clear from Image 3:
+The error is clear from Image 3:
+
+Error: Cannot find module '../middleware/auth'
+at /app/routes/user.js
+Your file structure shows middleware/ is inside the accesshub/ subfolder:
+
+accesshub/accesshub/middleware/auth.js
+But Railway runs from /app/ and your routes/user.js looks for ../middleware/auth. The path is one level off.
+
+Fix — update the require path in routes/user.js:
+
+Change line 5 from:
+
+js
+const { verifyToken, requireRole } = require("../middleware/auth");
+To:
+
+js
+const { verifyToken, requireRole } = require("../../middleware/auth");
+Go to GitHub → routes/user.js → edit that one line → commit. Railway will redeploy.
+
+You said: current routes/auth.
+current routes/auth.js
+const express = require("express");
+const router = express.Router();
+const db = require("../db");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "accesshub_secret";
+// =====================================
+// LOGIN
+// =====================================
+router.post("/login", async (req, res) => {
+  try {
+    const email    = req.body.email.trim().toLowerCase();
+    const password = req.body.password;
+    const [users] = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const user    = users[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Wrong password" });
+    }
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      SECRET_KEY,
+      { expiresIn: "8h" }
+    );
+    // Return user without password
+    const { password: _pw, ...safeUser } = user;
+    res.json({
+      message: "Login success",
+      token,
+      role: user.role,   // explicitly returned so frontend can store it cleanly
+      user: safeUser
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+module.exports = router;
+
+Show more
+11:43
+Claude responded: Good — your routes/auth.
+Good — your routes/auth.js is already updated correctly with the new version. No changes needed there.
+
+Just focus on fixing the one line in routes/user.js:
+
+js
+const { verifyToken, requireRole } = require("../../middleware/auth");
+That's the only thing needed to fix the crash.
+
+You said: still crash
+1778125591075_image.png
+still crash
+
+11:46
+Claude responded: Still Cannot find module '.
+Still Cannot find module '../../middleware/auth'. The path is still wrong.
+
+The issue is Railway deploys from /app/ and your actual folder structure inside the repo. Let's just use an absolute path to eliminate all guessing.
+
+Change the require in routes/user.js to:
+
+js
+const { verifyToken, requireRole } = require(require('path').join(__dirname, '../middleware/auth'));
+Or the simplest fix — just use path from the app root:
+
+js
+const { verifyToken, requireRole } = require('../middleware/auth');
+Wait — go to your GitHub and check: is the middleware folder at the same level as routes? Like this:
+
+accesshub/
+├── middleware/
+│   └── auth.js
+├── routes/
+│   └── user.js
+Or is it nested differently? Share a screenshot of your full GitHub file tree so I can see the exact structure.
+
+1778125644242_image.png
+11:47
+Claude responded: The structure is correct — middleware and routes are at the same level.
+The structure is correct — middleware and routes are at the same level. So the path in routes/user.js should be ../middleware/auth (one level up).
+
+Change it back to:
+
+js
+const { verifyToken, requireRole } = require("../middleware/auth");
+The ../../ was wrong — that goes two levels up. One ../ is correct since routes/ and middleware/ are siblings.
+
+You said: below pass put list of department 1.
+1778139470428_image.png
+1778139499494_image.png
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Bismi Admin Panel</title> <script>const API = window.location.origin;</script> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-
+
+pasted
+
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Bismi Admin Panel</title> <script>const API = window.location.origin;</script> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-
+
+pasted
+
+below pass put list of department 1.PJU 2.Farm - Development 3.Factory 4.BEET 5.ABF 6.Marketing 7.HRAISC 8.Farm - Flock Health 9.Farm - Technical 10.Fresh Frozen Chicken (FFC) 11.Farm - Planning 12.Naka Biolife 13.Sales 14.Logistic 15.Outlet Operation 16.Finance And Account 17.M & F 18.Business Development & IT 19.QC below department access have checkbox (pic 2) so when we select this they can view on user dashboard based on their selected
+
+admin.html:
+
+15:38
+Claude responded: I can see the issue — the department checkboxes aren't showing because loadDepartments() is fetching from your API but your departments table in DB only has 4-…
+I can see the issue — the department checkboxes aren't showing because loadDepartments() is fetching from your API but your departments table in DB only has 4-6 entries, not all 19. I need to update admin.html to add these departments to your DB first, then the checkboxes will populate.
+
+But first — do you want to add all 19 departments to your database, or just use them as a hardcoded list in the frontend only?
+
+The right way is to add them to DB so everything stays consistent. Do you want me to give you the SQL to insert all 19 departments, then update the checkbox display?
+
+You said: store on database because later will use in profile
+store on database because later will use in profile
+
+15:39
+Claude responded: Good call.
+Good call. First run this SQL to insert all 19 departments into your database:
+
+sql
+INSERT INTO departments (name) VALUES
+('PJU'),
+('Farm - Development'),
+('Factory'),
+('BEET'),
+('ABF'),
+('Marketing'),
+('HRAISC'),
+('Farm - Flock Health'),
+('Farm - Technical'),
+('Fresh Frozen Chicken (FFC)'),
+('Farm - Planning'),
+('Naka Biolife'),
+('Sales'),
+('Logistic'),
+('Outlet Operation'),
+('Finance And Account'),
+('M & F'),
+('Business Development & IT'),
+('QC');
+But wait — you already have departments in your DB (HRAISC, Finance & Account, Logistics, Maintenance & Facility from pic 2). So you need to decide:
+
+Delete the old ones and insert fresh — clean but will break existing user assignments
+Keep old ones and add new ones — safe but may have duplicates like Logistics vs Logistic
+Which do you prefer? Also share your current departments table so I can see exactly what's there:
+
+sql
+SELECT * FROM departments;
+Paste the result and I'll give you the exact clean SQL to run.
+
+You said: also below role
+also below role
+
+must have checkbox which department link they can access
+
+meaning taht user dashboard kan have sidebar list of department, then inside store links depends on teh department
+
+not all staff can access all link
+
+only certain people can access specific link
+
+15:44
+Claude responded: Okay so just to make sure I understand correctly before touching code:
+Okay so just to make sure I understand correctly before touching code:
+
+Current flow:
+
+Admin creates user → assigns departments → user sees those department links on dashboard ✅
+What you're saying is already working? Or is the issue that the department checkboxes are not showing in the Create User form (as seen in pic 1 — the checkbox area is empty under "Link Management Departments")?
+
+From the screenshot it looks like the checkboxes section is empty — that's the bug to fix, right?
+
+The fix would be:
+
+Run the SQL to insert all 19 departments into DB
+The loadDepartments() API call will then return all 19
+Checkboxes will populate automatically
+So really the only thing needed is the SQL insert — once departments are in the DB, the existing code already handles the rest.
+
+Can you confirm:
+
+What does SELECT * FROM departments; return right now?
+Is the checkbox emptiness the main issue, or is there something else about how department access works that needs changing?
+You said: admin create user
+
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Bismi AccessHub</title> <script>const API = window.location.origin;</script> <link href="https://fonts.googleapis.com/css2?family=Plus
+
+pasted
+
+admin create user
+
+enter name
+enter email
+enter password
+enter confirm password
+select department ( department they work)
+choose which role
+department access (which department link tehy can access)
+this is index.html
+if you look at the code you will see the sidebar have list of department (only 4 department) , based on admin panel selection
+
+15:47
+Claude responded: Got it.
+Got it. So the create user form needs two separate department fields:
+
+Department (single select) — which department they work in (their team)
+Department Access (multi checkbox) — which department links they can see on dashboard
+And the sidebar on index.html already works correctly — it shows departments based on what's assigned in user_departments table.
+
+So the fix is purely in admin.html create user form. Let me update it now.
+
+
+Check current admin.html create user form section
+Check current admin.html create user form section
+I can see the current admin.html is the old version. Since the pasted documents show a much better redesigned version already exists, let me work with that and update the create user form properly.
+
+
+Update create user form to separate department (work) from department access (links)
+Update create user form to separate department (work) from department access (links)
+The current output file is the old admin.html. Since the pasted document has the redesigned version, let me write the complete updated admin.html fresh based on document index 4/5 with the corrected create user form:
+
+
+Ran a command, viewed a file, edited a file
+Ran a command, viewed a file, edited a file
+Now update loadDepartments to also populate the work department dropdown, and update createUser to handle both fields:
+
+
+Viewed 3 files, edited a file
+Viewed 3 files, edited a file
+Now I have full context. Let me make all the updates:
+
+
+Ran 2 commands, edited a file
+Ran 2 commands, edited a file
+Now update createUser to include confirm password check and the work department field:
+
+
+Ran a command, read a file
+Ran a command, read a file
+Here's what changed in the Create User form:
+
+New form structure:
+
+Full Name + Email (side by side)
+Password + Confirm Password (side by side) — with match validation
+Department (single dropdown) — where they work e.g. Finance & Account
+Role — User or Admin
+Department Access (checkboxes) — which links they can see on dashboard
+Logic:
+
+If admin selects a work department, it's automatically added to their access list too (so their own dept is always included)
+All 19 departments will show once you run the SQL insert into your DB
+Passwords must match and be min 6 characters before submitting
+Still need to run the SQL to insert all 19 departments — once that's done the dropdowns and checkboxes will populate correctly.
+
+
+Admin
+Code · HTML 
+
+Want to be notified when Claude responds?
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+Admin · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bismi Admin Panel</title>
-<script>const API = window.location.origin;</script>
+  <script>
+    const API = window.location.origin;
+  </script>
+<title>Admin Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-:root {
-  --pink:         #D4186C;
-  --pink-hover:   #B5135C;
-  --pink-soft:    #FCE8F3;
-  --pink-pill:    #F9D5EA;
-  --ink:          #1C1C1E;
-  --ink-mid:      #5A5A6E;
-  --ink-light:    #9999AA;
-  --ink-faint:    #D0D0DA;
-  --surface:      #FFFFFF;
-  --surface-2:    #F5F4F2;
-  --border:       #EBEBEE;
-  --sidebar-w:    252px;
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
-  --shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
-  --shadow-focus: 0 0 0 3px rgba(212,24,108,0.18);
-  --font:         'Plus Jakarta Sans', sans-serif;
-  --font-display: 'DM Serif Display', serif;
-  --ease: cubic-bezier(.4,0,.2,1);
-  --t: 160ms;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+ 
 body {
-  font-family: var(--font);
-  background: var(--surface-2);
-  color: var(--ink);
+  font-family: "Segoe UI", sans-serif;
+  background: #f1f5f9;
   display: flex;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
 }
-
-/* ══ SIDEBAR ══ */
+ 
+/* SIDEBAR */
 .sidebar {
-  width: var(--sidebar-w);
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  height: 100vh;
+  width: 240px;
+  background: #1e293b;
+  color: white;
+  padding: 20px;
   position: fixed;
-  top: 0; left: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  z-index: 100;
 }
-
-.sidebar-brand {
-  padding: 24px 20px 20px;
+ 
+.sidebar button {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #334155;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 11px;
-  border-bottom: 1px solid var(--border);
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
 }
-
-.sidebar-logo-wrap {
-  width: 42px; height: 42px;
-  border-radius: var(--r-md);
-  background: var(--pink-soft);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden; flex-shrink: 0;
+ 
+.sidebar button:hover { background: #475569; transform: translateX(3px); }
+.sidebar button.active { background: #3b82f6; color: white; border: 2px solid rgba(255,255,255,0.6); }
+.sidebar h2 { text-align: center; margin-bottom: 20px; }
+ 
+/* BACK TO DASHBOARD BUTTON */
+.back-dashboard-btn {
+  background: rgba(212, 24, 108, 0.15) !important;
+  color: #f9a8d4 !important;
+  border: 1px solid rgba(212, 24, 108, 0.3) !important;
+  margin-bottom: 20px !important;
 }
-
-.sidebar-logo { width: 34px; height: 34px; object-fit: contain; }
-
-.sidebar-brand-text { display: flex; flex-direction: column; gap: 2px; }
-
-.sidebar-brand-name {
-  font-family: var(--font-display);
-  font-size: 21px; color: var(--ink);
-  line-height: 1; letter-spacing: -0.3px;
+.back-dashboard-btn:hover {
+  background: rgba(212, 24, 108, 0.28) !important;
+  color: #fff !important;
+  transform: translateX(-3px) !important;
 }
-
-.sidebar-brand-sub {
-  font-size: 9.5px; font-weight: 700;
-  letter-spacing: 1.1px; text-transform: uppercase;
-  color: var(--pink);
+.back-dashboard-btn i { color: inherit !important; }
+ 
+/* SIDEBAR DIVIDER */
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 4px 0 16px;
 }
-
-.sidebar-nav {
-  flex: 1;
-  padding: 18px 14px 10px;
-  display: flex; flex-direction: column;
-  gap: 2px; overflow-y: auto;
+ 
+.logout-btn {
+  margin-top: auto;
+  background: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 15px;
+  transition: all 0.25s ease;
 }
-
-.sidebar-nav::-webkit-scrollbar { width: 0; }
-
-.sidebar-section-label {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 1.2px; text-transform: uppercase;
-  color: var(--ink-faint);
-  padding: 14px 10px 6px;
-  user-select: none;
+ 
+.sidebar .logout-btn:hover { background: #ef4444; color: white; transform: translateX(3px); }
+.sidebar .logout-btn:active { transform: scale(0.97); }
+ 
+/* MAIN */
+.main { margin-left: 240px; padding: 30px; width: calc(100% - 240px); }
+ 
+/* CARD */
+.card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+ 
+/* FORM */
+input, select { width: 100%; padding: 10px; margin: 10px 0; }
+button.primary { background: #3b82f6; color: white; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
+ 
+/* CHECKBOX */
+.checkbox-card { display: flex; align-items: center; gap: 10px; }
+.checkbox-card input { width: 16px; height: 16px; }
+#departmentCheckboxes label { display: flex; align-items: center; gap: 10px; }
+ 
+/* TABLE */
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; }
+th { background: #e2e8f0; }
+ 
+/* USERS TABLE */
+#userTable th:nth-child(1), #userTable td:nth-child(1) { text-align: left; }
+#userTable th:nth-child(2), #userTable td:nth-child(2) { text-align: left; }
+#userTable th:nth-child(3), #userTable td:nth-child(3) { text-align: left; width: 120px; }
+#userTable th:nth-child(4), #userTable td:nth-child(4) { text-align: left; padding-left: 40px; }
+#userTable th:last-child,   #userTable td:last-child   { text-align: center; }
+ 
+/* LINKS TABLE */
+#linkTable th:nth-child(1), #linkTable td:nth-child(1) { text-align: left; }
+#linkTable th:nth-child(2), #linkTable td:nth-child(2) { text-align: center; }
+#linkTable th:nth-child(3), #linkTable td:nth-child(3) { text-align: left; }
+#linkTable th:last-child,   #linkTable td:last-child   { text-align: center; }
+#linkTable a { color: #3b82f6; text-decoration: none; font-weight: 500; }
+#linkTable a:hover { text-decoration: underline; }
+ 
+/* BADGES */
+.badge { background: #e2e8f0; padding: 4px 10px; border-radius: 6px; margin: 2px 4px 2px 0; display: inline-block; }
+ 
+/* ACTION BUTTONS */
+.action-buttons { display: flex; justify-content: center; gap: 10px; }
+ 
+.action-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
-
-.sidebar button {
-  width: 100%; padding: 10px 13px;
-  border: none; background: transparent;
-  color: var(--ink-mid); cursor: pointer;
-  border-radius: 10px; text-align: left;
-  font-family: var(--font); font-size: 14px; font-weight: 500;
-  display: flex; align-items: center; gap: 10px;
-  transition: background var(--t) var(--ease), color var(--t) var(--ease);
+ 
+.edit-btn    { background: #facc15; color: #1e293b; }
+.edit-btn:hover    { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
+ 
+.delete-btn  { background: #ef4444; color: white; }
+.delete-btn:hover  { background: #dc2626; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
+ 
+.cancel-btn  { background: #f97316; color: white; }
+.cancel-btn:hover  { background: #ea580c; transform: translateY(-2px); }
+ 
+.restore-btn { background: #22c55e; color: white; }
+.restore-btn:hover { background: #16a34a; transform: translateY(-2px); }
+ 
+.action-buttons button:active { transform: scale(0.95); }
+.action-buttons i { font-size: 12px; }
+ 
+.icon-only { padding: 8px; width: 34px; height: 34px; justify-content: center; }
+ 
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
 }
-
-.sidebar button i {
-  width: 18px; text-align: center; font-size: 14px;
-  color: var(--ink-light);
-  transition: color var(--t) var(--ease); flex-shrink: 0;
+ 
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
-
-.sidebar button:hover { background: var(--surface-2); color: var(--ink); }
-.sidebar button:hover i { color: var(--ink-mid); }
-.sidebar button.active { background: var(--pink-soft); color: var(--pink); font-weight: 700; }
-.sidebar button.active i { color: var(--pink); }
-
-.back-btn {
-  background: var(--surface-2) !important;
-  color: var(--ink-mid) !important;
-  border: 1px solid var(--border) !important;
-  margin-bottom: 4px;
+ 
+.modal-content h3 { margin-bottom: 5px; }
+ 
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
 }
-.back-btn:hover { background: var(--border) !important; color: var(--ink) !important; }
-
-.sidebar-footer { padding: 14px; border-top: 1px solid var(--border); }
-
-.logout-btn { justify-content: center !important; font-size: 13.5px !important; color: var(--ink-light) !important; }
-.logout-btn:hover { background: #FFF1F1 !important; color: #DC2626 !important; }
-.logout-btn:hover i { color: #DC2626 !important; }
-
-/* ══ MAIN ══ */
-.main { margin-left: var(--sidebar-w); padding: 36px 40px; width: 100%; min-height: 100vh; }
-
-.page-header { margin-bottom: 28px; }
-
-.page-title {
-  font-family: var(--font-display);
-  font-size: 30px; color: var(--ink);
-  letter-spacing: -0.5px; line-height: 1;
-  display: flex; align-items: center; gap: 10px;
+ 
+.btn-cancel  { background: #e5e7eb; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-update  { background: #3b82f6; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-delete  { background: #ef4444; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-confirm { background: #22c55e; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+ 
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ffffff;
+  color: #1e293b;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  width: auto;
+  max-width: 300px;
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  word-wrap: break-word;
 }
-
-.page-title-icon {
-  width: 36px; height: 36px;
-  background: var(--pink-soft); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--pink); font-size: 16px;
+ 
+.toast.show { opacity: 1; transform: translateY(0); }
+ 
+/* EDIT DEPARTMENTS */
+#editDepartments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
 }
-
-.page-title span.accent { color: var(--pink); }
-.page-subtitle { margin-top: 6px; font-size: 13.5px; color: var(--ink-light); font-weight: 400; padding-left: 2px; }
-
-/* ══ CARDS ══ */
-.card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 24px 28px;
-  box-shadow: var(--shadow-card);
-  margin-bottom: 20px;
+ 
+#editDepartments label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
 }
-
-.card-title {
-  font-size: 16px; font-weight: 700;
-  color: var(--ink); margin-bottom: 20px;
-  display: flex; align-items: center; gap: 8px;
+ 
+#editDepartments label:hover { background: #e2e8f0; }
+#editDepartments input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
+ 
+/* BOOKING STATUS BADGES */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
 }
-.card-title i { color: var(--pink); font-size: 15px; }
-
-/* ══ FORM ══ */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-.form-grid.full { grid-template-columns: 1fr; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-
-.form-group label { font-size: 12px; font-weight: 600; color: var(--ink-mid); letter-spacing: 0.2px; }
-
-.form-group input,
-.form-group select {
-  width: 100%; padding: 10px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-sm);
-  font-family: var(--font); font-size: 13.5px;
-  color: var(--ink); background: var(--surface);
-  outline: none; margin: 0;
-  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
-}
-
-.form-group input:focus,
-.form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
-.form-group input::placeholder { color: var(--ink-faint); }
-
-.pw-input-wrap {
-  display: flex; align-items: center;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-sm);
-  overflow: hidden; background: var(--surface);
-  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
-}
-.pw-input-wrap:focus-within { border-color: var(--pink); box-shadow: var(--shadow-focus); }
-.pw-input-wrap input {
-  flex: 1; border: none !important; outline: none !important;
-  box-shadow: none !important; padding: 10px 14px; font-size: 13.5px;
-  font-family: var(--font); background: transparent; color: var(--ink); margin: 0; width: auto;
-}
-.pw-input-wrap button {
-  border: none; background: transparent; padding: 0 12px; cursor: pointer;
-  color: var(--ink-light); font-size: 13px; height: 42px; width: auto; border-radius: 0;
-  transition: color var(--t) var(--ease);
-}
-.pw-input-wrap button:hover { color: var(--pink); }
-
-/* ROLE TOGGLE */
-.role-toggle {
+ 
+.status-confirmed { background: #dcfce7; color: #166534; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+ 
+/* BOOKING FILTER BAR */
+.filter-bar {
   display: flex;
   gap: 10px;
-  margin-bottom: 4px;
-}
-
-.role-option {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--ink-mid);
-  background: var(--surface);
-  transition: all var(--t) var(--ease);
-  user-select: none;
-}
-
-.role-option input[type="radio"] { display: none; }
-
-.role-option:hover { background: var(--surface-2); border-color: var(--ink-faint); color: var(--ink); }
-
-.role-option.selected-user {
-  background: #EFF6FF;
-  border-color: #2563EB;
-  color: #2563EB;
-  font-weight: 700;
-}
-
-.role-option.selected-admin {
-  background: var(--pink-soft);
-  border-color: var(--pink);
-  color: var(--pink);
-  font-weight: 700;
-}
-
-.role-option i { font-size: 15px; }
-
-/* DEPT SECTION LABEL */
-.dept-section-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--ink-light);
-  margin: 16px 0 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Dept checkboxes */
-.dept-checkboxes {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 8px; margin-top: 4px;
-}
-
-.dept-checkboxes label {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 12px; border-radius: var(--r-sm);
-  border: 1.5px solid var(--border);
-  font-size: 13px; font-weight: 500; color: var(--ink-mid);
-  cursor: pointer;
-  transition: border-color var(--t) var(--ease), background var(--t) var(--ease);
-}
-
-.dept-checkboxes label:hover { background: var(--pink-soft); border-color: var(--pink-pill); color: var(--ink); }
-.dept-checkboxes input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--pink); cursor: pointer; }
-.dept-checkboxes label:has(input:checked) { background: var(--pink-soft); border-color: var(--pink); color: var(--pink); font-weight: 600; }
-
-/* Dept access info box */
-.access-info {
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  border-radius: var(--r-sm);
-  padding: 10px 14px;
-  font-size: 12.5px;
-  color: #1D4ED8;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.access-info i { margin-top: 1px; flex-shrink: 0; }
-
-.access-info.admin-info {
-  background: var(--pink-soft);
-  border-color: var(--pink-pill);
-  color: var(--pink);
-}
-
-/* Buttons */
-.btn-primary {
-  padding: 10px 22px;
-  background: var(--pink); color: #fff;
-  border: none; border-radius: var(--r-sm);
-  font-family: var(--font); font-size: 13.5px; font-weight: 600;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
-  transition: background var(--t) var(--ease), transform var(--t) var(--ease);
-}
-.btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
-
-.btn-secondary {
-  padding: 10px 22px;
-  background: var(--surface-2); color: var(--ink-mid);
-  border: 1.5px solid var(--border); border-radius: var(--r-sm);
-  font-family: var(--font); font-size: 13.5px; font-weight: 600;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
-  transition: background var(--t) var(--ease);
-}
-.btn-secondary:hover { background: var(--border); }
-
-/* ══ TABLE ══ */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th {
-  background: var(--surface-2); padding: 11px 14px;
-  font-size: 11px; font-weight: 700; text-align: left;
-  text-transform: uppercase; letter-spacing: 0.8px;
-  color: var(--ink-light); border-bottom: 1.5px solid var(--border);
-}
-td { padding: 13px 14px; font-size: 13.5px; color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: #FAFAFA; }
-
-.badge {
-  background: var(--pink-soft); color: var(--pink);
-  border: 1px solid var(--pink-pill);
-  padding: 3px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 600;
-  display: inline-block; margin: 2px 3px 2px 0;
-}
-
-.role-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-.role-user  { background: #EFF6FF; color: #2563EB; }
-.role-admin { background: var(--pink-soft); color: var(--pink); }
-
-.action-btns { display: flex; align-items: center; gap: 6px; }
-.act-btn {
-  width: 32px; height: 32px; border: none; border-radius: var(--r-sm);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  transition: transform var(--t) var(--ease), opacity var(--t) var(--ease);
-}
-.act-btn:hover { transform: translateY(-1px); opacity: 0.85; }
-.act-edit    { background: #FEF9C3; color: #B45309; }
-.act-delete  { background: #FEE2E2; color: #DC2626; }
-.act-cancel  { background: #FEE2E2; color: #DC2626; }
-.act-restore { background: #DCFCE7; color: #16A34A; }
-.act-view    { background: #EFF6FF; color: #2563EB; }
-
-/* ══ FILTER BAR ══ */
-.filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
-.filter-bar select,
-.filter-bar input[type="date"] {
-  padding: 9px 12px; border-radius: var(--r-sm);
-  border: 1.5px solid var(--border);
-  font-family: var(--font); font-size: 13px;
-  color: var(--ink); background: var(--surface);
-  outline: none; margin: 0;
-  transition: border-color var(--t) var(--ease);
-}
-.filter-bar select:focus,
-.filter-bar input:focus { border-color: var(--pink); }
-
-.status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-.status-confirmed { background: #DCFCE7; color: #15803D; }
-.status-cancelled { background: #FEE2E2; color: #DC2626; }
-
-/* ══ MODAL ══ */
-.modal {
-  display: none; position: fixed; inset: 0;
-  z-index: 999; background: rgba(0,0,0,0.35);
-  justify-content: center; align-items: center;
-  backdrop-filter: blur(2px);
-}
-.modal-box {
-  background: var(--surface); border-radius: var(--r-lg); padding: 28px;
-  width: 440px; max-width: 95vw; max-height: 88vh; overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  animation: modalPop 200ms var(--ease);
-}
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.95) translateY(8px); }
-  to   { opacity: 1; transform: scale(1)   translateY(0); }
-}
-.modal-title { font-family: var(--font-display); font-size: 20px; color: var(--ink); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-.modal-title i { color: var(--pink); font-size: 17px; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
-
-/* Admin password re-entry modal */
-.admin-pw-modal .modal-box { width: 380px; }
-.admin-pw-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--pink-soft); color: var(--pink);
-  border: 1px solid var(--pink-pill);
-  border-radius: 20px; padding: 4px 12px;
-  font-size: 12px; font-weight: 700;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
 }
-
-/* ══ TOAST ══ */
-.toast {
-  position: fixed; top: 24px; right: 24px;
-  background: var(--surface); color: var(--ink);
-  padding: 13px 18px; border-radius: var(--r-md);
-  font-size: 13.5px; font-weight: 500;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 300px;
-  opacity: 0; transform: translateY(-12px);
-  transition: all 0.28s var(--ease);
-  z-index: 9999; border-left: 4px solid var(--pink);
+ 
+.filter-bar select,
+.filter-bar input {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  color: #1e293b;
+  background: #f8fafc;
+  margin: 0;
 }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.error { border-left-color: #DC2626; }
-.toast.success { border-left-color: #16A34A; }
-
-/* Edit dept checkboxes */
-#editDepartments {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 8px; margin: 10px 0; max-height: 240px; overflow-y: auto;
-}
-#editDepartments label {
-  display: flex; align-items: center; gap: 8px; padding: 9px 12px;
-  border-radius: var(--r-sm); border: 1.5px solid var(--border);
-  font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer;
-  transition: border-color var(--t), background var(--t);
-}
-#editDepartments label:hover { background: var(--pink-soft); border-color: var(--pink-pill); }
-#editDepartments input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--pink); }
-#editDepartments label:has(input:checked) { background: var(--pink-soft); border-color: var(--pink); color: var(--pink); font-weight: 600; }
-
-.detail-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-.detail-table td { padding: 9px 0; font-size: 13.5px; border-bottom: 1px solid var(--border); }
-.detail-table tr:last-child td { border-bottom: none; }
-.detail-table td:first-child { color: var(--ink-light); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; width: 38%; }
-.detail-table td:last-child { font-weight: 500; color: var(--ink); }
-
-.empty-row td { text-align: center; padding: 40px !important; color: var(--ink-light); font-size: 13.5px; }
-
-@media (max-width: 960px) {
-  :root { --sidebar-w: 210px; }
-  .main { padding: 24px 20px; }
+ 
+.filter-bar select:focus,
+.filter-bar input:focus { border-color: #3b82f6; outline: none; }
+ 
+/* BOOKINGS TABLE */
+#bookingsTable th:last-child,
+#bookingsTable td:last-child { text-align: center; }
+ 
+.booking-detail { font-size: 12px; color: #64748b; margin-top: 2px; }
+ 
+@keyframes pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
 }
 </style>
 </head>
+ 
 <body>
-
-<!-- ══ MODALS ══ -->
-
-
-<!-- Edit User -->
+ 
+<!-- EDIT USER MODAL -->
 <div id="editModal" class="modal">
-  <div class="modal-box" style="width:520px;">
-    <div class="modal-title"><i class="fas fa-user-pen"></i> Edit User</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="editName" placeholder="Name">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="editEmail" placeholder="Email">
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:14px;">
-      <label>New Password <span style="color:var(--ink-light);font-weight:400;">(leave blank to keep)</span></label>
-      <div class="pw-input-wrap">
-        <input type="password" id="editPassword" placeholder="New password (optional)">
-        <button type="button" onclick="togglePw('editPassword',this)"><i class="fas fa-eye"></i></button>
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:16px;">
-      <label>Departments</label>
-      <div id="editDepartments"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-      <button class="btn-primary"   onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
+  <div class="modal-content">
+    <h3>Edit User</h3>
+    <input type="text"     id="editName"     placeholder="Name">
+    <input type="email"    id="editEmail"    placeholder="Email">
+    <input type="password" id="editPassword" placeholder="New Password (optional)">
+    <h4>Departments</h4>
+    <div id="editDepartments"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-update" onclick="confirmEdit()">Update</button>
     </div>
   </div>
 </div>
-
-<!-- Delete Confirm -->
+ 
+<!-- DELETE MODAL -->
 <div id="deleteModal" class="modal">
-  <div class="modal-box" style="width:360px;">
-    <div class="modal-title"><i class="fas fa-trash"></i> Confirm Delete</div>
-    <p id="deleteMessage" style="color:var(--ink-mid);font-size:14px;line-height:1.6;">Are you sure you want to delete this?</p>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-primary" style="background:#DC2626;" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
+  <div class="modal-content">
+    <h3>Confirm Delete</h3>
+    <p id="deleteMessage">Are you sure you want to delete this?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-delete"  onclick="confirmDelete()">Delete</button>
     </div>
   </div>
 </div>
-
-<!-- Edit Link -->
+ 
+<!-- EDIT LINK MODAL -->
 <div id="editLinkModal" class="modal">
-  <div class="modal-box">
-    <div class="modal-title"><i class="fas fa-link"></i> Edit Link</div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label>Link Name</label>
-      <input type="text" id="editLinkName" placeholder="Link Name">
-    </div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label>URL</label>
-      <input type="text" id="editLinkURL" placeholder="https://...">
-    </div>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label>Department</label>
-      <select id="editLinkDepartment"></select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeEditLinkModal()">Cancel</button>
-      <button class="btn-primary"   onclick="updateLink()"><i class="fas fa-save"></i> Update</button>
+  <div class="modal-content">
+    <h3>Edit Link</h3>
+    <input type="text" id="editLinkName" placeholder="Link Name">
+    <input type="text" id="editLinkURL"  placeholder="URL">
+    <select id="editLinkDepartment"></select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditLinkModal()">Cancel</button>
+      <button class="btn-update" onclick="updateLink()">Update</button>
     </div>
   </div>
 </div>
-
-<!-- Logout Confirm -->
+ 
+<!-- LOGOUT MODAL -->
 <div id="logoutModal" class="modal">
-  <div class="modal-box" style="width:360px;">
-    <div class="modal-title"><i class="fas fa-sign-out-alt"></i> Confirm Logout</div>
-    <p style="color:var(--ink-mid);font-size:14px;line-height:1.6;">Are you sure you want to logout?</p>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeLogoutModal()">Cancel</button>
-      <button class="btn-primary" style="background:#DC2626;" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  <div class="modal-content">
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to logout?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn-delete" onclick="confirmLogout()">Logout</button>
     </div>
   </div>
 </div>
-
-<!-- Booking Detail -->
+ 
+<!-- BOOKING DETAIL MODAL -->
 <div id="bookingDetailModal" class="modal">
-  <div class="modal-box" style="width:480px;">
-    <div class="modal-title"><i class="fas fa-calendar-check"></i> Booking Details</div>
-    <table class="detail-table">
-      <tr><td>Room</td>       <td id="dRoom"></td></tr>
-      <tr><td>Event</td>      <td id="dEvent"></td></tr>
-      <tr><td>Date</td>       <td id="dDate"></td></tr>
-      <tr><td>Time</td>       <td id="dTime"></td></tr>
-      <tr><td>Duration</td>   <td id="dDuration"></td></tr>
-      <tr><td>Name</td>       <td id="dName"></td></tr>
-      <tr><td>Department</td> <td id="dDept"></td></tr>
-      <tr><td>Phone</td>      <td id="dPhone"></td></tr>
-      <tr><td>Status</td>     <td id="dStatus"></td></tr>
-      <tr><td>Submitted</td>  <td id="dCreated"></td></tr>
+  <div class="modal-content" style="width:480px;">
+    <h3>Booking Details</h3>
+    <table style="width:100%; margin:16px 0; border-collapse:collapse;">
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:40%;">Room</td>       <td id="dRoom"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Event</td>      <td id="dEvent"    style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Date</td>       <td id="dDate"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Time</td>       <td id="dTime"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Duration</td>   <td id="dDuration" style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Name</td>       <td id="dName"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Department</td> <td id="dDept"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Phone</td>      <td id="dPhone"    style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Status</td>     <td id="dStatus"   style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Submitted</td>  <td id="dCreated"  style="font-size:13px;font-weight:500;"></td></tr>
     </table>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-primary" id="detailCancelBtn"  onclick="cancelFromDetail()"  style="background:#DC2626;"><i class="fas fa-ban"></i> Cancel Booking</button>
-      <button class="btn-primary" id="detailRestoreBtn" onclick="restoreFromDetail()" style="background:#16A34A;display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBookingDetailModal()">Close</button>
+      <button class="btn-delete"  id="detailCancelBtn"  onclick="cancelFromDetail()">
+        <i class="fa-solid fa-ban"></i> Cancel Booking
+      </button>
+      <button class="btn-confirm" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;">
+        <i class="fa-solid fa-rotate-left"></i> Restore
+      </button>
     </div>
   </div>
 </div>
-
-<!-- ══ SIDEBAR ══ -->
+ 
+<!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-logo-wrap">
-      <img src="bismi_jpg__1_.jpeg" alt="Bismi" class="sidebar-logo">
-    </div>
-    <div class="sidebar-brand-text">
-      <span class="sidebar-brand-name">Bismi</span>
-      <span class="sidebar-brand-sub">Admin Panel</span>
-    </div>
-  </div>
-
-  <nav class="sidebar-nav">
-    <button class="back-btn" onclick="goBackToDashboard()">
-      <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </button>
-
-    <span class="sidebar-section-label">Management</span>
-    <button onclick="showSection('usersSection',this)" id="navUsers">
-      <i class="fas fa-users"></i> Users
-    </button>
-    <button onclick="showSection('linksSection',this)" id="navLinks">
-      <i class="fas fa-link"></i> Links
-    </button>
-    <button onclick="showSection('bookingsSection',this)" id="bookingsNavBtn">
-      <i class="fas fa-door-open"></i> Bookings
-    </button>
-  </nav>
-
-  <div class="sidebar-footer">
-    <button class="logout-btn" onclick="openLogoutModal()">
-      <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
-  </div>
+  <h2 id="adminPanelTitle">Admin Panel</h2>
+ 
+  <!-- Back to Dashboard -->
+  <button class="back-dashboard-btn" onclick="goBackToDashboard()">
+    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+  </button>
+ 
+  <hr class="sidebar-divider">
+ 
+  <button onclick="showSection('usersSection', this)"><i class="fa-solid fa-users"></i> Users</button>
+  <button onclick="showSection('linksSection', this)"><i class="fa-solid fa-link"></i> Links</button>
+  <!-- Bookings: superadmin only -->
+  <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)"><i class="fa-solid fa-door-open"></i> Bookings</button>
+  <button class="logout-btn" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 </div>
-
-<!-- ══ MAIN ══ -->
+ 
+<!-- MAIN -->
 <div class="main">
+ 
 <div id="toast" class="toast"></div>
-
+ 
 <!-- USERS SECTION -->
 <div id="usersSection">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-users"></i></div>
-      User <span class="accent">Management</span>
-    </h2>
-    <p class="page-subtitle">Create and manage system users</p>
-  </div>
-
   <div class="card">
-    <div class="card-title"><i class="fas fa-user-plus"></i> Create New User</div>
-
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="name" placeholder="Enter full name" onblur="titleCaseInput(this)">
+    <h3>Create User</h3>
+ 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Full Name</label>
+        <input id="name" placeholder="Enter full name">
       </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="Enter email address">
-      </div>
-    </div>
-
-    <div class="form-grid" style="margin-bottom:16px;">
-      <div class="form-group">
-        <label>Password</label>
-        <div class="pw-input-wrap">
-          <input type="password" id="password" placeholder="Create password">
-          <button type="button" onclick="togglePw('password',this)"><i class="fas fa-eye"></i></button>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Confirm Password</label>
-        <div class="pw-input-wrap">
-          <input type="password" id="confirmPassword" placeholder="Repeat password">
-          <button type="button" onclick="togglePw('confirmPassword',this)"><i class="fas fa-eye"></i></button>
-        </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Email</label>
+        <input id="email" type="email" placeholder="Enter email">
       </div>
     </div>
-
-    <!-- ROLE SELECTOR -->
-    <div class="form-group" style="margin-bottom:16px;">
-      <label>Role</label>
-      <div class="role-toggle">
-        <label class="role-option selected-user" id="roleOptUser" onclick="selectRole('user')">
-          <input type="radio" name="roleRadio" value="user" checked>
-          <i class="fas fa-user"></i> User
-          <span style="font-size:11px;font-weight:400;margin-left:auto;opacity:0.7;">Staff access</span>
-        </label>
-        <label class="role-option" id="roleOptAdmin" onclick="selectRole('admin')">
-          <input type="radio" name="roleRadio" value="admin">
-          <i class="fas fa-shield-halved"></i> Admin
-          <span style="font-size:11px;font-weight:400;margin-left:auto;opacity:0.7;">Full access</span>
-        </label>
+ 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Password</label>
+        <input id="password" type="password" placeholder="Create password">
       </div>
-
-      <!-- Access info -->
-      <div class="access-info" id="accessInfoUser">
-        <i class="fas fa-info-circle"></i>
-        <span>User can access <strong>assigned department links</strong>, Room Booking, and Training Module. They <strong>cannot</strong> see the Admin Panel.</span>
-      </div>
-      <div class="access-info admin-info" id="accessInfoAdmin" style="display:none;">
-        <i class="fas fa-shield-halved"></i>
-        <span>Admin has full access including the Admin Panel. They can also use the dashboard like a regular staff member.</span>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Confirm Password</label>
+        <input id="confirmPassword" type="password" placeholder="Repeat password">
       </div>
     </div>
-
-    <!-- DEPARTMENTS -->
-    <div class="form-group" style="margin-bottom:20px;" id="deptSection">
-      <label>Department Access</label>
-      <p style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">
-        Select which departments this user can see links for.
-      </p>
-
-      <!-- All-staff section (always visible info) -->
-      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--r-sm);padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:#15803D;display:flex;align-items:center;gap:8px;">
-        <i class="fas fa-check-circle"></i>
+ 
+    <!-- DEPARTMENT (where they work) -->
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
+        Department <span style="font-weight:400;color:#94a3b8;">(where they work)</span>
+      </label>
+      <select id="userDepartment">
+        <option value="">Select department...</option>
+      </select>
+    </div>
+ 
+    <!-- ROLE -->
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Role</label>
+      <select id="role">
+        <option value="user">User (Staff)</option>
+        <option value="admin">Admin (Department Admin)</option>
+      </select>
+    </div>
+ 
+    <!-- DEPARTMENT ACCESS (which links they can see) -->
+    <div style="margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
+        Department Access <span style="font-weight:400;color:#94a3b8;">(which links they can view on dashboard)</span>
+      </label>
+      <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Check all departments this user is allowed to see links for.</p>
+ 
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#15803D;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-circle-check"></i>
         <span><strong>Room Booking</strong> and <strong>Training Module</strong> are accessible to all staff automatically.</span>
       </div>
-
-      <div class="dept-section-label">Link Management Departments</div>
-      <div id="departmentCheckboxes" class="dept-checkboxes"></div>
+ 
+      <div id="departmentCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
     </div>
-
-    <button class="btn-primary" onclick="createUser()">
-      <i class="fas fa-user-plus"></i> Create User
+ 
+    <button class="primary" onclick="createUser()">
+      <i class="fa-solid fa-user-plus"></i> Create User
     </button>
   </div>
-
+ 
   <div class="card">
-    <div class="card-title"><i class="fas fa-list"></i> Users List</div>
-    <div class="table-wrap">
+    <h3>Users List</h3>
+    <div class="table-container">
       <table id="userTable">
         <thead>
-          <tr><th>Name</th><th>Email</th><th>Role</th><th>Departments</th><th>Action</th></tr>
+          <tr>
+            <th>Name</th><th>Email</th><th>Role</th><th>Departments</th><th>Action</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
 </div>
-
+ 
 <!-- LINKS SECTION -->
 <div id="linksSection" style="display:none;">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-link"></i></div>
-      Link <span class="accent">Management</span>
-    </h2>
-    <p class="page-subtitle">Add and manage department links</p>
-  </div>
-
   <div class="card">
-    <div class="card-title"><i class="fas fa-plus-circle"></i> Add New Link</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Link Name</label>
-        <input type="text" id="linkName" placeholder="e.g. Daily Balancing Report">
-      </div>
-      <div class="form-group">
-        <label>URL</label>
-        <input type="text" id="linkURL" placeholder="https://...">
-      </div>
-    </div>
-    <div class="form-group" style="margin-bottom:20px;">
-      <label>Department</label>
-      <select id="linkDepartment"><option value="">Select Department</option></select>
-    </div>
-    <button class="btn-primary" onclick="createLink()">
-      <i class="fas fa-plus"></i> Add Link
-    </button>
+    <h3>Add Link</h3>
+    <input id="linkName" placeholder="Link Name">
+    <input id="linkURL"  placeholder="URL">
+    <select id="linkDepartment"></select>
+    <button class="primary" onclick="createLink()">Add Link</button>
   </div>
-
+ 
   <div class="card">
-    <div class="card-title"><i class="fas fa-list"></i> Links List</div>
-    <div class="table-wrap">
+    <h3>Links List</h3>
+    <div class="table-container">
       <table id="linkTable">
         <thead>
           <tr><th>Link Name</th><th>URL</th><th>Department</th><th>Action</th></tr>
@@ -764,526 +1683,557 @@ tr:hover td { background: #FAFAFA; }
     </div>
   </div>
 </div>
-
+ 
 <!-- BOOKINGS SECTION -->
 <div id="bookingsSection" style="display:none;">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-door-open"></i></div>
-      Room <span class="accent">Bookings</span>
-    </h2>
-    <p class="page-subtitle">View and manage all room reservations</p>
-  </div>
-
   <div class="card">
+    <h3>Room Bookings</h3>
+ 
     <div class="filter-bar">
       <select id="filterStatus" onchange="filterBookings()">
         <option value="">All Status</option>
         <option value="confirmed">Confirmed</option>
         <option value="cancelled">Cancelled</option>
       </select>
+ 
       <select id="filterRoom" onchange="filterBookings()">
         <option value="">All Rooms</option>
       </select>
+ 
       <input type="date" id="filterDate" onchange="filterBookings()">
-      <button class="btn-secondary" onclick="clearBookingFilters()" style="padding:9px 16px;">
-        <i class="fas fa-times"></i> Clear
+ 
+      <button class="primary" onclick="clearBookingFilters()" style="width:auto;padding:8px 14px;border-radius:8px;">
+        Clear
       </button>
     </div>
-    <div class="table-wrap">
+ 
+    <div class="table-container">
       <table id="bookingsTable">
         <thead>
-          <tr><th>Room</th><th>Event</th><th>Date</th><th>Time</th><th>Booked By</th><th>Contact</th><th>Status</th><th>Action</th></tr>
+          <tr>
+            <th>Room</th><th>Event</th><th>Date</th><th>Time</th>
+            <th>Booked By</th><th>Contact</th><th>Status</th><th>Action</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
 </div>
-
-</div><!-- /.main -->
-
+ 
+</div><!-- end .main -->
+ 
 <script>
-
-/* ─────────────────────────────────────────
-   ALL DEPARTMENTS LIST
-───────────────────────────────────────── */
-const ALL_DEPARTMENTS = [
-  'PJU', 'Farm - Development', 'Factory', 'BEET', 'ABF',
-  'Marketing', 'HRAISC', 'Farm - Flock Health', 'Farm - Technical',
-  'Fresh Frozen Chicken (FFC)', 'Farm - Planning', 'Naka Biolife',
-  'Sales', 'Logistic', 'Outlet Operation', 'Finance And Account',
-  'M & F', 'Business Development & IT', 'QC'
-];
-
-/* ─────────────────────────────────────────
-   STATE
-───────────────────────────────────────── */
+ 
 let editingUserId    = null;
 let editingLinkId    = null;
 let deleteType       = null;
 let deleteId         = null;
 let allBookings      = [];
 let viewingBookingId = null;
-let selectedRole     = 'user';
-
-/* ─────────────────────────────────────────
-   ROLE SELECTOR
-───────────────────────────────────────── */
-function selectRole(role) {
-  selectedRole = role;
-  document.getElementById('roleOptUser').className  = 'role-option' + (role === 'user'  ? ' selected-user'  : '');
-  document.getElementById('roleOptAdmin').className = 'role-option' + (role === 'admin' ? ' selected-admin' : '');
-  document.getElementById('accessInfoUser').style.display  = role === 'user'  ? 'flex' : 'none';
-  document.getElementById('accessInfoAdmin').style.display = role === 'admin' ? 'flex' : 'none';
+ 
+/* ── BACK TO DASHBOARD ── */
+function goBackToDashboard() {
+  window.location.href = "index.html";
 }
-
-/* ─────────────────────────────────────────
-   HELPERS
-───────────────────────────────────────── */
-function goBackToDashboard() { window.location.href = 'index.html'; }
-
-function titleCaseInput(input) {
-  input.value = input.value.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-}
-
+ 
+/* ---- SECTION SWITCHING ---- */
 function showSection(id, btn) {
-  ['usersSection','linksSection','bookingsSection'].forEach(s => {
-    document.getElementById(s).style.display = 'none';
+  ["usersSection","linksSection","bookingsSection"].forEach(s => {
+    document.getElementById(s).style.display = "none";
   });
-  document.getElementById(id).style.display = 'block';
-  document.querySelectorAll('.sidebar button:not(.back-btn):not(.logout-btn)')
-    .forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  document.getElementById(id).style.display = "block";
+ 
+  document.querySelectorAll(".sidebar button:not(.back-dashboard-btn):not(.logout-btn)").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
 }
-
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.classList.remove('show','error','success');
-  void t.offsetWidth;
-  t.textContent = msg;
-  t.classList.add('show', type);
-  setTimeout(() => t.classList.remove('show'), 2800);
+ 
+/* ---- TOAST ---- */
+function showToast(message, type = "default") {
+  const toast = document.getElementById("toast");
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.innerText = message;
+  toast.style.borderLeft = type === "error" ? "4px solid #ef4444" : "4px solid #22c55e";
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
 }
-
-function togglePw(id, btn) {
-  const inp  = document.getElementById(id);
-  const show = inp.type === 'password';
-  inp.type   = show ? 'text' : 'password';
-  btn.querySelector('i').className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
-}
-
-function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
-
-function formatBookingDate(d) {
-  return new Date(d).toLocaleDateString('en-MY', { day:'numeric', month:'short', year:'numeric' });
-}
-
-function formatBookingTime(t) {
-  if (!t) return '';
-  const [h, m] = t.slice(0,5).split(':').map(Number);
-  return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
-}
-
-/* ─────────────────────────────────────────
-   DEPARTMENTS
-───────────────────────────────────────── */
+ 
+/* ---- DEPARTMENTS ---- */
 async function loadDepartments() {
-  try {
-    const res  = await fetch(`${API}/api/departments`);
-    const data = await res.json();
-
-    const box = document.getElementById('departmentCheckboxes');
-    box.innerHTML = '';
-
+  let data;
+ 
+  if (window.userRole === "admin") {
+    // Load only this admin's departments
+    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+    const user = JSON.parse(userData);
+    const res  = await fetch(`${API}/api/users/${user.id}/departments`);
+    data = await res.json();
+  } else {
+    const res = await fetch(`${API}/api/departments`);
+    data = await res.json();
+  }
+ 
+  // Populate work department dropdown
+  const deptDropdown = document.getElementById("userDepartment");
+  if (deptDropdown) {
+    deptDropdown.innerHTML = "<option value=\'\'>Select department...</option>";
     data.forEach(dep => {
-      box.innerHTML += `
-        <label>
-          <input type="checkbox" value="${dep.id}"> ${dep.name}
-        </label>`;
+      deptDropdown.innerHTML += `<option value="${dep.id}">${dep.name}</option>`;
     });
-  } catch(e) {
-    // fallback: render from hardcoded list if API fails
-    const box = document.getElementById('departmentCheckboxes');
-    box.innerHTML = ALL_DEPARTMENTS.map((name, i) =>
-      `<label><input type="checkbox" value="${i+1}"> ${name}</label>`
-    ).join('');
   }
+ 
+  // Populate access checkboxes
+  const checkbox = document.getElementById("departmentCheckboxes");
+  checkbox.innerHTML = "";
+  data.forEach(dep => {
+    checkbox.innerHTML += `
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
+        <input type="checkbox" value="${dep.id}" style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
+        ${dep.name}
+      </label>`;
+  });
 }
-
+ 
 async function loadLinkDepartments() {
-  const res  = await fetch(`${API}/api/departments`);
-  const data = await res.json();
-  const dd   = document.getElementById('linkDepartment');
-  dd.innerHTML = "<option value=''>Select Department</option>";
-  data.forEach(dep => { dd.innerHTML += `<option value="${dep.id}">${dep.name}</option>`; });
-}
-
-/* ─────────────────────────────────────────
-   USERS
-───────────────────────────────────────── */
-async function loadUsers() {
-  const res   = await fetch(`${API}/api/users`, { headers: { 'Authorization': `Bearer ${window.authToken}` } });
-  const users = await res.json();
-  const tbody = document.querySelector('#userTable tbody');
-  tbody.innerHTML = '';
-
-  if (!users.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No users found</td></tr>`;
-    return;
+  let data;
+ 
+  if (window.userRole === "admin") {
+    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+    const user = JSON.parse(userData);
+    const res  = await fetch(`${API}/api/users/${user.id}/departments`);
+    data = await res.json();
+  } else {
+    const res = await fetch(`${API}/api/departments`);
+    data = await res.json();
   }
-
-  users.forEach(u => {
-    const roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
+ 
+  const dropdown = document.getElementById("linkDepartment");
+  dropdown.innerHTML = "<option value=''>Select Department</option>";
+  data.forEach(dep => {
+    dropdown.innerHTML += `<option value="${dep.id}">${dep.name}</option>`;
+  });
+}
+ 
+/* ---- USERS ---- */
+async function loadUsers() {
+  const res   = await fetch(`${API}/api/users`, {
+    headers: { "Authorization": `Bearer ${window.authToken}` }
+  });
+  const users = await res.json();
+  const tbody = document.querySelector("#userTable tbody");
+  tbody.innerHTML = "";
+  users.forEach(user => {
     tbody.innerHTML += `
       <tr>
-        <td style="font-weight:600;">${u.name || '—'}</td>
-        <td style="color:var(--ink-mid);">${u.email}</td>
-        <td><span class="role-badge ${roleClass}">${capitalize(u.role)}</span></td>
-        <td>${u.departments?.map(d => `<span class="badge">${d.name}</span>`).join('') || '—'}</td>
+        <td>${user.name || "-"}</td>
+        <td>${user.email}</td>
+        <td>${user.role}</td>
+        <td>${user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "-"}</td>
         <td>
-          <div class="action-btns">
-            <button class="act-btn act-edit"   title="Edit"   onclick="editUser(${u.id})"><i class="fas fa-pen"></i></button>
-            <button class="act-btn act-delete" title="Delete" onclick="openDeleteModal('user',${u.id})"><i class="fas fa-trash"></i></button>
+          <div class="action-buttons">
+            <button class="edit-btn icon-only"   onclick="editUser(${user.id})"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn icon-only" onclick="openDeleteModal('user', ${user.id})"><i class="fa-solid fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
   });
 }
-
+ 
 async function createUser() {
-  const name    = document.getElementById('name').value.trim();
-  const email   = document.getElementById('email').value.trim();
-  const pw      = document.getElementById('password').value;
-  const confirm = document.getElementById('confirmPassword').value;
-  const role    = selectedRole;
-  const deps    = [...document.querySelectorAll('#departmentCheckboxes input:checked')].map(cb => cb.value);
-
-  if (!name || !email || !pw)  { showToast('Please fill all required fields', 'error'); return; }
-  if (pw !== confirm)           { showToast('Passwords do not match', 'error'); return; }
-  if (pw.length < 6)            { showToast('Password must be at least 6 characters', 'error'); return; }
-
+  const name        = document.getElementById("name").value.trim();
+  const email       = document.getElementById("email").value.trim();
+  const password    = document.getElementById("password").value;
+  const confirm     = document.getElementById("confirmPassword").value;
+  const role        = document.getElementById("role").value;
+  const workDept    = document.getElementById("userDepartment").value;
+  const deps = [];
+  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
+ 
+  if (!name || !email || !password)  { showToast("Please fill all fields", "error"); return; }
+  if (password !== confirm)           { showToast("Passwords do not match", "error"); return; }
+  if (password.length < 6)            { showToast("Password must be at least 6 characters", "error"); return; }
+ 
+  // If work dept selected and not already in access list, add it automatically
+  if (workDept && !deps.includes(workDept)) deps.push(workDept);
+ 
   const res = await fetch(`${API}/api/users`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.authToken}` },
-    body: JSON.stringify({ name, email, password: pw, role, departments: deps })
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
+    body: JSON.stringify({ name, email, password, role, departments: deps, work_department: workDept })
   });
-
+ 
   const data = await res.json();
-  if (!res.ok) { showToast(data.message || 'Failed to create user', 'error'); return; }
-
-  showToast('User created successfully!');
-  ['name','email','password','confirmPassword'].forEach(id => document.getElementById(id).value = '');
-  document.querySelectorAll('#departmentCheckboxes input:checked').forEach(cb => cb.checked = false);
-  selectRole('user');
+  if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
+ 
+  showToast("User created successfully!");
+  ["name","email","password","confirmPassword"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("role").value = "user";
+  document.getElementById("userDepartment").value = "";
+  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => cb.checked = false);
   loadUsers();
 }
-
-/* ─────────────────────────────────────────
-   LINKS
-───────────────────────────────────────── */
+ 
+/* ---- LINKS ---- */
 async function loadLinks() {
   const res   = await fetch(`${API}/api/links`);
   const links = await res.json();
-  const tbody = document.querySelector('#linkTable tbody');
-  tbody.innerHTML = '';
-
-  if (!links.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No links found</td></tr>`;
-    return;
-  }
-
-  links.forEach(l => {
+  const tbody = document.querySelector("#linkTable tbody");
+  tbody.innerHTML = "";
+  links.forEach(link => {
     tbody.innerHTML += `
       <tr>
-        <td style="font-weight:600;">${l.name}</td>
-        <td><a href="${l.url}" target="_blank" style="color:var(--pink);font-weight:500;text-decoration:none;">${l.url.length>40?l.url.slice(0,40)+'…':l.url}</a></td>
-        <td><span class="badge">${l.department_name}</span></td>
+        <td>${link.name}</td>
+        <td><a href="${link.url}" target="_blank">Open</a></td>
+        <td>${link.department_name}</td>
         <td>
-          <div class="action-btns">
-            <button class="act-btn act-edit"   onclick="editLink(${l.id},'${l.name.replace(/'/g,"\\'")}','${l.url}',${l.department_id})"><i class="fas fa-pen"></i></button>
-            <button class="act-btn act-delete" onclick="openDeleteModal('link',${l.id})"><i class="fas fa-trash"></i></button>
+          <div class="action-buttons">
+            <button class="edit-btn icon-only"   onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn icon-only" onclick="openDeleteModal('link', ${link.id})"><i class="fa-solid fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
   });
 }
-
+ 
 async function createLink() {
-  const name = document.getElementById('linkName').value.trim();
-  const url  = document.getElementById('linkURL').value.trim();
-  const dept = document.getElementById('linkDepartment').value;
-
-  if (!name || !url || !dept) { showToast('Please fill all fields', 'error'); return; }
-
+  const name          = document.getElementById("linkName").value;
+  const url           = document.getElementById("linkURL").value;
+  const department_id = document.getElementById("linkDepartment").value;
+ 
+  if (!name || !url || !department_id) { showToast("Please fill all fields","error"); return; }
+ 
   const res = await fetch(`${API}/api/links`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ name, url, department_id: dept })
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, url, department_id })
   });
-
-  if (!res.ok) { showToast('Failed to add link', 'error'); return; }
-  showToast('Link added!');
-  document.getElementById('linkName').value = '';
-  document.getElementById('linkURL').value  = '';
-  document.getElementById('linkDepartment').value = '';
+ 
+  if (!res.ok) { showToast("Failed to add link","error"); return; }
+ 
+  showToast("Link added!");
+  document.getElementById("linkName").value = "";
+  document.getElementById("linkURL").value  = "";
+  document.getElementById("linkDepartment").value = "";
   loadLinks();
 }
-
-async function editLink(id, name, url, deptId) {
+ 
+async function editLink(id, name, url, department_id) {
   editingLinkId = id;
-  document.getElementById('editLinkName').value = name;
-  document.getElementById('editLinkURL').value  = url;
+  document.getElementById("editLinkName").value = name;
+  document.getElementById("editLinkURL").value  = url;
+ 
   const res  = await fetch(`${API}/api/departments`);
   const deps = await res.json();
-  const dd   = document.getElementById('editLinkDepartment');
-  dd.innerHTML = '';
-  deps.forEach(d => { dd.innerHTML += `<option value="${d.id}" ${d.id==deptId?'selected':''}>${d.name}</option>`; });
-  document.getElementById('editLinkModal').style.display = 'flex';
-}
-
-function closeEditLinkModal() { document.getElementById('editLinkModal').style.display = 'none'; }
-
-async function updateLink() {
-  const name = document.getElementById('editLinkName').value.trim();
-  const url  = document.getElementById('editLinkURL').value.trim();
-  const dept = document.getElementById('editLinkDepartment').value;
-  await fetch(`${API}/api/links/${editingLinkId}`, {
-    method: 'PUT',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ name, url, department_id: dept })
+  const dropdown = document.getElementById("editLinkDepartment");
+  dropdown.innerHTML = "";
+  deps.forEach(dep => {
+    dropdown.innerHTML += `<option value="${dep.id}" ${dep.id == department_id ? "selected" : ""}>${dep.name}</option>`;
   });
-  showToast('Link updated!');
+  document.getElementById("editLinkModal").style.display = "flex";
+}
+ 
+function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
+ 
+async function updateLink() {
+  const name          = document.getElementById("editLinkName").value;
+  const url           = document.getElementById("editLinkURL").value;
+  const department_id = document.getElementById("editLinkDepartment").value;
+ 
+  await fetch(`${API}/api/links/${editingLinkId}`, {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, url, department_id })
+  });
+ 
+  showToast("Link updated!");
   closeEditLinkModal();
   loadLinks();
 }
-
-/* ─────────────────────────────────────────
-   DELETE
-───────────────────────────────────────── */
+ 
+/* ---- DELETE ---- */
 function openDeleteModal(type, id) {
-  deleteType = type; deleteId = id;
-  document.getElementById('deleteMessage').textContent =
-    type === 'user'    ? 'Are you sure you want to delete this user? This cannot be undone.' :
-    type === 'booking' ? 'Are you sure you want to delete this booking permanently?' :
-                         'Are you sure you want to delete this link?';
-  document.getElementById('deleteModal').style.display = 'flex';
+  deleteType = type;
+  deleteId   = id;
+  document.getElementById("deleteModal").style.display = "flex";
 }
-
-function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; }
-
+ 
+function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; }
+ 
 async function confirmDelete() {
-  const url = deleteType === 'link'    ? `${API}/api/links/${deleteId}`
-            : deleteType === 'booking' ? `${API}/api/bookings/${deleteId}`
-                                       : `${API}/api/users/${deleteId}`;
-  await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${window.authToken}` } });
-  showToast('Deleted successfully!');
+  const url = deleteType === "link"
+    ? `${API}/api/links/${deleteId}`
+    : deleteType === "booking"
+    ? `${API}/api/bookings/${deleteId}`
+    : `${API}/api/users/${deleteId}`;
+ 
+  await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${window.authToken}` } });
+  showToast("Deleted!");
   closeDeleteModal();
-  if (deleteType === 'link')         loadLinks();
-  else if (deleteType === 'booking') loadBookings();
+ 
+  if (deleteType === "link")         loadLinks();
+  else if (deleteType === "booking") loadBookings();
   else                               loadUsers();
 }
-
-/* ─────────────────────────────────────────
-   EDIT USER
-───────────────────────────────────────── */
+ 
+/* ---- EDIT USER ---- */
 async function editUser(id) {
-  const [resUser, resDeps] = await Promise.all([
-    fetch(`${API}/api/users/${id}`, { headers: { 'Authorization': `Bearer ${window.authToken}` } }),
-    fetch(`${API}/api/departments`)
-  ]);
-  const user        = await resUser.json();
-  const departments = await resDeps.json();
-
+  const resUser = await fetch(`${API}/api/users/${id}`);
+  const user    = await resUser.json();
+  const resDep  = await fetch(`${API}/api/departments`);
+  const departments = await resDep.json();
+ 
   editingUserId = id;
-  document.getElementById('editName').value     = user.name  || '';
-  document.getElementById('editEmail').value    = user.email || '';
-  document.getElementById('editPassword').value = '';
-
-  const cont = document.getElementById('editDepartments');
-  cont.innerHTML = '';
+  document.getElementById("editModal").style.display = "flex";
+  document.getElementById("editName").value  = user.name  || "";
+  document.getElementById("editEmail").value = user.email || "";
+ 
+  const container = document.getElementById("editDepartments");
+  container.innerHTML = "";
   departments.forEach(dep => {
     const checked = user.departments?.some(d => d.id === dep.id);
-    cont.innerHTML += `
-      <label>
-        <input type="checkbox" value="${dep.id}" ${checked?'checked':''}>
+    container.innerHTML += `
+      <label class="checkbox-card">
+        <input type="checkbox" value="${dep.id}" ${checked ? "checked" : ""}>
         <span>${dep.name}</span>
       </label>`;
   });
-  document.getElementById('editModal').style.display = 'flex';
 }
-
-function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
-
+ 
+function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
+ 
 async function confirmEdit() {
-  const name  = document.getElementById('editName').value.trim();
-  const email = document.getElementById('editEmail').value.trim();
-  const pw    = document.getElementById('editPassword').value;
-  const deps  = [...document.querySelectorAll('#editDepartments input:checked')].map(cb => cb.value);
-  const body  = { name, email, departments: deps };
-  if (pw) body.password = pw;
-
+  const name     = document.getElementById("editName").value;
+  const email    = document.getElementById("editEmail").value;
+  const password = document.getElementById("editPassword").value;
+  const deps = [];
+  document.querySelectorAll("#editDepartments input:checked").forEach(cb => deps.push(cb.value));
+ 
+  const body = { name, email, departments: deps };
+  if (password) body.password = password;
+ 
   await fetch(`${API}/api/users/${editingUserId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.authToken}` },
+    method: "PUT",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
     body: JSON.stringify(body)
   });
-  showToast('User updated!');
+ 
+  showToast("User updated!");
   closeEditModal();
   loadUsers();
 }
-
-/* ─────────────────────────────────────────
-   LOGOUT
-───────────────────────────────────────── */
-function openLogoutModal()  { document.getElementById('logoutModal').style.display = 'flex'; }
-function closeLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+ 
+/* ---- LOGOUT ---- */
+function openLogoutModal()  { document.getElementById("logoutModal").style.display = "flex"; }
+function closeLogoutModal() { document.getElementById("logoutModal").style.display = "none"; }
+ 
 function confirmLogout() {
-  localStorage.clear(); sessionStorage.clear();
-  showToast('Logged out');
-  setTimeout(() => window.location.href = 'login.html', 700);
+  localStorage.clear();
+  sessionStorage.clear();
+  showToast("Logged out successfully");
+  setTimeout(() => window.location.href = "login.html", 800);
 }
-
-/* ─────────────────────────────────────────
-   BOOKINGS
-───────────────────────────────────────── */
+ 
+/* ---- LOAD BOOKINGS ---- */
 async function loadBookings() {
-  const res = await fetch(`${API}/api/bookings`);
+  const res   = await fetch(`${API}/api/bookings`);
   allBookings = await res.json();
   renderBookings(allBookings);
   loadBookingRoomFilter();
 }
-
+ 
 async function loadBookingRoomFilter() {
   const res   = await fetch(`${API}/api/bookings/rooms`);
   const rooms = await res.json();
-  const sel   = document.getElementById('filterRoom');
+  const sel   = document.getElementById("filterRoom");
   sel.innerHTML = `<option value="">All Rooms</option>`;
-  rooms.forEach(r => { sel.innerHTML += `<option value="${r.id}">${r.name}</option>`; });
+  rooms.forEach(r => {
+    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+  });
 }
-
+ 
+/* ---- RENDER BOOKINGS ---- */
 function renderBookings(bookings) {
-  const tbody = document.querySelector('#bookingsTable tbody');
-  tbody.innerHTML = '';
-  if (!Array.isArray(bookings) || !bookings.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No bookings found</td></tr>`;
+  const tbody = document.querySelector("#bookingsTable tbody");
+  tbody.innerHTML = "";
+ 
+  if (!Array.isArray(bookings) || bookings.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">No bookings found</td></tr>`;
     return;
   }
+ 
   bookings.forEach(b => {
+    const isConfirmed = b.status === 'confirmed';
     tbody.innerHTML += `
       <tr>
-        <td style="font-weight:600;">${b.room_name}</td>
+        <td>${b.room_name}</td>
         <td>${b.event_name}</td>
         <td>${formatBookingDate(b.date)}</td>
-        <td style="white-space:nowrap;font-size:12.5px;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
+        <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
         <td>
-          <div style="font-weight:600;">${b.name}</div>
-          <div style="font-size:12px;color:var(--ink-light);">${b.department}</div>
+          ${b.name}
+          <div class="booking-detail">${b.department}</div>
         </td>
-        <td style="font-size:12.5px;">${b.phone}</td>
+        <td>${b.phone}</td>
         <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
         <td>
-          <div class="action-btns">
-            <button class="act-btn act-view"  onclick="viewBookingDetail(${b.id})"><i class="fas fa-eye"></i></button>
-            ${b.status==='confirmed'
-              ? `<button class="act-btn act-cancel"  onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fas fa-ban"></i></button>`
-              : `<button class="act-btn act-restore" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fas fa-rotate-left"></i></button>`}
-            <button class="act-btn act-delete" onclick="openDeleteModal('booking',${b.id})"><i class="fas fa-trash"></i></button>
+          <div class="action-buttons">
+            <button class="edit-btn icon-only" title="View Details" onclick="viewBookingDetail(${b.id})">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            ${isConfirmed
+              ? `<button class="cancel-btn icon-only" title="Cancel Booking" onclick="updateBookingStatus(${b.id},'cancelled')">
+                   <i class="fa-solid fa-ban"></i>
+                 </button>`
+              : `<button class="restore-btn icon-only" title="Restore Booking" onclick="updateBookingStatus(${b.id},'confirmed')">
+                   <i class="fa-solid fa-rotate-left"></i>
+                 </button>`
+            }
+            <button class="delete-btn icon-only" title="Delete" onclick="openDeleteModal('booking', ${b.id})">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </div>
         </td>
       </tr>`;
   });
 }
-
+ 
+/* ---- FILTER BOOKINGS ---- */
 function filterBookings() {
-  const status = document.getElementById('filterStatus').value;
-  const roomId = document.getElementById('filterRoom').value;
-  const date   = document.getElementById('filterDate').value;
-  renderBookings(allBookings.filter(b =>
-    (!status || b.status === status) &&
-    (!roomId || String(b.room_id) === roomId) &&
-    (!date   || b.date.slice(0,10) === date)
-  ));
+  const status = document.getElementById("filterStatus").value;
+  const roomId = document.getElementById("filterRoom").value;
+  const date   = document.getElementById("filterDate").value;
+ 
+  const filtered = allBookings.filter(b => {
+    const matchStatus = !status || b.status === status;
+    const matchRoom   = !roomId || String(b.room_id) === roomId;
+    const matchDate   = !date   || b.date.slice(0,10) === date;
+    return matchStatus && matchRoom && matchDate;
+  });
+ 
+  renderBookings(filtered);
 }
-
+ 
 function clearBookingFilters() {
-  document.getElementById('filterStatus').value = '';
-  document.getElementById('filterRoom').value   = '';
-  document.getElementById('filterDate').value   = '';
+  document.getElementById("filterStatus").value = "";
+  document.getElementById("filterRoom").value   = "";
+  document.getElementById("filterDate").value   = "";
   renderBookings(allBookings);
 }
-
+ 
+/* ---- UPDATE BOOKING STATUS ---- */
 async function updateBookingStatus(id, status) {
   const res = await fetch(`${API}/api/bookings/${id}/status`, {
-    method: 'PUT',
-    headers: {'Content-Type':'application/json'},
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ status })
   });
-  if (res.ok) { showToast(status==='cancelled'?'Booking cancelled':'Booking restored'); loadBookings(); }
-  else showToast('Failed to update status','error');
+ 
+  if (res.ok) {
+    showToast(status === 'cancelled' ? 'Booking cancelled' : 'Booking restored');
+    loadBookings();
+  } else {
+    showToast("Failed to update status","error");
+  }
 }
-
+ 
+/* ---- VIEW BOOKING DETAIL MODAL ---- */
 function viewBookingDetail(id) {
   const b = allBookings.find(x => x.id === id);
   if (!b) return;
   viewingBookingId = id;
-  document.getElementById('dRoom').textContent     = b.room_name;
-  document.getElementById('dEvent').textContent    = b.event_name;
-  document.getElementById('dDate').textContent     = formatBookingDate(b.date);
-  document.getElementById('dTime').textContent     = `${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}`;
-  document.getElementById('dDuration').textContent = (b.duration_hours>0?b.duration_hours+' hr ':'')+(b.duration_minutes>0?b.duration_minutes+' min':'');
-  document.getElementById('dName').textContent     = b.name;
-  document.getElementById('dDept').textContent     = b.department;
-  document.getElementById('dPhone').textContent    = b.phone;
-  document.getElementById('dStatus').innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
-  document.getElementById('dCreated').textContent  = new Date(b.created_at).toLocaleString('en-MY');
-  document.getElementById('detailCancelBtn').style.display  = b.status==='confirmed' ? 'inline-flex' : 'none';
-  document.getElementById('detailRestoreBtn').style.display = b.status==='cancelled'  ? 'inline-flex' : 'none';
-  document.getElementById('bookingDetailModal').style.display = 'flex';
+ 
+  document.getElementById("dRoom").textContent     = b.room_name;
+  document.getElementById("dEvent").textContent    = b.event_name;
+  document.getElementById("dDate").textContent     = formatBookingDate(b.date);
+  document.getElementById("dTime").textContent     = formatBookingTime(b.start_time) + " – " + formatBookingTime(b.end_time);
+  document.getElementById("dDuration").textContent = (b.duration_hours > 0 ? b.duration_hours + " hr " : "") + (b.duration_minutes > 0 ? b.duration_minutes + " min" : "");
+  document.getElementById("dName").textContent     = b.name;
+  document.getElementById("dDept").textContent     = b.department;
+  document.getElementById("dPhone").textContent    = b.phone;
+  document.getElementById("dStatus").innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
+  document.getElementById("dCreated").textContent  = new Date(b.created_at).toLocaleString("en-MY");
+ 
+  document.getElementById("detailCancelBtn").style.display  = b.status === 'confirmed' ? 'inline-flex' : 'none';
+  document.getElementById("detailRestoreBtn").style.display = b.status === 'cancelled'  ? 'inline-flex' : 'none';
+ 
+  document.getElementById("bookingDetailModal").style.display = "flex";
 }
-
-function closeBookingDetailModal() { document.getElementById('bookingDetailModal').style.display = 'none'; }
-async function cancelFromDetail()  { await updateBookingStatus(viewingBookingId,'cancelled'); closeBookingDetailModal(); }
-async function restoreFromDetail() { await updateBookingStatus(viewingBookingId,'confirmed'); closeBookingDetailModal(); }
-
-/* ─────────────────────────────────────────
-   INIT ADMIN PANEL (after password verified)
-───────────────────────────────────────── */
-async function initAdminPanel() {
+ 
+function closeBookingDetailModal() { document.getElementById("bookingDetailModal").style.display = "none"; }
+ 
+async function cancelFromDetail() {
+  await updateBookingStatus(viewingBookingId, 'cancelled');
+  closeBookingDetailModal();
+}
+ 
+async function restoreFromDetail() {
+  await updateBookingStatus(viewingBookingId, 'confirmed');
+  closeBookingDetailModal();
+}
+ 
+/* ---- HELPERS ---- */
+function formatBookingDate(d) {
+  return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
+}
+ 
+function formatBookingTime(t) {
+  if (!t) return "";
+  const [h, m] = t.slice(0,5).split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour  = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2,"0")} ${ampm}`;
+}
+ 
+function capitalize(s) {
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+ 
+/* ---- INIT ---- */
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const role  = localStorage.getItem("role")  || sessionStorage.getItem("role");
+ 
+  if (!token || (role !== "admin" && role !== "superadmin")) {
+    window.location.href = "login.html";
+    return;
+  }
+ 
+  // Store token globally for API calls
+  window.authToken = token;
+  window.userRole  = role;
+ 
+  // Hide Bookings nav for dept admin
+  if (role === "admin") {
+    document.getElementById("bookingsNavBtn").style.display = "none";
+    document.getElementById("adminPanelTitle").textContent  = "Admin Panel";
+ 
+    // Hide role selector — admin can only create users
+    const roleSelect = document.getElementById("role");
+    roleSelect.style.display = "none";
+    const roleLabel = document.createElement("input");
+    roleLabel.type  = "text";
+    roleLabel.value = "User";
+    roleLabel.disabled = true;
+    roleLabel.style.background = "#f1f5f9";
+    roleLabel.style.color = "#64748b";
+    roleSelect.insertAdjacentElement("afterend", roleLabel);
+  }
+ 
   try {
     await loadDepartments();
     await loadLinkDepartments();
     await loadUsers();
     await loadLinks();
-    await loadBookings();
-    document.getElementById('navUsers').classList.add('active');
+    if (role === "superadmin") await loadBookings();
   } catch (err) {
-    console.error('INIT ERROR:', err);
-    showToast('Failed to load data', 'error');
+    console.error("INIT ERROR:", err);
+    showToast("Failed to load data","error");
   }
-}
-
-/* ─────────────────────────────────────────
-   INIT — check auth then prompt password
-───────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  const token    = localStorage.getItem('token')    || sessionStorage.getItem('token');
-  const role     = localStorage.getItem('role')     || sessionStorage.getItem('role');
-  const userData = localStorage.getItem('user')     || sessionStorage.getItem('user');
-
-  // Not logged in at all
-  if (!token || !userData) { window.location.href = 'login.html'; return; }
-
-  // Not an admin
-  if (role !== 'admin' && role !== 'superadmin') { window.location.href = 'index.html'; return; }
-
-  window.authToken = token;
-  window.userRole  = role;
-
-  // Always prompt for password re-entry before showing admin panel
-  showAdminPwModal();
 });
-
+ 
 </script>
 </body>
 </html>
+ 
