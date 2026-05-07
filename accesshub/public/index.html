@@ -200,15 +200,15 @@
       <i class="fas fa-graduation-cap"></i> Training Module
     </button>
 
-    <span class="sidebar-section-label">General</span>
-    <button class="booking-btn" onclick="loadProfilePage(this)">
-      <i class="fas fa-user-circle"></i> Profile
-    </button>
-
-    <!-- Admin section — injected by JS if role === admin -->
+    <!-- Admin section — visible only if role === admin (set on DOMContentLoaded) -->
     <span class="sidebar-section-label" id="adminSectionLabel" style="display:none;">Admin</span>
     <button class="booking-btn admin-panel-btn" id="adminPanelBtn" style="display:none;" onclick="openReauth(this)">
       <i class="fas fa-user-shield"></i> Admin Panel
+    </button>
+
+    <span class="sidebar-section-label">General</span>
+    <button class="booking-btn" onclick="loadProfilePage(this)">
+      <i class="fas fa-user-circle"></i> Profile
     </button>
   </nav>
 
@@ -428,13 +428,6 @@ function generateSidebar(departments) {
   });
 
   setActive(allBtn);
-
-  // Show admin button if role is admin
-  const role = localStorage.getItem("role") || sessionStorage.getItem("role");
-  if (role === "admin") {
-    document.getElementById("adminSectionLabel").style.display = "block";
-    document.getElementById("adminPanelBtn").style.display     = "block";
-  }
 }
 
 function setActive(btn) {
@@ -673,8 +666,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!token || !userData) { window.location.href = "login.html"; return; }
 
-  // ✅ Admins now stay on user dashboard instead of being redirected
-  // Admin panel is accessible via the sidebar button + re-auth modal
+  // Show admin section immediately if role is admin
+  if (role === "admin") {
+    document.getElementById("adminSectionLabel").style.display = "block";
+    document.getElementById("adminPanelBtn").style.display     = "block";
+  }
 
   window.currentUserId = JSON.parse(userData).id;
   await loadDepartments();
