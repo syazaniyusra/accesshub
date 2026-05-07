@@ -8,27 +8,15 @@
 <title>Admin Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-/* ========================= */
-/* RESET */
-/* ========================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ========================= */
-/* LAYOUT - BODY */
-/* ========================= */
 body {
   font-family: "Segoe UI", sans-serif;
   background: #f1f5f9;
   display: flex;
 }
 
-/* ========================= */
 /* SIDEBAR */
-/* ========================= */
 .sidebar {
   width: 240px;
   background: #1e293b;
@@ -58,25 +46,10 @@ body {
   transition: all 0.25s ease;
 }
 
-.sidebar button:hover {
-  background: #475569;
-  transform: translateX(3px);
-}
+.sidebar button:hover { background: #475569; transform: translateX(3px); }
+.sidebar button.active { background: #3b82f6; color: white; border: 2px solid rgba(255,255,255,0.6); }
+.sidebar h2 { text-align: center; margin-bottom: 20px; }
 
-.sidebar button.active {
-  background: #3b82f6;
-  color: white;
-  border: 2px solid rgba(255,255,255,0.6);
-}
-
-.sidebar h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* ========================= */
-/* LOGOUT BUTTON */
-/* ========================= */
 .logout-btn {
   margin-top: auto;
   background: #334155;
@@ -96,145 +69,50 @@ body {
   transition: all 0.25s ease;
 }
 
-.sidebar .logout-btn:hover {
-  background: #ef4444;
-  color: white;
-  transform: translateX(3px);
-}
+.sidebar .logout-btn:hover { background: #ef4444; color: white; transform: translateX(3px); }
+.sidebar .logout-btn:active { transform: scale(0.97); }
 
-.sidebar .logout-btn:active {
-  transform: scale(0.97);
-}
+/* MAIN */
+.main { margin-left: 240px; padding: 30px; width: calc(100% - 240px); }
 
-/* ========================= */
-/* MAIN CONTENT */
-/* ========================= */
-.main {
-  margin-left: 240px;
-  padding: 30px;
-  width: calc(100% - 240px);
-}
-
-/* ========================= */
 /* CARD */
-/* ========================= */
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
+.card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
 
-/* ========================= */
 /* FORM */
-/* ========================= */
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-}
+input, select { width: 100%; padding: 10px; margin: 10px 0; }
+button.primary { background: #3b82f6; color: white; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
 
-button.primary {
-  background: #3b82f6;
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-/* ========================= */
 /* CHECKBOX */
-/* ========================= */
-.checkbox-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.checkbox-card { display: flex; align-items: center; gap: 10px; }
+.checkbox-card input { width: 16px; height: 16px; }
+#departmentCheckboxes label { display: flex; align-items: center; gap: 10px; }
 
-.checkbox-card input {
-  width: 16px;
-  height: 16px;
-}
+/* TABLE */
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; }
+th { background: #e2e8f0; }
 
-#departmentCheckboxes label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ========================= */
-/* TABLE BASE */
-/* ========================= */
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 12px;
-}
-
-th {
-  background: #e2e8f0;
-}
-
-/* ========================= */
 /* USERS TABLE */
-/* ========================= */
-#userTable th:nth-child(1),
-#userTable td:nth-child(1) { text-align: left; }
-#userTable th:nth-child(2),
-#userTable td:nth-child(2) { text-align: left; }
-#userTable th:nth-child(3),
-#userTable td:nth-child(3) { text-align: left; width: 120px; }
-#userTable th:nth-child(4),
-#userTable td:nth-child(4) { text-align: left; padding-left: 40px; }
-#userTable th:last-child,
-#userTable td:last-child { text-align: center; }
+#userTable th:nth-child(1), #userTable td:nth-child(1) { text-align: left; }
+#userTable th:nth-child(2), #userTable td:nth-child(2) { text-align: left; }
+#userTable th:nth-child(3), #userTable td:nth-child(3) { text-align: left; width: 120px; }
+#userTable th:nth-child(4), #userTable td:nth-child(4) { text-align: left; padding-left: 40px; }
+#userTable th:last-child,   #userTable td:last-child   { text-align: center; }
 
-/* ========================= */
 /* LINKS TABLE */
-/* ========================= */
-#linkTable th:nth-child(1),
-#linkTable td:nth-child(1) { text-align: left; }
-#linkTable th:nth-child(2),
-#linkTable td:nth-child(2) { text-align: center; }
-#linkTable th:nth-child(3),
-#linkTable td:nth-child(3) { text-align: left; }
-#linkTable th:last-child,
-#linkTable td:last-child { text-align: center; }
-
-#linkTable a {
-  color: #3b82f6;
-  text-decoration: none;
-  font-weight: 500;
-}
+#linkTable th:nth-child(1), #linkTable td:nth-child(1) { text-align: left; }
+#linkTable th:nth-child(2), #linkTable td:nth-child(2) { text-align: center; }
+#linkTable th:nth-child(3), #linkTable td:nth-child(3) { text-align: left; }
+#linkTable th:last-child,   #linkTable td:last-child   { text-align: center; }
+#linkTable a { color: #3b82f6; text-decoration: none; font-weight: 500; }
 #linkTable a:hover { text-decoration: underline; }
 
-/* ========================= */
 /* BADGES */
-/* ========================= */
-.badge {
-  background: #e2e8f0;
-  padding: 4px 10px;
-  border-radius: 6px;
-  margin: 2px 4px 2px 0;
-  display: inline-block;
-}
+.badge { background: #e2e8f0; padding: 4px 10px; border-radius: 6px; margin: 2px 4px 2px 0; display: inline-block; }
 
-/* ========================= */
 /* ACTION BUTTONS */
-/* ========================= */
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
+.action-buttons { display: flex; justify-content: center; gap: 10px; }
 
 .action-buttons button {
   display: flex;
@@ -250,45 +128,24 @@ th {
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.edit-btn { background: #facc15; color: #1e293b; }
-.edit-btn:hover {
-  background: #eab308;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-}
+.edit-btn    { background: #facc15; color: #1e293b; }
+.edit-btn:hover    { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
 
-.delete-btn { background: #ef4444; color: white; }
-.delete-btn:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-}
+.delete-btn  { background: #ef4444; color: white; }
+.delete-btn:hover  { background: #dc2626; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
 
-.approve-btn { background: #22c55e; color: white; }
-.approve-btn:hover {
-  background: #16a34a;
-  transform: translateY(-2px);
-}
+.cancel-btn  { background: #f97316; color: white; }
+.cancel-btn:hover  { background: #ea580c; transform: translateY(-2px); }
 
-.reject-btn { background: #ef4444; color: white; }
-.reject-btn:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
-}
+.restore-btn { background: #22c55e; color: white; }
+.restore-btn:hover { background: #16a34a; transform: translateY(-2px); }
 
 .action-buttons button:active { transform: scale(0.95); }
 .action-buttons i { font-size: 12px; }
 
-.icon-only {
-  padding: 8px;
-  width: 34px;
-  height: 34px;
-  justify-content: center;
-}
+.icon-only { padding: 8px; width: 34px; height: 34px; justify-content: center; }
 
-/* ========================= */
 /* MODAL */
-/* ========================= */
 .modal {
   display: none;
   position: fixed;
@@ -317,35 +174,12 @@ th {
   margin-top: 20px;
 }
 
-.btn-cancel {
-  background: #e5e7eb;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
+.btn-cancel  { background: #e5e7eb; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-update  { background: #3b82f6; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-delete  { background: #ef4444; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-confirm { background: #22c55e; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
 
-.btn-update {
-  background: #3b82f6;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-delete {
-  background: #ef4444;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-/* ========================= */
 /* TOAST */
-/* ========================= */
 .toast {
   position: fixed;
   top: 20px;
@@ -369,9 +203,7 @@ th {
 
 .toast.show { opacity: 1; transform: translateY(0); }
 
-/* ========================= */
 /* EDIT DEPARTMENTS */
-/* ========================= */
 #editDepartments {
   display: flex;
   flex-direction: column;
@@ -392,17 +224,9 @@ th {
 }
 
 #editDepartments label:hover { background: #e2e8f0; }
+#editDepartments input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
 
-#editDepartments input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  cursor: pointer;
-}
-
-/* ========================= */
 /* BOOKING STATUS BADGES */
-/* ========================= */
 .status-badge {
   padding: 4px 10px;
   border-radius: 6px;
@@ -411,13 +235,10 @@ th {
   display: inline-block;
 }
 
-.status-pending  { background: #fef9c3; color: #854d0e; }
-.status-approved { background: #dcfce7; color: #166534; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
+.status-confirmed { background: #dcfce7; color: #166534; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
 
-/* ========================= */
 /* BOOKING FILTER BAR */
-/* ========================= */
 .filter-bar {
   display: flex;
   gap: 10px;
@@ -439,26 +260,14 @@ th {
 }
 
 .filter-bar select:focus,
-.filter-bar input:focus {
-  border-color: #3b82f6;
-  outline: none;
-}
+.filter-bar input:focus { border-color: #3b82f6; outline: none; }
 
-/* ========================= */
 /* BOOKINGS TABLE */
-/* ========================= */
 #bookingsTable th:last-child,
 #bookingsTable td:last-child { text-align: center; }
 
-.booking-detail {
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 2px;
-}
+.booking-detail { font-size: 12px; color: #64748b; margin-top: 2px; }
 
-/* ========================= */
-/* ANIMATION */
-/* ========================= */
 @keyframes pop {
   from { transform: scale(0.9); opacity: 0; }
   to   { transform: scale(1);   opacity: 1; }
@@ -468,14 +277,12 @@ th {
 
 <body>
 
-<!-- ========================= -->
 <!-- EDIT USER MODAL -->
-<!-- ========================= -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <h3>Edit User</h3>
-    <input type="text" id="editName" placeholder="Name">
-    <input type="email" id="editEmail" placeholder="Email">
+    <input type="text"     id="editName"     placeholder="Name">
+    <input type="email"    id="editEmail"    placeholder="Email">
     <input type="password" id="editPassword" placeholder="New Password (optional)">
     <h4>Departments</h4>
     <div id="editDepartments"></div>
@@ -486,28 +293,24 @@ th {
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- DELETE MODAL -->
-<!-- ========================= -->
 <div id="deleteModal" class="modal">
   <div class="modal-content">
     <h3>Confirm Delete</h3>
     <p id="deleteMessage">Are you sure you want to delete this?</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+      <button class="btn-delete"  onclick="confirmDelete()">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- EDIT LINK MODAL -->
-<!-- ========================= -->
 <div id="editLinkModal" class="modal">
   <div class="modal-content">
     <h3>Edit Link</h3>
     <input type="text" id="editLinkName" placeholder="Link Name">
-    <input type="text" id="editLinkURL" placeholder="URL">
+    <input type="text" id="editLinkURL"  placeholder="URL">
     <select id="editLinkDepartment"></select>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditLinkModal()">Cancel</button>
@@ -516,9 +319,7 @@ th {
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- LOGOUT MODAL -->
-<!-- ========================= -->
 <div id="logoutModal" class="modal">
   <div class="modal-content">
     <h3>Confirm Logout</h3>
@@ -530,39 +331,36 @@ th {
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- BOOKING DETAIL MODAL -->
-<!-- ========================= -->
 <div id="bookingDetailModal" class="modal">
   <div class="modal-content" style="width:480px;">
     <h3>Booking Details</h3>
     <table style="width:100%; margin:16px 0; border-collapse:collapse;">
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px; width:40%;">Room</td>       <td id="dRoom"    style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Event</td>      <td id="dEvent"   style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Date</td>       <td id="dDate"    style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Time</td>       <td id="dTime"    style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Duration</td>   <td id="dDuration" style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Name</td>       <td id="dName"    style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Department</td> <td id="dDept"    style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Phone</td>      <td id="dPhone"   style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Status</td>     <td id="dStatus"  style="font-size:13px; font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0; color:#64748b; font-size:13px;">Submitted</td>  <td id="dCreated" style="font-size:13px; font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:40%;">Room</td>       <td id="dRoom"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Event</td>      <td id="dEvent"    style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Date</td>       <td id="dDate"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Time</td>       <td id="dTime"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Duration</td>   <td id="dDuration" style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Name</td>       <td id="dName"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Department</td> <td id="dDept"     style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Phone</td>      <td id="dPhone"    style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Status</td>     <td id="dStatus"   style="font-size:13px;font-weight:500;"></td></tr>
+      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Submitted</td>  <td id="dCreated"  style="font-size:13px;font-weight:500;"></td></tr>
     </table>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-update approve-btn" id="detailApproveBtn" onclick="approveFromDetail()">
-        <i class="fa-solid fa-check"></i> Approve
+      <!-- Admin can cancel a confirmed booking or restore a cancelled one -->
+      <button class="btn-delete"  id="detailCancelBtn"  onclick="cancelFromDetail()">
+        <i class="fa-solid fa-ban"></i> Cancel Booking
       </button>
-      <button class="btn-delete reject-btn" id="detailRejectBtn" onclick="rejectFromDetail()">
-        <i class="fa-solid fa-xmark"></i> Reject
+      <button class="btn-confirm" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;">
+        <i class="fa-solid fa-rotate-left"></i> Restore
       </button>
     </div>
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- SIDEBAR -->
-<!-- ========================= -->
 <div class="sidebar">
   <h2>Admin Panel</h2>
   <button onclick="showSection('usersSection')"><i class="fa-solid fa-users"></i> Users</button>
@@ -571,21 +369,17 @@ th {
   <button class="logout-btn" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 </div>
 
-<!-- ========================= -->
 <!-- MAIN -->
-<!-- ========================= -->
 <div class="main">
 
 <div id="toast" class="toast"></div>
 
-<!-- ========================= -->
 <!-- USERS SECTION -->
-<!-- ========================= -->
 <div id="usersSection">
   <div class="card">
     <h3>Create User</h3>
-    <input id="name" placeholder="Name">
-    <input id="email" placeholder="Email">
+    <input id="name"     placeholder="Name">
+    <input id="email"    placeholder="Email">
     <input id="password" placeholder="Password">
     <select id="role">
       <option value="user">User</option>
@@ -601,11 +395,7 @@ th {
       <table id="userTable">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Departments</th>
-            <th>Action</th>
+            <th>Name</th><th>Email</th><th>Role</th><th>Departments</th><th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -614,14 +404,12 @@ th {
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- LINKS SECTION -->
-<!-- ========================= -->
 <div id="linksSection" style="display:none;">
   <div class="card">
     <h3>Add Link</h3>
     <input id="linkName" placeholder="Link Name">
-    <input id="linkURL" placeholder="URL">
+    <input id="linkURL"  placeholder="URL">
     <select id="linkDepartment"></select>
     <button class="primary" onclick="createLink()">Add Link</button>
   </div>
@@ -631,12 +419,7 @@ th {
     <div class="table-container">
       <table id="linkTable">
         <thead>
-          <tr>
-            <th>Link Name</th>
-            <th>URL</th>
-            <th>Department</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>Link Name</th><th>URL</th><th>Department</th><th>Action</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -644,9 +427,7 @@ th {
   </div>
 </div>
 
-<!-- ========================= -->
 <!-- BOOKINGS SECTION -->
-<!-- ========================= -->
 <div id="bookingsSection" style="display:none;">
   <div class="card">
     <h3>Room Bookings</h3>
@@ -654,9 +435,8 @@ th {
     <div class="filter-bar">
       <select id="filterStatus" onchange="filterBookings()">
         <option value="">All Status</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="cancelled">Cancelled</option>
       </select>
 
       <select id="filterRoom" onchange="filterBookings()">
@@ -665,7 +445,7 @@ th {
 
       <input type="date" id="filterDate" onchange="filterBookings()">
 
-      <button class="primary" onclick="clearBookingFilters()" style="width:auto; padding:8px 14px; border-radius:8px;">
+      <button class="primary" onclick="clearBookingFilters()" style="width:auto;padding:8px 14px;border-radius:8px;">
         Clear
       </button>
     </div>
@@ -674,14 +454,8 @@ th {
       <table id="bookingsTable">
         <thead>
           <tr>
-            <th>Room</th>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Booked By</th>
-            <th>Contact</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>Room</th><th>Event</th><th>Date</th><th>Time</th>
+            <th>Booked By</th><th>Contact</th><th>Status</th><th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -694,29 +468,22 @@ th {
 
 <script>
 
-/* ===================================================== */
-/* GLOBAL VARIABLES */
-/* ===================================================== */
-let editingUserId  = null;
-let editingLinkId  = null;
-let deleteType     = null;
-let deleteId       = null;
-let allBookings    = [];
+let editingUserId    = null;
+let editingLinkId    = null;
+let deleteType       = null;
+let deleteId         = null;
+let allBookings      = [];
 let viewingBookingId = null;
 
-/* ===================================================== */
-/* SECTION SWITCHING */
-/* ===================================================== */
+/* ---- SECTION SWITCHING ---- */
 function showSection(id) {
-  ["usersSection", "linksSection", "bookingsSection"].forEach(s => {
+  ["usersSection","linksSection","bookingsSection"].forEach(s => {
     document.getElementById(s).style.display = "none";
   });
   document.getElementById(id).style.display = "block";
 }
 
-/* ===================================================== */
-/* TOAST */
-/* ===================================================== */
+/* ---- TOAST ---- */
 function showToast(message, type = "default") {
   const toast = document.getElementById("toast");
   toast.classList.remove("show");
@@ -727,11 +494,9 @@ function showToast(message, type = "default") {
   setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
-/* ===================================================== */
-/* LOAD DEPARTMENTS */
-/* ===================================================== */
+/* ---- DEPARTMENTS ---- */
 async function loadDepartments() {
-  const res = await fetch(`${API}/api/departments`);
+  const res  = await fetch(`${API}/api/departments`);
   const data = await res.json();
   const checkbox = document.getElementById("departmentCheckboxes");
   checkbox.innerHTML = "";
@@ -744,7 +509,7 @@ async function loadDepartments() {
 }
 
 async function loadLinkDepartments() {
-  const res = await fetch(`${API}/api/departments`);
+  const res  = await fetch(`${API}/api/departments`);
   const data = await res.json();
   const dropdown = document.getElementById("linkDepartment");
   dropdown.innerHTML = "<option value=''>Select Department</option>";
@@ -753,11 +518,9 @@ async function loadLinkDepartments() {
   });
 }
 
-/* ===================================================== */
-/* LOAD USERS */
-/* ===================================================== */
+/* ---- USERS ---- */
 async function loadUsers() {
-  const res = await fetch(`${API}/api/users`);
+  const res   = await fetch(`${API}/api/users`);
   const users = await res.json();
   const tbody = document.querySelector("#userTable tbody");
   tbody.innerHTML = "";
@@ -770,21 +533,14 @@ async function loadUsers() {
         <td>${user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "-"}</td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only" onclick="editUser(${user.id})">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="delete-btn icon-only" onclick="openDeleteModal('user', ${user.id})">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+            <button class="edit-btn icon-only"   onclick="editUser(${user.id})"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn icon-only" onclick="openDeleteModal('user', ${user.id})"><i class="fa-solid fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
   });
 }
 
-/* ===================================================== */
-/* CREATE USER */
-/* ===================================================== */
 async function createUser() {
   const name     = document.getElementById("name").value;
   const email    = document.getElementById("email").value;
@@ -793,15 +549,15 @@ async function createUser() {
   const deps = [];
   document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
 
-  if (!name || !email || !password) { showToast("Please fill all fields", "error"); return; }
+  if (!name || !email || !password) { showToast("Please fill all fields","error"); return; }
 
   const res = await fetch(`${API}/api/users`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ name, email, password, role, departments: deps })
   });
 
-  if (!res.ok) { showToast("Failed to create user", "error"); return; }
+  if (!res.ok) { showToast("Failed to create user","error"); return; }
 
   showToast("User created!");
   document.getElementById("name").value = "";
@@ -812,11 +568,9 @@ async function createUser() {
   loadUsers();
 }
 
-/* ===================================================== */
-/* LOAD LINKS */
-/* ===================================================== */
+/* ---- LINKS ---- */
 async function loadLinks() {
-  const res = await fetch(`${API}/api/links`);
+  const res   = await fetch(`${API}/api/links`);
   const links = await res.json();
   const tbody = document.querySelector("#linkTable tbody");
   tbody.innerHTML = "";
@@ -828,46 +582,36 @@ async function loadLinks() {
         <td>${link.department_name}</td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only" onclick="editLink(${link.id}, '${link.name}', '${link.url}', ${link.department_id})">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="delete-btn icon-only" onclick="openDeleteModal('link', ${link.id})">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+            <button class="edit-btn icon-only"   onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn icon-only" onclick="openDeleteModal('link', ${link.id})"><i class="fa-solid fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
   });
 }
 
-/* ===================================================== */
-/* CREATE LINK */
-/* ===================================================== */
 async function createLink() {
   const name          = document.getElementById("linkName").value;
   const url           = document.getElementById("linkURL").value;
   const department_id = document.getElementById("linkDepartment").value;
 
-  if (!name || !url || !department_id) { showToast("Please fill all fields", "error"); return; }
+  if (!name || !url || !department_id) { showToast("Please fill all fields","error"); return; }
 
   const res = await fetch(`${API}/api/links`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ name, url, department_id })
   });
 
-  if (!res.ok) { showToast("Failed to add link", "error"); return; }
+  if (!res.ok) { showToast("Failed to add link","error"); return; }
 
   showToast("Link added!");
   document.getElementById("linkName").value = "";
-  document.getElementById("linkURL").value = "";
+  document.getElementById("linkURL").value  = "";
   document.getElementById("linkDepartment").value = "";
   loadLinks();
 }
 
-/* ===================================================== */
-/* EDIT LINK */
-/* ===================================================== */
 async function editLink(id, name, url, department_id) {
   editingLinkId = id;
   document.getElementById("editLinkName").value = name;
@@ -892,7 +636,7 @@ async function updateLink() {
 
   await fetch(`${API}/api/links/${editingLinkId}`, {
     method: "PUT",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ name, url, department_id })
   });
 
@@ -901,9 +645,7 @@ async function updateLink() {
   loadLinks();
 }
 
-/* ===================================================== */
-/* DELETE */
-/* ===================================================== */
+/* ---- DELETE ---- */
 function openDeleteModal(type, id) {
   deleteType = type;
   deleteId   = id;
@@ -923,14 +665,12 @@ async function confirmDelete() {
   showToast("Deleted!");
   closeDeleteModal();
 
-  if (deleteType === "link")    loadLinks();
+  if (deleteType === "link")         loadLinks();
   else if (deleteType === "booking") loadBookings();
-  else loadUsers();
+  else                               loadUsers();
 }
 
-/* ===================================================== */
-/* EDIT USER */
-/* ===================================================== */
+/* ---- EDIT USER ---- */
 async function editUser(id) {
   const resUser = await fetch(`${API}/api/users/${id}`);
   const user    = await resUser.json();
@@ -968,7 +708,7 @@ async function confirmEdit() {
 
   await fetch(`${API}/api/users/${editingUserId}`, {
     method: "PUT",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify(body)
   });
 
@@ -977,9 +717,7 @@ async function confirmEdit() {
   loadUsers();
 }
 
-/* ===================================================== */
-/* LOGOUT */
-/* ===================================================== */
+/* ---- LOGOUT ---- */
 function openLogoutModal()  { document.getElementById("logoutModal").style.display = "flex"; }
 function closeLogoutModal() { document.getElementById("logoutModal").style.display = "none"; }
 
@@ -990,11 +728,9 @@ function confirmLogout() {
   setTimeout(() => window.location.href = "login.html", 800);
 }
 
-/* ===================================================== */
-/* LOAD BOOKINGS */
-/* ===================================================== */
+/* ---- LOAD BOOKINGS ---- */
 async function loadBookings() {
-  const res = await fetch(`${API}/api/bookings`);
+  const res   = await fetch(`${API}/api/bookings`);
   allBookings = await res.json();
   renderBookings(allBookings);
   loadBookingRoomFilter();
@@ -1010,19 +746,18 @@ async function loadBookingRoomFilter() {
   });
 }
 
-/* ===================================================== */
-/* RENDER BOOKINGS */
-/* ===================================================== */
+/* ---- RENDER BOOKINGS ---- */
 function renderBookings(bookings) {
   const tbody = document.querySelector("#bookingsTable tbody");
   tbody.innerHTML = "";
 
   if (!Array.isArray(bookings) || bookings.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:30px;">No bookings found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">No bookings found</td></tr>`;
     return;
   }
 
   bookings.forEach(b => {
+    const isConfirmed = b.status === 'confirmed';
     tbody.innerHTML += `
       <tr>
         <td>${b.room_name}</td>
@@ -1040,18 +775,14 @@ function renderBookings(bookings) {
             <button class="edit-btn icon-only" title="View Details" onclick="viewBookingDetail(${b.id})">
               <i class="fa-solid fa-eye"></i>
             </button>
-            ${b.status === "pending" ? `
-              <button class="approve-btn icon-only" title="Approve" onclick="updateBookingStatus(${b.id}, 'approved')">
-                <i class="fa-solid fa-check"></i>
-              </button>
-              <button class="reject-btn icon-only" title="Reject" onclick="updateBookingStatus(${b.id}, 'rejected')">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            ` : `
-              <button class="edit-btn icon-only" title="Reset to Pending" onclick="updateBookingStatus(${b.id}, 'pending')">
-                <i class="fa-solid fa-rotate-left"></i>
-              </button>
-            `}
+            ${isConfirmed
+              ? `<button class="cancel-btn icon-only" title="Cancel Booking" onclick="updateBookingStatus(${b.id},'cancelled')">
+                   <i class="fa-solid fa-ban"></i>
+                 </button>`
+              : `<button class="restore-btn icon-only" title="Restore Booking" onclick="updateBookingStatus(${b.id},'confirmed')">
+                   <i class="fa-solid fa-rotate-left"></i>
+                 </button>`
+            }
             <button class="delete-btn icon-only" title="Delete" onclick="openDeleteModal('booking', ${b.id})">
               <i class="fa-solid fa-trash"></i>
             </button>
@@ -1061,9 +792,7 @@ function renderBookings(bookings) {
   });
 }
 
-/* ===================================================== */
-/* FILTER BOOKINGS */
-/* ===================================================== */
+/* ---- FILTER BOOKINGS ---- */
 function filterBookings() {
   const status = document.getElementById("filterStatus").value;
   const roomId = document.getElementById("filterRoom").value;
@@ -1086,27 +815,23 @@ function clearBookingFilters() {
   renderBookings(allBookings);
 }
 
-/* ===================================================== */
-/* UPDATE BOOKING STATUS */
-/* ===================================================== */
+/* ---- UPDATE BOOKING STATUS ---- */
 async function updateBookingStatus(id, status) {
   const res = await fetch(`${API}/api/bookings/${id}/status`, {
     method: "PUT",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ status })
   });
 
   if (res.ok) {
-    showToast(capitalize(status) + " successfully!");
+    showToast(status === 'cancelled' ? 'Booking cancelled' : 'Booking restored');
     loadBookings();
   } else {
-    showToast("Failed to update status", "error");
+    showToast("Failed to update status","error");
   }
 }
 
-/* ===================================================== */
-/* VIEW BOOKING DETAIL MODAL */
-/* ===================================================== */
+/* ---- VIEW BOOKING DETAIL MODAL ---- */
 function viewBookingDetail(id) {
   const b = allBookings.find(x => x.id === id);
   if (!b) return;
@@ -1123,27 +848,26 @@ function viewBookingDetail(id) {
   document.getElementById("dStatus").innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
   document.getElementById("dCreated").textContent  = new Date(b.created_at).toLocaleString("en-MY");
 
-  document.getElementById("detailApproveBtn").style.display = b.status !== "approved" ? "inline-flex" : "none";
-  document.getElementById("detailRejectBtn").style.display  = b.status !== "rejected"  ? "inline-flex" : "none";
+  // Show Cancel or Restore depending on current status
+  document.getElementById("detailCancelBtn").style.display  = b.status === 'confirmed' ? 'inline-flex' : 'none';
+  document.getElementById("detailRestoreBtn").style.display = b.status === 'cancelled'  ? 'inline-flex' : 'none';
 
   document.getElementById("bookingDetailModal").style.display = "flex";
 }
 
 function closeBookingDetailModal() { document.getElementById("bookingDetailModal").style.display = "none"; }
 
-async function approveFromDetail() {
-  await updateBookingStatus(viewingBookingId, "approved");
+async function cancelFromDetail() {
+  await updateBookingStatus(viewingBookingId, 'cancelled');
   closeBookingDetailModal();
 }
 
-async function rejectFromDetail() {
-  await updateBookingStatus(viewingBookingId, "rejected");
+async function restoreFromDetail() {
+  await updateBookingStatus(viewingBookingId, 'confirmed');
   closeBookingDetailModal();
 }
 
-/* ===================================================== */
-/* HELPERS */
-/* ===================================================== */
+/* ---- HELPERS ---- */
 function formatBookingDate(d) {
   return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
 }
@@ -1161,21 +885,25 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/* ===================================================== */
-/* INIT */
-/* ===================================================== */
+/* ---- INIT ---- */
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("INIT RUNNING...");
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const role  = localStorage.getItem("role")  || sessionStorage.getItem("role");
+
+  if (!token || role !== "admin") {
+    window.location.href = "login.html";
+    return;
+  }
+
   try {
     await loadDepartments();
     await loadLinkDepartments();
     await loadUsers();
     await loadLinks();
     await loadBookings();
-    console.log("INIT SUCCESS");
   } catch (err) {
     console.error("INIT ERROR:", err);
-    showToast("Failed to load data", "error");
+    showToast("Failed to load data","error");
   }
 });
 
