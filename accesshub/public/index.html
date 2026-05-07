@@ -1,292 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>User Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bismi AccessHub</title>
 
   <script>
     const API = window.location.origin;
   </script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      display: flex;
-      background: #f1f5f9;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 240px;
-      background: #1e293b;
-      color: white;
-      height: 100vh;
-      padding: 20px;
-      position: fixed;
-
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar h2 {
-      margin-bottom: 25px;
-    }
-
-    .sidebar button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: none;
-      background: #334155;
-      color: white;
-      cursor: pointer;
-      border-radius: 8px;
-      text-align: left;
-      transition: 0.2s;
-    }
-
-    .sidebar button:hover {
-      background: #475569;
-    }
-
-    .sidebar button.active {
-      background: #3b82f6;
-    }
-
-    .logout-btn {
-      margin-top: auto;
-      background: #ef4444 !important;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .booking-btn {
-      background: #1d4ed8 !important;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .booking-btn:hover {
-      background: #2563eb !important;
-    }
-
-    /* MAIN */
-    .main {
-      margin-left: 240px;
-      padding: 25px;
-      width: 100%;
-    }
-
-    input {
-      padding: 12px;
-      width: 100%;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    /* ROW LIST */
-    #dashboard {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      background: white;
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
-
-    .badge {
-      display: inline-block;
-      background: #e2e8f0;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    .link-btn {
-      padding: 10px 16px;
-      background: #3b82f6;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-
-    .empty {
-      text-align: center;
-      color: gray;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 200px;
-      }
-
-      .main {
-        margin-left: 200px;
-      }
-    }
-
-    .search-bar {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .input-group {
-      display: flex;
-      align-items: center;
-      height: 48px;
-
-      border-radius: 30px;
-      overflow: hidden;
-
-      background: #f1f5f9;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    .input-group input {
-      flex: 1;
-      border: none;
-      outline: none;
-
-      height: 48px;
-      padding: 0 20px;
-
-      font-size: 14px;
-      background: transparent;
-
-      display: flex;
-      align-items: center;
-    }
-
-    .input-group button {
-      border: none;
-      background: transparent;
-      padding: 0 18px;
-      cursor: pointer;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      height: 48px;
-    }
-
-    .input-group button i {
-      color: #6b7280;
-      font-size: 16px;
-    }
-
-    .input-group button:hover i {
-      color: #3b82f6;
-    }
-
-    .input-group:focus-within {
-      box-shadow: 0 4px 18px rgba(59,130,246,0.25);
-    }
-
-    .input-group input::placeholder {
-      position: relative;
-      top: 1px;
-    }
-  </style>
-
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+  <!-- Dashboard Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
 <div class="sidebar">
-  <h2>AccessHub</h2>
 
-  <!-- Departments inserted dynamically -->
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <img src="bismi_jpg__2_.jpeg" alt="Bismi Logo" class="sidebar-logo">
+    <div class="sidebar-brand-text">
+      <span class="sidebar-brand-name">AccessHub</span>
+      <span class="sidebar-brand-sub">Segar Halal Suci</span>
+    </div>
+  </div>
 
-  <button class="booking-btn" onclick="loadBookingPage(this)">
-    <i class="fas fa-door-open"></i> Room Booking
-  </button>
+  <!-- Nav -->
+  <nav class="sidebar-nav" id="sidebarNav">
+    <span class="sidebar-section-label">Navigation</span>
+    <!-- Department buttons inserted here dynamically -->
 
-  <button class="logout-btn" onclick="logout()">Logout</button>
+    <span class="sidebar-section-label">Tools</span>
+    <button class="booking-btn" onclick="loadBookingPage(this)">
+      <i class="fas fa-door-open"></i> Room Booking
+    </button>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>&nbsp; Logout
+    </button>
+  </div>
+
 </div>
 
-<!-- MAIN -->
+
+<!-- ══════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════ -->
 <div class="main">
 
-  <!-- DASHBOARD CONTENT -->
+  <!-- DASHBOARD PAGE -->
   <div id="dashboardPage">
 
-    <h2>AccessHub Dashboard</h2>
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">
+          <i class="fas fa-th-large" style="color:var(--bismi-pink);font-size:22px;"></i>
+          Access<span class="accent">Hub</span>
+        </h2>
+        <p class="page-subtitle">Welcome back — select a link below to get started</p>
+      </div>
+    </div>
 
+    <!-- Search -->
     <div class="search-bar">
       <div class="input-group">
         <input
           type="text"
           id="searchInput"
           placeholder="Search links..."
-          aria-label="Search"
+          aria-label="Search links"
         >
-
-        <button type="button" id="searchBtn">
+        <button type="button" id="searchBtn" aria-label="Search">
           <i class="fas fa-search"></i>
         </button>
       </div>
     </div>
 
+    <!-- Cards grid -->
     <div id="dashboard"></div>
 
   </div>
 
-  <!-- BOOKING CONTENT -->
+  <!-- BOOKING PAGE -->
   <div id="bookingPage" style="display:none;"></div>
 
-</div>
+</div><!-- /.main -->
 
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
 <script>
 
 let allData = [];
 
-// ===============================
+// ────────────────────────────────────────
 // LOAD LINKS
-// ===============================
+// ────────────────────────────────────────
 async function loadLinks() {
-
-  const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
-
-  const userData =
-    localStorage.getItem("user") ||
-    sessionStorage.getItem("user");
-
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
   const user = JSON.parse(userData);
-  const userId = user.id;
 
   try {
-
-    const res = await fetch(`${API}/api/links`);
+    const res  = await fetch(`${API}/api/links`);
     const data = await res.json();
 
-    console.log("API RESULT:", data);
-
-    if (!Array.isArray(data)) {
-      console.error("Links error:", data);
-      return;
-    }
+    if (!Array.isArray(data)) { console.error("Links error:", data); return; }
 
     const filtered = data.filter(link =>
       !window.userDepartmentIds ||
@@ -295,356 +127,205 @@ async function loadLinks() {
     );
 
     allData = filtered;
-
     renderDashboard(filtered);
 
   } catch (err) {
-
     console.error("Fetch error:", err);
-
   }
 }
 
-// ===============================
+// ────────────────────────────────────────
 // LOAD DEPARTMENTS
-// ===============================
+// ────────────────────────────────────────
 async function loadDepartments() {
-
   try {
-
-    const userData =
-      localStorage.getItem("user") ||
-      sessionStorage.getItem("user");
-
+    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
     const user = JSON.parse(userData);
 
-    const res = await fetch(`${API}/api/users/${user.id}/departments`);
+    const res         = await fetch(`${API}/api/users/${user.id}/departments`);
     const departments = await res.json();
 
-    if (!Array.isArray(departments)) {
-      console.error("Departments error:", departments);
-      return;
-    }
+    if (!Array.isArray(departments)) { console.error("Departments error:", departments); return; }
 
     window.userDepartmentIds = departments.map(d => d.id);
-
     generateSidebar(departments);
 
   } catch (err) {
-
     console.error("Department fetch error:", err);
-
   }
 }
 
-// ===============================
+// ────────────────────────────────────────
 // RENDER DASHBOARD
-// ===============================
+// ────────────────────────────────────────
 function renderDashboard(data, keyword = "") {
-
   const container = document.getElementById("dashboard");
-
   container.innerHTML = "";
 
   if (data.length === 0) {
-
     container.innerHTML = `
       <div class="empty">
-        ${keyword
-          ? "No results found for \"" + keyword + "\""
-          : "No links available"}
-      </div>
-    `;
-
+        <div class="empty-icon"><i class="fas fa-search"></i></div>
+        <p>${keyword ? 'No results for "' + keyword + '"' : "No links available"}</p>
+      </div>`;
     return;
   }
 
   data.forEach(link => {
-
     container.innerHTML += `
       <div class="card">
-
-        <div>
+        <div class="card-icon">
+          <i class="fas fa-link"></i>
+        </div>
+        <div class="card-body">
           <h4>${link.name}</h4>
         </div>
-
         <a href="${link.url}" target="_blank" class="link-btn">
-          Open
+          Open <i class="fas fa-arrow-up-right-from-square"></i>
         </a>
-
-      </div>
-    `;
-
+      </div>`;
   });
 }
 
-// ===============================
+// ────────────────────────────────────────
 // SIDEBAR
-// ===============================
+// ────────────────────────────────────────
 function generateSidebar(departments) {
+  const nav = document.getElementById("sidebarNav");
 
-  const sidebar = document.querySelector(".sidebar");
+  // Remove old department buttons (keep section labels + booking btn)
+  nav.querySelectorAll("button:not(.booking-btn)").forEach(btn => btn.remove());
 
-  sidebar
-    .querySelectorAll("button:not(.logout-btn):not(.booking-btn)")
-    .forEach(btn => btn.remove());
-
+  // "All" button
   const allBtn = document.createElement("button");
+  allBtn.innerHTML = '<i class="fas fa-grid-2"></i> All';
+  allBtn.onclick = () => { showDashboard(); setActive(allBtn); renderDashboard(allData); };
 
-  allBtn.innerText = "All";
+  // Insert after first section label
+  const firstLabel = nav.querySelector(".sidebar-section-label");
+  firstLabel.insertAdjacentElement("afterend", allBtn);
 
-  allBtn.onclick = () => {
-
-    showDashboard();
-
-    setActive(allBtn);
-
-    renderDashboard(allData);
-  };
-
-  sidebar.insertBefore(
-    allBtn,
-    document.querySelector(".booking-btn")
-  );
+  let insertRef = allBtn;
 
   departments.forEach(dep => {
-
     if (dep.name.toLowerCase() === "room booking") return;
 
     const btn = document.createElement("button");
+    btn.innerHTML = `<i class="fas fa-folder"></i> ${dep.name}`;
+    btn.onclick = () => { showDashboard(); setActive(btn); filterCategory(dep.id); };
 
-    btn.innerText = dep.name;
-
-    btn.onclick = () => {
-
-      showDashboard();
-
-      setActive(btn);
-
-      filterCategory(dep.id);
-    };
-
-    sidebar.insertBefore(
-      btn,
-      document.querySelector(".booking-btn")
-    );
+    insertRef.insertAdjacentElement("afterend", btn);
+    insertRef = btn;
   });
 
   setActive(allBtn);
 }
 
-// ===============================
+// ────────────────────────────────────────
 // FILTER
-// ===============================
+// ────────────────────────────────────────
 function filterCategory(departmentId) {
-
-  console.log("Clicked:", departmentId);
-
-  const filtered = allData.filter(item => {
-
-    console.log("Checking:", item.department_id);
-
-    return Number(item.department_id) === Number(departmentId);
-
-  });
-
-  console.log("RESULT:", filtered);
-
+  const filtered = allData.filter(item =>
+    Number(item.department_id) === Number(departmentId)
+  );
   renderDashboard(filtered);
 }
 
-// ===============================
+// ────────────────────────────────────────
 // ACTIVE BUTTON
-// ===============================
+// ────────────────────────────────────────
 function setActive(button) {
-
-  document
-    .querySelectorAll(".sidebar button")
-    .forEach(btn => btn.classList.remove("active"));
-
+  document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
   button.classList.add("active");
 }
 
-// ===============================
+// ────────────────────────────────────────
 // SHOW DASHBOARD
-// ===============================
+// ────────────────────────────────────────
 function showDashboard() {
-
   document.getElementById("dashboardPage").style.display = "block";
-  document.getElementById("bookingPage").style.display = "none";
+  document.getElementById("bookingPage").style.display   = "none";
 }
 
-// ===============================
+// ────────────────────────────────────────
 // LOAD BOOKING PAGE
-// ===============================
+// ────────────────────────────────────────
 async function loadBookingPage(button) {
-
   setActive(button);
 
   document.getElementById("dashboardPage").style.display = "none";
-
-  const bookingContainer =
-    document.getElementById("bookingPage");
-
+  const bookingContainer = document.getElementById("bookingPage");
   bookingContainer.style.display = "block";
 
-  // Already loaded
-  if (bookingContainer.innerHTML.trim() !== "") {
-    return;
-  }
+  if (bookingContainer.innerHTML.trim() !== "") return;
 
   try {
+    const res  = await fetch("booking.html");
+    let   html = await res.text();
 
-    const res = await fetch("booking.html");
-
-    let html = await res.text();
-
-    // Remove full HTML structure
     html = html.replace(/<!DOCTYPE html>[\s\S]*?<body>/i, "");
     html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
-
-    // Remove sidebar
-    html = html.replace(
-      /<!-- SIDEBAR -->[\s\S]*?<!-- MAIN -->/i,
-      ""
-    );
-
-    // Remove main wrapper
-    html = html.replace(
-      /<div class="main">/i,
-      ""
-    );
-
+    html = html.replace(/<!-- SIDEBAR -->[\s\S]*?<!-- MAIN -->/i, "");
+    html = html.replace(/<div class="main">/i, "");
     html = html.replace(/<\/div>\s*$/, "");
 
     bookingContainer.innerHTML = html;
 
-    // Execute scripts
-    const scripts =
-      bookingContainer.querySelectorAll("script");
-
-    scripts.forEach(oldScript => {
-
-      const newScript =
-        document.createElement("script");
-
-      if (oldScript.src) {
-        newScript.src = oldScript.src;
-      } else {
-        newScript.textContent = oldScript.textContent;
-      }
-
+    bookingContainer.querySelectorAll("script").forEach(oldScript => {
+      const newScript = document.createElement("script");
+      oldScript.src ? (newScript.src = oldScript.src) : (newScript.textContent = oldScript.textContent);
       document.body.appendChild(newScript);
-
       oldScript.remove();
     });
 
   } catch (err) {
-
     console.error("Booking page load error:", err);
-
-    bookingContainer.innerHTML = `
-      <div class="empty">
-        Failed to load booking page
-      </div>
-    `;
+    bookingContainer.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
   }
 }
 
-// ===============================
+// ────────────────────────────────────────
 // SEARCH
-// ===============================
-document.getElementById("searchInput")
-.addEventListener("keyup", function () {
-
-  const keyword = this.value.toLowerCase();
-
-  const filtered = allData.filter(item =>
-    item.name.toLowerCase().includes(keyword)
-  );
-
-  renderDashboard(filtered, this.value);
-});
-
-document.getElementById("searchBtn")
-.addEventListener("click", function () {
-
-  const keyword =
-    document.getElementById("searchInput")
-    .value
-    .toLowerCase();
-
-  const filtered = allData.filter(item =>
-    item.name.toLowerCase().includes(keyword)
-  );
-
+// ────────────────────────────────────────
+function doSearch() {
+  const keyword  = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = allData.filter(item => item.name.toLowerCase().includes(keyword));
   renderDashboard(filtered, keyword);
-});
+}
 
-document.getElementById("searchInput")
-.addEventListener("keypress", function (e) {
+document.getElementById("searchInput").addEventListener("keyup",    doSearch);
+document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
+document.getElementById("searchBtn").addEventListener("click",      doSearch);
 
-  if (e.key === "Enter") {
-    document.getElementById("searchBtn").click();
-  }
-});
-
-// ===============================
+// ────────────────────────────────────────
 // LOGOUT
-// ===============================
+// ────────────────────────────────────────
 function logout() {
-
   localStorage.clear();
   sessionStorage.clear();
-
   window.location.href = "login.html";
 }
 
-// ===============================
+// ────────────────────────────────────────
 // INIT
-// ===============================
+// ────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
+  const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
+  const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
+  const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
 
-  const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
-
-  const role =
-    localStorage.getItem("role") ||
-    sessionStorage.getItem("role");
-
-  const userData =
-    localStorage.getItem("user") ||
-    sessionStorage.getItem("user");
-
-  // NOT LOGGED IN
-  if (!token || !userData) {
-
-    window.location.href = "login.html";
-
-    return;
-  }
+  if (!token || !userData) { window.location.href = "login.html"; return; }
 
   const user = JSON.parse(userData);
 
-  // ADMIN
-  if (role === "admin") {
-
-    window.location.href = "admin.html";
-
-    return;
-  }
+  if (role === "admin") { window.location.href = "admin.html"; return; }
 
   window.currentUserId = user.id;
 
-  // LOAD
   await loadDepartments();
   await loadLinks();
-
-  console.log("LOGGED IN USER:", user);
 });
 
 </script>
-
 </body>
 </html>
