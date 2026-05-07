@@ -2,8 +2,7 @@ const express = require("express");
 const router  = express.Router();
 const db      = require("../db");
 const bcrypt  = require("bcryptjs");
-const { verifyToken, requireRole } = require("../../middleware/auth");
-
+const { verifyToken, requireRole } = require("../middleware/auth");
 // =====================================
 // GET ALL USERS
 // superadmin → all users
