@@ -360,15 +360,37 @@ async function loadLinks() {
 async function loadDepartments() {
   try {
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const user = JSON.parse(userData);
+    const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
+    const user     = JSON.parse(userData);
 
-    const res         = await fetch(`${API}/api/users/${user.id}/departments`);
-    const departments = await res.json();
-    if (!Array.isArray(departments)) return;
+    let workDepts, linkDepts;
 
-    window.userDepartmentIds = departments.map(d => d.id);
-    window.userDepartments    = departments;
-    generateSidebar(departments);
+    if (role === "admin" || role === "superadmin") {
+      // Admin sees all departments for both sidebar and profile
+      const res = await fetch(`${API}/api/departments`);
+      const all = await res.json();
+      workDepts = all;
+      linkDepts = all;
+    } else {
+      // Regular user: work dept for profile, link-access for sidebar
+      const [resWork, resLink] = await Promise.all([
+        fetch(`${API}/api/users/${user.id}/departments`),
+        fetch(`${API}/api/users/${user.id}/link-access`)
+      ]);
+      workDepts = await resWork.json();
+      linkDepts = await resLink.json();
+    }
+
+    if (!Array.isArray(linkDepts)) return;
+
+    // Work depts shown on profile page
+    window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
+
+    // Link access depts used for sidebar filter and link filtering
+    window.userDepartmentIds = linkDepts.map(d => d.id);
+    window.userLinkDepts     = linkDepts;
+
+    generateSidebar(linkDepts);
   } catch (e) { console.error(e); }
 }
 
