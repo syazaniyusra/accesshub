@@ -474,30 +474,6 @@ tr:hover td { background: #FAFAFA; }
 
 <!-- ══ MODALS ══ -->
 
-<!-- Admin Password Re-entry Modal -->
-<div id="adminPwModal" class="modal admin-pw-modal">
-  <div class="modal-box">
-    <div class="modal-title"><i class="fas fa-shield-halved"></i> Admin Access</div>
-    <div class="admin-pw-badge"><i class="fas fa-lock"></i> Restricted Area</div>
-    <p style="font-size:13.5px;color:var(--ink-mid);margin-bottom:18px;line-height:1.6;">
-      Please re-enter your admin password to access the Admin Panel.
-    </p>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label>Admin Password</label>
-      <div class="pw-input-wrap">
-        <input type="password" id="adminPwInput" placeholder="Enter your password" onkeypress="if(event.key==='Enter') verifyAdminPw()">
-        <button type="button" onclick="togglePw('adminPwInput',this)"><i class="fas fa-eye"></i></button>
-      </div>
-      <span id="adminPwError" style="color:#DC2626;font-size:12px;margin-top:4px;display:none;">
-        <i class="fas fa-circle-exclamation"></i> Incorrect password. Please try again.
-      </span>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="cancelAdminAccess()">Cancel</button>
-      <button class="btn-primary" onclick="verifyAdminPw()"><i class="fas fa-unlock"></i> Verify</button>
-    </div>
-  </div>
-</div>
 
 <!-- Edit User -->
 <div id="editModal" class="modal">
@@ -850,50 +826,6 @@ let deleteId         = null;
 let allBookings      = [];
 let viewingBookingId = null;
 let selectedRole     = 'user';
-
-/* ─────────────────────────────────────────
-   ADMIN PASSWORD RE-ENTRY
-───────────────────────────────────────── */
-function showAdminPwModal() {
-  document.getElementById('adminPwModal').style.display = 'flex';
-  document.getElementById('adminPwInput').value = '';
-  document.getElementById('adminPwError').style.display = 'none';
-  setTimeout(() => document.getElementById('adminPwInput').focus(), 100);
-}
-
-function cancelAdminAccess() {
-  document.getElementById('adminPwModal').style.display = 'none';
-  // Redirect back to dashboard if they cancel
-  window.location.href = 'index.html';
-}
-
-async function verifyAdminPw() {
-  const pw = document.getElementById('adminPwInput').value;
-  if (!pw) return;
-
-  try {
-    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
-    const user     = JSON.parse(userData);
-
-    const res = await fetch(`${API}/api/auth/verify-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: user.email, password: pw })
-    });
-
-    if (res.ok) {
-      document.getElementById('adminPwModal').style.display = 'none';
-      initAdminPanel();
-    } else {
-      document.getElementById('adminPwError').style.display = 'block';
-      document.getElementById('adminPwInput').value = '';
-      document.getElementById('adminPwInput').focus();
-    }
-  } catch (err) {
-    console.error('verify pw error:', err);
-    document.getElementById('adminPwError').style.display = 'block';
-  }
-}
 
 /* ─────────────────────────────────────────
    ROLE SELECTOR
