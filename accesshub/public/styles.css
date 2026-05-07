@@ -236,7 +236,7 @@ body {
   box-shadow: var(--shadow-xs);
   transition: border-color var(--dur) var(--ease),
               box-shadow var(--dur) var(--ease);
-  max-width: 480px;
+  max-width: 100%;
 }
 
 .input-group:focus-within {
@@ -285,9 +285,9 @@ body {
 
 /* ── Grid ── */
 #dashboard {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* ── Card ── */
@@ -386,7 +386,6 @@ body {
 
 /* ── Empty State ── */
 .empty {
-  grid-column: 1 / -1;
   text-align: center;
   padding: 70px 20px;
 }
