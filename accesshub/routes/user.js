@@ -1,28 +1,62 @@
 const express = require("express");
-const router = express.Router();
-const db = require("../db");
-const bcrypt = require("bcryptjs");
+const router  = express.Router();
+const db      = require("../db");
+const bcrypt  = require("bcryptjs");
+const { verifyToken, requireRole } = require("../middleware/auth");
 
 // =====================================
-// GET ALL USERS + DEPARTMENTS
+// GET ALL USERS
+// superadmin → all users
+// admin      → only users in their department
 // =====================================
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
-    const [rows] = await db.query(`
-      SELECT 
-        u.id,
-        u.name,
-        u.email,
-        u.role,
-        d.id AS department_id,
-        d.name AS department_name
-      FROM users u
-      LEFT JOIN user_departments ud ON u.id = ud.user_id
-      LEFT JOIN departments d ON d.id = ud.department_id
-    `);
+    let rows;
 
+    if (req.user.role === "superadmin") {
+      // Return all users
+      [rows] = await db.query(`
+        SELECT
+          u.id, u.name, u.email, u.role,
+          d.id   AS department_id,
+          d.name AS department_name
+        FROM users u
+        LEFT JOIN user_departments ud ON u.id = ud.user_id
+        LEFT JOIN departments d ON d.id = ud.department_id
+        ORDER BY u.id
+      `);
+    } else {
+      // Admin: get their own department ids first
+      const [adminDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [req.user.id]
+      );
+      const deptIds = adminDepts.map(d => d.department_id);
+
+      if (deptIds.length === 0) {
+        return res.json([]);
+      }
+
+      // Return only users who belong to at least one of admin's departments
+      [rows] = await db.query(`
+        SELECT
+          u.id, u.name, u.email, u.role,
+          d.id   AS department_id,
+          d.name AS department_name
+        FROM users u
+        LEFT JOIN user_departments ud ON u.id = ud.user_id
+        LEFT JOIN departments d ON d.id = ud.department_id
+        WHERE u.id IN (
+          SELECT DISTINCT user_id FROM user_departments
+          WHERE department_id IN (?)
+        )
+        AND u.role = 'user'
+        ORDER BY u.id
+      `, [deptIds]);
+    }
+
+    // Group departments per user
     const usersMap = {};
-
     rows.forEach(row => {
       if (!usersMap[row.id]) {
         usersMap[row.id] = {
@@ -33,7 +67,6 @@ router.get("/", async (req, res) => {
           departments: []
         };
       }
-
       if (row.department_id) {
         usersMap[row.id].departments.push({
           id: row.department_id,
@@ -52,13 +85,28 @@ router.get("/", async (req, res) => {
 
 // =====================================
 // CREATE USER
+// superadmin → can create any role, any dept
+// admin      → can only create 'user' role, only their own dept
 // =====================================
-router.post("/", async (req, res) => {
+router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
-    const { name, email, password, role, departments } = req.body;
+    let { name, email, password, role, departments } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email & password required" });
+    }
+
+    // Admins can only create users, not other admins
+    if (req.user.role === "admin") {
+      role = "user";
+
+      // Restrict departments to only admin's own departments
+      const [adminDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [req.user.id]
+      );
+      const allowedIds = adminDepts.map(d => String(d.department_id));
+      departments = (departments || []).filter(id => allowedIds.includes(String(id)));
     }
 
     const [existing] = await db.query(
@@ -98,11 +146,36 @@ router.post("/", async (req, res) => {
 
 // =====================================
 // UPDATE USER
+// superadmin → can update anyone
+// admin      → can only update users in their department
 // =====================================
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
     const userId = req.params.id;
-    const { name, email, password, departments } = req.body;
+    let { name, email, password, departments } = req.body;
+
+    // Admin: verify target user is in their department
+    if (req.user.role === "admin") {
+      const [adminDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [req.user.id]
+      );
+      const allowedIds = adminDepts.map(d => String(d.department_id));
+
+      const [targetDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [userId]
+      );
+      const targetIds = targetDepts.map(d => String(d.department_id));
+
+      const hasOverlap = targetIds.some(id => allowedIds.includes(id));
+      if (!hasOverlap) {
+        return res.status(403).json({ message: "You can only edit users in your department" });
+      }
+
+      // Restrict departments to admin's own
+      departments = (departments || []).filter(id => allowedIds.includes(String(id)));
+    }
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -138,13 +211,36 @@ router.put("/:id", async (req, res) => {
 
 // =====================================
 // DELETE USER
+// superadmin → anyone
+// admin      → only users in their department
 // =====================================
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
     const userId = req.params.id;
+
+    if (req.user.role === "admin") {
+      const [adminDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [req.user.id]
+      );
+      const allowedIds = adminDepts.map(d => String(d.department_id));
+
+      const [targetDepts] = await db.query(
+        "SELECT department_id FROM user_departments WHERE user_id = ?",
+        [userId]
+      );
+      const targetIds = targetDepts.map(d => String(d.department_id));
+
+      const hasOverlap = targetIds.some(id => allowedIds.includes(id));
+      if (!hasOverlap) {
+        return res.status(403).json({ message: "You can only delete users in your department" });
+      }
+    }
+
     await db.query("DELETE FROM user_departments WHERE user_id = ?", [userId]);
     await db.query("DELETE FROM users WHERE id = ?", [userId]);
     res.json({ message: "User deleted successfully" });
+
   } catch (err) {
     console.error("DELETE ERROR:", err);
     res.status(500).json({ error: "Failed to delete user" });
@@ -154,14 +250,14 @@ router.delete("/:id", async (req, res) => {
 // =====================================
 // GET SINGLE USER
 // =====================================
-router.get("/:id", async (req, res) => {
+router.get("/:id", verifyToken, async (req, res) => {
   try {
     const userId = req.params.id;
 
     const [rows] = await db.query(`
-      SELECT 
+      SELECT
         u.id, u.name, u.email, u.role,
-        d.id AS department_id,
+        d.id   AS department_id,
         d.name AS department_name
       FROM users u
       LEFT JOIN user_departments ud ON u.id = ud.user_id
@@ -174,10 +270,10 @@ router.get("/:id", async (req, res) => {
     }
 
     const user = {
-      id: rows[0].id,
-      name: rows[0].name,
-      email: rows[0].email,
-      role: rows[0].role,
+      id:          rows[0].id,
+      name:        rows[0].name,
+      email:       rows[0].email,
+      role:        rows[0].role,
       departments: rows
         .filter(r => r.department_id)
         .map(r => ({ id: r.department_id, name: r.department_name }))
@@ -216,9 +312,9 @@ router.get("/:id/departments", async (req, res) => {
 // =====================================
 // CHANGE PASSWORD
 // =====================================
-router.post("/:id/change-password", async (req, res) => {
+router.post("/:id/change-password", verifyToken, async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId          = req.params.id;
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -229,7 +325,6 @@ router.post("/:id/change-password", async (req, res) => {
       return res.status(400).json({ message: "New password must be at least 6 characters" });
     }
 
-    // Fetch current hashed password
     const [rows] = await db.query(
       "SELECT password FROM users WHERE id = ?",
       [userId]
@@ -239,20 +334,13 @@ router.post("/:id/change-password", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Verify current password
     const match = await bcrypt.compare(currentPassword, rows[0].password);
-
     if (!match) {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
 
-    // Hash and save new password
     const hashed = await bcrypt.hash(newPassword, 10);
-
-    await db.query(
-      "UPDATE users SET password = ? WHERE id = ?",
-      [hashed, userId]
-    );
+    await db.query("UPDATE users SET password = ? WHERE id = ?", [hashed, userId]);
 
     res.json({ message: "Password updated successfully" });
 
@@ -262,7 +350,4 @@ router.post("/:id/change-password", async (req, res) => {
   }
 });
 
-// =====================================
-// EXPORT
-// =====================================
 module.exports = router;
