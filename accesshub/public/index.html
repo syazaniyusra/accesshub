@@ -10,8 +10,166 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── RE-AUTH MODAL ── */
+    .reauth-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+    }
+    .reauth-overlay.open { display: flex; }
+
+    .reauth-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 36px 32px 28px;
+      width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+      animation: reauthPop 0.25s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes reauthPop {
+      from { transform: scale(0.88); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .reauth-icon {
+      width: 48px; height: 48px;
+      background: #FCE8F3;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      color: #D4186C;
+      font-size: 20px;
+    }
+
+    .reauth-box h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: #1C1C1E;
+      margin-bottom: 4px;
+    }
+
+    .reauth-box p {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .reauth-input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .reauth-input-wrap input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      color: #1C1C1E;
+    }
+    .reauth-input-wrap input:focus { border-color: #D4186C; }
+    .reauth-input-wrap button {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: #9ca3af; font-size: 14px; padding: 0;
+    }
+
+    .reauth-error {
+      font-size: 12.5px;
+      color: #ef4444;
+      margin-bottom: 14px;
+      display: none;
+      padding: 8px 12px;
+      background: #fef2f2;
+      border-radius: 8px;
+    }
+
+    .reauth-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .reauth-cancel {
+      flex: 1;
+      padding: 11px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.2s;
+    }
+    .reauth-cancel:hover { background: #f9fafb; }
+
+    .reauth-confirm {
+      flex: 2;
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      background: #D4186C;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .reauth-confirm:hover   { background: #b8155d; }
+    .reauth-confirm:active  { transform: scale(0.97); }
+    .reauth-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── ADMIN SIDEBAR BUTTON ── */
+    .admin-panel-btn {
+      background: linear-gradient(135deg, #D4186C, #b8155d) !important;
+      color: #fff !important;
+    }
+    .admin-panel-btn:hover {
+      background: linear-gradient(135deg, #b8155d, #961149) !important;
+      transform: translateX(3px);
+    }
+    .admin-panel-btn i { color: #fff !important; }
+  </style>
 </head>
 <body>
+
+<!-- ══════════════════════════════════════
+     RE-AUTH MODAL
+══════════════════════════════════════ -->
+<div class="reauth-overlay" id="reauthOverlay">
+  <div class="reauth-box">
+    <div class="reauth-icon"><i class="fas fa-shield-alt"></i></div>
+    <h3>Admin Verification</h3>
+    <p>Re-enter your password to access the Admin Panel.</p>
+
+    <div class="reauth-input-wrap">
+      <input type="password" id="reauthPassword" placeholder="Your password" autocomplete="current-password">
+      <button type="button" onclick="toggleReauthPw(this)"><i class="fas fa-eye"></i></button>
+    </div>
+
+    <div class="reauth-error" id="reauthError"></div>
+
+    <div class="reauth-actions">
+      <button class="reauth-cancel" onclick="closeReauth()">Cancel</button>
+      <button class="reauth-confirm" id="reauthConfirmBtn" onclick="verifyAndGoAdmin()">
+        <i class="fas fa-lock-open"></i> Enter Admin Panel
+      </button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ══════════════════════════════════════
      SIDEBAR
@@ -45,6 +203,12 @@
     <span class="sidebar-section-label">General</span>
     <button class="booking-btn" onclick="loadProfilePage(this)">
       <i class="fas fa-user-circle"></i> Profile
+    </button>
+
+    <!-- Admin section — injected by JS if role === admin -->
+    <span class="sidebar-section-label" id="adminSectionLabel" style="display:none;">Admin</span>
+    <button class="booking-btn admin-panel-btn" id="adminPanelBtn" style="display:none;" onclick="openReauth(this)">
+      <i class="fas fa-user-shield"></i> Admin Panel
     </button>
   </nav>
 
@@ -175,6 +339,7 @@
 
 let allData = [];
 
+/* ── LINKS ── */
 async function loadLinks() {
   try {
     const res  = await fetch(`${API}/api/links`);
@@ -191,6 +356,7 @@ async function loadLinks() {
   } catch (e) { console.error(e); }
 }
 
+/* ── DEPARTMENTS ── */
 async function loadDepartments() {
   try {
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
@@ -206,6 +372,7 @@ async function loadDepartments() {
   } catch (e) { console.error(e); }
 }
 
+/* ── RENDER DASHBOARD ── */
 function renderDashboard(data, keyword = "") {
   const container = document.getElementById("dashboard");
   container.innerHTML = "";
@@ -231,8 +398,9 @@ function renderDashboard(data, keyword = "") {
   });
 }
 
+/* ── SIDEBAR ── */
 function generateSidebar(departments) {
-  const nav        = document.getElementById("sidebarNav");
+  const nav         = document.getElementById("sidebarNav");
   const othersLabel = document.getElementById("othersLabel");
 
   // Remove previous dept buttons
@@ -260,6 +428,13 @@ function generateSidebar(departments) {
   });
 
   setActive(allBtn);
+
+  // Show admin button if role is admin
+  const role = localStorage.getItem("role") || sessionStorage.getItem("role");
+  if (role === "admin") {
+    document.getElementById("adminSectionLabel").style.display = "block";
+    document.getElementById("adminPanelBtn").style.display     = "block";
+  }
 }
 
 function setActive(btn) {
@@ -279,6 +454,7 @@ function showPage(id) {
   });
 }
 
+/* ── TRAINING / BOOKING / PROFILE ── */
 async function loadTrainingPage(button) {
   setActive(button);
   document.getElementById("dashboardPage").style.display = "none";
@@ -295,7 +471,6 @@ function loadProfilePage(button) {
   const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
   const user     = JSON.parse(userData);
 
-  // Avatar initials
   const initials = (user.name || user.username || "U")
     .split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
   document.getElementById("profileAvatar").textContent = initials;
@@ -304,7 +479,6 @@ function loadProfilePage(button) {
   document.getElementById("profileEmail").textContent = user.email || "—";
   document.getElementById("profileRole").textContent  = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
 
-  // Departments
   const deptsEl = document.getElementById("profileDepts");
   deptsEl.innerHTML = "";
   if (window.userDepartments?.length) {
@@ -392,6 +566,7 @@ async function loadBookingPage(button) {
   }
 }
 
+/* ── SEARCH ── */
 function doSearch() {
   const kw = document.getElementById("searchInput").value.toLowerCase();
   renderDashboard(allData.filter(i => i.name.toLowerCase().includes(kw)), kw);
@@ -401,15 +576,105 @@ document.getElementById("searchInput").addEventListener("keyup",    doSearch);
 document.getElementById("searchBtn").addEventListener("click",      doSearch);
 document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 
+/* ── LOGOUT ── */
 function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = "login.html"; }
 
+
+/* ══════════════════════════════════════
+   RE-AUTH MODAL — ADMIN PANEL ACCESS
+══════════════════════════════════════ */
+let _reauthTriggerBtn = null;
+
+function openReauth(btn) {
+  _reauthTriggerBtn = btn;
+  document.getElementById("reauthPassword").value = "";
+  document.getElementById("reauthError").style.display = "none";
+  document.getElementById("reauthConfirmBtn").disabled = false;
+  document.getElementById("reauthOverlay").classList.add("open");
+  setTimeout(() => document.getElementById("reauthPassword").focus(), 100);
+}
+
+function closeReauth() {
+  document.getElementById("reauthOverlay").classList.remove("open");
+  document.getElementById("reauthPassword").value = "";
+  document.getElementById("reauthError").style.display = "none";
+}
+
+function toggleReauthPw(btn) {
+  const input = document.getElementById("reauthPassword");
+  const isText = input.type === "text";
+  input.type = isText ? "password" : "text";
+  btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
+}
+
+async function verifyAndGoAdmin() {
+  const password = document.getElementById("reauthPassword").value.trim();
+  const errorEl  = document.getElementById("reauthError");
+  const confirmBtn = document.getElementById("reauthConfirmBtn");
+
+  if (!password) {
+    errorEl.textContent = "Please enter your password.";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  // Get email from session
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const user     = JSON.parse(userData);
+
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  errorEl.style.display = "none";
+
+  try {
+    const res  = await fetch(`${API}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, password })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      // Verified — go to admin panel
+      closeReauth();
+      window.location.href = "admin.html";
+    } else {
+      errorEl.textContent = "Incorrect password. Please try again.";
+      errorEl.style.display = "block";
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<i class="fas fa-lock-open"></i> Enter Admin Panel';
+      document.getElementById("reauthPassword").value = "";
+      document.getElementById("reauthPassword").focus();
+    }
+  } catch {
+    errorEl.textContent = "Server error. Please try again.";
+    errorEl.style.display = "block";
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '<i class="fas fa-lock-open"></i> Enter Admin Panel';
+  }
+}
+
+// Allow Enter key to submit
+document.getElementById("reauthPassword").addEventListener("keypress", e => {
+  if (e.key === "Enter") verifyAndGoAdmin();
+});
+
+// Click outside overlay to close
+document.getElementById("reauthOverlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("reauthOverlay")) closeReauth();
+});
+
+
+/* ── INIT ── */
 document.addEventListener("DOMContentLoaded", async () => {
   const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
   const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
   const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
 
   if (!token || !userData) { window.location.href = "login.html"; return; }
-  if (role === "admin")    { window.location.href = "admin.html"; return; }
+
+  // ✅ Admins now stay on user dashboard instead of being redirected
+  // Admin panel is accessible via the sidebar button + re-auth modal
 
   window.currentUserId = JSON.parse(userData).id;
   await loadDepartments();
