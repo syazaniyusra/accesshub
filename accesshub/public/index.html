@@ -41,6 +41,11 @@
     <button class="booking-btn" onclick="loadTrainingPage(this)">
       <i class="fas fa-graduation-cap"></i> Training Module
     </button>
+
+    <span class="sidebar-section-label">General</span>
+    <button class="booking-btn" onclick="loadProfilePage(this)">
+      <i class="fas fa-user-circle"></i> Profile
+    </button>
   </nav>
 
   <!-- Footer -->
@@ -85,6 +90,81 @@
   <!-- Booking -->
   <div id="bookingPage" style="display:none;"></div>
 
+  <!-- Profile -->
+  <div id="profilePage" style="display:none;">
+    <div class="page-header">
+      <h2 class="page-title">
+        <div class="page-title-icon"><i class="fas fa-user"></i></div>
+        My <span class="accent">Profile</span>
+      </h2>
+      <p class="page-subtitle">View your account details and manage your password</p>
+    </div>
+
+    <div class="profile-grid">
+
+      <!-- Info Card -->
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar"></div>
+        <div class="profile-info">
+          <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-user"></i> Full Name</span>
+            <span class="profile-value" id="profileName">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-envelope"></i> Email</span>
+            <span class="profile-value" id="profileEmail">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-layer-group"></i> Departments</span>
+            <div class="profile-tags" id="profileDepts"></div>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-shield-alt"></i> Role</span>
+            <span class="profile-value" id="profileRole">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password Card -->
+      <div class="profile-card">
+        <div class="profile-card-title">
+          <i class="fas fa-lock"></i> Change Password
+        </div>
+
+        <div id="pwMsg" class="pw-msg" style="display:none;"></div>
+
+        <div class="pw-field">
+          <label>Current Password</label>
+          <div class="pw-input-wrap">
+            <input type="password" id="pwCurrent" placeholder="Enter current password">
+            <button type="button" onclick="togglePw('pwCurrent', this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+
+        <div class="pw-field">
+          <label>New Password</label>
+          <div class="pw-input-wrap">
+            <input type="password" id="pwNew" placeholder="Min. 6 characters">
+            <button type="button" onclick="togglePw('pwNew', this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+
+        <div class="pw-field">
+          <label>Confirm New Password</label>
+          <div class="pw-input-wrap">
+            <input type="password" id="pwConfirm" placeholder="Repeat new password">
+            <button type="button" onclick="togglePw('pwConfirm', this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+
+        <button class="pw-save-btn" onclick="changePassword()">
+          <i class="fas fa-save"></i> Update Password
+        </button>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 
@@ -121,6 +201,7 @@ async function loadDepartments() {
     if (!Array.isArray(departments)) return;
 
     window.userDepartmentIds = departments.map(d => d.id);
+    window.userDepartments    = departments;
     generateSidebar(departments);
   } catch (e) { console.error(e); }
 }
@@ -189,6 +270,13 @@ function setActive(btn) {
 function showDashboard() {
   document.getElementById("dashboardPage").style.display = "block";
   document.getElementById("bookingPage").style.display   = "none";
+  document.getElementById("profilePage").style.display   = "none";
+}
+
+function showPage(id) {
+  ["dashboardPage","bookingPage","profilePage"].forEach(p => {
+    document.getElementById(p).style.display = p === id ? "block" : "none";
+  });
 }
 
 async function loadTrainingPage(button) {
@@ -197,6 +285,87 @@ async function loadTrainingPage(button) {
   const bc = document.getElementById("bookingPage");
   bc.style.display = "block";
   bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
+}
+
+function loadProfilePage(button) {
+  setActive(button);
+  showPage("profilePage");
+
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
+  const user     = JSON.parse(userData);
+
+  // Avatar initials
+  const initials = (user.name || user.username || "U")
+    .split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+  document.getElementById("profileAvatar").textContent = initials;
+
+  document.getElementById("profileName").textContent  = user.name  || user.username || "—";
+  document.getElementById("profileEmail").textContent = user.email || "—";
+  document.getElementById("profileRole").textContent  = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+
+  // Departments
+  const deptsEl = document.getElementById("profileDepts");
+  deptsEl.innerHTML = "";
+  if (window.userDepartments?.length) {
+    window.userDepartments.forEach(d => {
+      const tag = document.createElement("span");
+      tag.className = "dept-tag";
+      tag.textContent = d.name;
+      deptsEl.appendChild(tag);
+    });
+  } else {
+    deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>";
+  }
+}
+
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isText = input.type === "text";
+  input.type = isText ? "password" : "text";
+  btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
+}
+
+async function changePassword() {
+  const current = document.getElementById("pwCurrent").value.trim();
+  const newPw   = document.getElementById("pwNew").value.trim();
+  const confirm = document.getElementById("pwConfirm").value.trim();
+  const msgEl   = document.getElementById("pwMsg");
+
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = "pw-msg " + type;
+    msgEl.style.display = "block";
+    setTimeout(() => { msgEl.style.display = "none"; }, 4000);
+  }
+
+  if (!current || !newPw || !confirm) return showMsg("Please fill in all fields.", "error");
+  if (newPw.length < 6)              return showMsg("New password must be at least 6 characters.", "error");
+  if (newPw !== confirm)             return showMsg("Passwords do not match.", "error");
+
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const user     = JSON.parse(userData);
+  const token    = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  try {
+    const res  = await fetch(`${API}/api/users/${user.id}/change-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ currentPassword: current, newPassword: newPw })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      showMsg("Password updated successfully!", "success");
+      document.getElementById("pwCurrent").value = "";
+      document.getElementById("pwNew").value     = "";
+      document.getElementById("pwConfirm").value = "";
+    } else {
+      showMsg(data.message || "Failed to update password.", "error");
+    }
+  } catch {
+    showMsg("Server error. Please try again.", "error");
+  }
 }
 
 async function loadBookingPage(button) {
