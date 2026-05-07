@@ -4,7 +4,7 @@ const db = require("../db");
 const bcrypt = require("bcryptjs");
 
 // =====================================
-// ✅ GET ALL USERS + DEPARTMENTS
+// GET ALL USERS + DEPARTMENTS
 // =====================================
 router.get("/", async (req, res) => {
   try {
@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
 });
 
 // =====================================
-// ✅ CREATE USER
+// CREATE USER
 // =====================================
 router.post("/", async (req, res) => {
   try {
@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
 });
 
 // =====================================
-// ✅ UPDATE USER
+// UPDATE USER
 // =====================================
 router.put("/:id", async (req, res) => {
   try {
@@ -137,7 +137,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // =====================================
-// ✅ DELETE USER
+// DELETE USER
 // =====================================
 router.delete("/:id", async (req, res) => {
   try {
@@ -152,7 +152,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // =====================================
-// ✅ GET SINGLE USER
+// GET SINGLE USER
 // =====================================
 router.get("/:id", async (req, res) => {
   try {
@@ -191,10 +191,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // =====================================
-// ✅ GET USER'S DEPARTMENTS
+// GET USER'S DEPARTMENTS
 // =====================================
 router.get("/:id/departments", async (req, res) => {
   try {
@@ -214,3 +212,57 @@ router.get("/:id/departments", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch user departments" });
   }
 });
+
+// =====================================
+// CHANGE PASSWORD
+// =====================================
+router.post("/:id/change-password", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Both current and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    // Fetch current hashed password
+    const [rows] = await db.query(
+      "SELECT password FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const match = await bcrypt.compare(currentPassword, rows[0].password);
+
+    if (!match) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash and save new password
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await db.query(
+      "UPDATE users SET password = ? WHERE id = ?",
+      [hashed, userId]
+    );
+
+    res.json({ message: "Password updated successfully" });
+
+  } catch (err) {
+    console.error("CHANGE PASSWORD ERROR:", err);
+    res.status(500).json({ error: "Failed to change password" });
+  }
+});
+
+// =====================================
+// EXPORT
+// =====================================
+module.exports = router;
