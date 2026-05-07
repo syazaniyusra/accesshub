@@ -87,6 +87,36 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 // =====================
+// GET all bookings (user room schedule view)
+// =====================
+router.get("/all", async (req, res) => {
+
+  try {
+
+    const [bookings] = await db.query(`
+      SELECT
+        b.*,
+        r.name AS room_name
+      FROM bookings b
+      JOIN rooms r
+        ON b.room_id = r.id
+      WHERE b.status != 'cancelled'
+      ORDER BY b.date DESC, b.start_time ASC
+    `);
+
+    res.json(bookings);
+
+  } catch (err) {
+
+    console.error("GET ALL BOOKINGS ERROR:", err);
+
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
+
+// =====================
 // GET booked slots
 // =====================
 router.get("/slots", async (req, res) => {
@@ -109,7 +139,7 @@ router.get("/slots", async (req, res) => {
       FROM bookings
       WHERE room_id = ?
       AND date = ?
-      AND status != 'rejected'
+      AND status NOT IN ('cancelled')
     `, [room_id, date]);
 
     res.json(slots);
@@ -125,7 +155,7 @@ router.get("/slots", async (req, res) => {
 });
 
 // =====================
-// CREATE booking
+// CREATE booking (auto-confirm if room is available)
 // =====================
 router.post("/", async (req, res) => {
 
@@ -191,7 +221,7 @@ router.post("/", async (req, res) => {
       );
 
       end_time =
-        startObj.toTimeString().slice(0,5);
+        startObj.toTimeString().slice(0, 5);
     }
 
     // =====================
@@ -217,6 +247,7 @@ router.post("/", async (req, res) => {
 
     // =====================
     // CHECK CONFLICT
+    // Only block on confirmed bookings (not cancelled)
     // =====================
 
     const [conflicts] = await db.query(`
@@ -224,7 +255,7 @@ router.post("/", async (req, res) => {
       FROM bookings
       WHERE room_id = ?
       AND date = ?
-      AND status != 'rejected'
+      AND status NOT IN ('cancelled')
       AND (
         (start_time < ? AND end_time > ?)
         OR
@@ -249,12 +280,12 @@ router.post("/", async (req, res) => {
     if (conflicts.length > 0) {
 
       return res.status(409).json({
-        error: "This time slot is already booked"
+        error: "Room not available for this time slot. Please choose another time."
       });
     }
 
     // =====================
-    // INSERT BOOKING
+    // INSERT BOOKING — auto-confirmed
     // =====================
 
     await db.query(`
@@ -285,12 +316,12 @@ router.post("/", async (req, res) => {
       name,
       department,
       phone,
-      "pending"
+      "confirmed"   // auto-confirmed, no admin approval needed
     ]);
 
     res.json({
       success: true,
-      message: "Booking submitted successfully"
+      message: "Booking confirmed successfully"
     });
 
   } catch (err) {
@@ -304,16 +335,16 @@ router.post("/", async (req, res) => {
 });
 
 // =====================
-// UPDATE booking status
+// UPDATE booking status (admin: confirm / cancel only)
 // =====================
 router.put("/:id/status", async (req, res) => {
 
   const { status } = req.body;
 
-  if (!["approved", "rejected", "pending"].includes(status)) {
+  if (!["confirmed", "cancelled"].includes(status)) {
 
     return res.status(400).json({
-      error: "Invalid status"
+      error: "Invalid status. Must be 'confirmed' or 'cancelled'."
     });
   }
 
