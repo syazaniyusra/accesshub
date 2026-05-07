@@ -5,20 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bismi AccessHub</title>
 
-  <script>
-    const API = window.location.origin;
-  </script>
+  <script>const API = window.location.origin;</script>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-  <!-- Dashboard Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
 <!-- ══════════════════════════════════════
@@ -28,7 +20,9 @@
 
   <!-- Brand -->
   <div class="sidebar-brand">
-    <img src="bismi_jpg__2_.jpeg" alt="Bismi Logo" class="sidebar-logo">
+    <div class="sidebar-logo-wrap">
+      <img src="bismi_jpg__2_.jpeg" alt="Bismi" class="sidebar-logo">
+    </div>
     <div class="sidebar-brand-text">
       <span class="sidebar-brand-name">Bismi</span>
       <span class="sidebar-brand-sub">Segar Halal Suci</span>
@@ -37,10 +31,10 @@
 
   <!-- Nav -->
   <nav class="sidebar-nav" id="sidebarNav">
-    <span class="sidebar-section-label">Navigation</span>
-    <!-- Department buttons inserted here dynamically -->
+    <span class="sidebar-section-label">Link Management</span>
+    <!-- Department buttons injected here -->
 
-    <span class="sidebar-section-label">Tools</span>
+    <span class="sidebar-section-label" id="othersLabel">Others</span>
     <button class="booking-btn" onclick="loadBookingPage(this)">
       <i class="fas fa-door-open"></i> Room Booking
     </button>
@@ -49,7 +43,7 @@
   <!-- Footer -->
   <div class="sidebar-footer">
     <button class="logout-btn" onclick="logout()">
-      <i class="fas fa-sign-out-alt"></i>&nbsp; Logout
+      <i class="fas fa-sign-out-alt"></i> Logout
     </button>
   </div>
 
@@ -57,47 +51,38 @@
 
 
 <!-- ══════════════════════════════════════
-     MAIN CONTENT
+     MAIN
 ══════════════════════════════════════ -->
 <div class="main">
 
-  <!-- DASHBOARD PAGE -->
+  <!-- Dashboard -->
   <div id="dashboardPage">
 
     <div class="page-header">
-      <div>
-        <h2 class="page-title">
-          <i class="fas fa-th-large" style="color:var(--bismi-pink);font-size:22px;"></i>
-          Access<span class="accent">Hub</span>
-        </h2>
-        <p class="page-subtitle">Welcome back — select a link below to get started</p>
-      </div>
+      <h2 class="page-title">
+        <div class="page-title-icon"><i class="fas fa-th-large"></i></div>
+        Access<span class="accent">Hub</span>
+      </h2>
+      <p class="page-subtitle">Welcome back — select a link below to get started</p>
     </div>
 
-    <!-- Search -->
     <div class="search-bar">
       <div class="input-group">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search links..."
-          aria-label="Search links"
-        >
+        <input type="text" id="searchInput" placeholder="Search links..." aria-label="Search">
         <button type="button" id="searchBtn" aria-label="Search">
           <i class="fas fa-search"></i>
         </button>
       </div>
     </div>
 
-    <!-- Cards grid -->
     <div id="dashboard"></div>
 
   </div>
 
-  <!-- BOOKING PAGE -->
+  <!-- Booking -->
   <div id="bookingPage" style="display:none;"></div>
 
-</div><!-- /.main -->
+</div>
 
 
 <!-- ══════════════════════════════════════
@@ -107,36 +92,22 @@
 
 let allData = [];
 
-// ────────────────────────────────────────
-// LOAD LINKS
-// ────────────────────────────────────────
 async function loadLinks() {
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const user = JSON.parse(userData);
-
   try {
     const res  = await fetch(`${API}/api/links`);
     const data = await res.json();
-
-    if (!Array.isArray(data)) { console.error("Links error:", data); return; }
+    if (!Array.isArray(data)) return;
 
     const filtered = data.filter(link =>
-      !window.userDepartmentIds ||
-      window.userDepartmentIds.length === 0 ||
+      !window.userDepartmentIds?.length ||
       window.userDepartmentIds.includes(Number(link.department_id))
     );
 
     allData = filtered;
     renderDashboard(filtered);
-
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
+  } catch (e) { console.error(e); }
 }
 
-// ────────────────────────────────────────
-// LOAD DEPARTMENTS
-// ────────────────────────────────────────
 async function loadDepartments() {
   try {
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
@@ -144,29 +115,22 @@ async function loadDepartments() {
 
     const res         = await fetch(`${API}/api/users/${user.id}/departments`);
     const departments = await res.json();
-
-    if (!Array.isArray(departments)) { console.error("Departments error:", departments); return; }
+    if (!Array.isArray(departments)) return;
 
     window.userDepartmentIds = departments.map(d => d.id);
     generateSidebar(departments);
-
-  } catch (err) {
-    console.error("Department fetch error:", err);
-  }
+  } catch (e) { console.error(e); }
 }
 
-// ────────────────────────────────────────
-// RENDER DASHBOARD
-// ────────────────────────────────────────
 function renderDashboard(data, keyword = "") {
   const container = document.getElementById("dashboard");
   container.innerHTML = "";
 
-  if (data.length === 0) {
+  if (!data.length) {
     container.innerHTML = `
       <div class="empty">
         <div class="empty-icon"><i class="fas fa-search"></i></div>
-        <p>${keyword ? 'No results for "' + keyword + '"' : "No links available"}</p>
+        <p>${keyword ? `No results for "${keyword}"` : "No links available"}</p>
       </div>`;
     return;
   }
@@ -174,12 +138,8 @@ function renderDashboard(data, keyword = "") {
   data.forEach(link => {
     container.innerHTML += `
       <div class="card">
-        <div class="card-icon">
-          <i class="fas fa-link"></i>
-        </div>
-        <div class="card-body">
-          <h4>${link.name}</h4>
-        </div>
+        <div class="card-icon"><i class="fas fa-link"></i></div>
+        <div class="card-body"><h4>${link.name}</h4></div>
         <a href="${link.url}" target="_blank" class="link-btn">
           Open <i class="fas fa-arrow-up-right-from-square"></i>
         </a>
@@ -187,33 +147,30 @@ function renderDashboard(data, keyword = "") {
   });
 }
 
-// ────────────────────────────────────────
-// SIDEBAR
-// ────────────────────────────────────────
 function generateSidebar(departments) {
-  const nav = document.getElementById("sidebarNav");
+  const nav        = document.getElementById("sidebarNav");
+  const othersLabel = document.getElementById("othersLabel");
 
-  // Remove old department buttons (keep section labels + booking btn)
-  nav.querySelectorAll("button:not(.booking-btn)").forEach(btn => btn.remove());
+  // Remove previous dept buttons
+  nav.querySelectorAll("button:not(.booking-btn)").forEach(b => b.remove());
 
-  // "All" button
   const allBtn = document.createElement("button");
-  allBtn.innerHTML = '<i class="fas fa-grid-2"></i> All';
+  allBtn.innerHTML = '<i class="fas fa-border-all"></i> All';
   allBtn.onclick = () => { showDashboard(); setActive(allBtn); renderDashboard(allData); };
 
-  // Insert after first section label
   const firstLabel = nav.querySelector(".sidebar-section-label");
   firstLabel.insertAdjacentElement("afterend", allBtn);
-
   let insertRef = allBtn;
 
   departments.forEach(dep => {
     if (dep.name.toLowerCase() === "room booking") return;
-
     const btn = document.createElement("button");
     btn.innerHTML = `<i class="fas fa-folder"></i> ${dep.name}`;
-    btn.onclick = () => { showDashboard(); setActive(btn); filterCategory(dep.id); };
-
+    btn.onclick = () => {
+      showDashboard();
+      setActive(btn);
+      renderDashboard(allData.filter(i => Number(i.department_id) === Number(dep.id)));
+    };
     insertRef.insertAdjacentElement("afterend", btn);
     insertRef = btn;
   });
@@ -221,107 +178,60 @@ function generateSidebar(departments) {
   setActive(allBtn);
 }
 
-// ────────────────────────────────────────
-// FILTER
-// ────────────────────────────────────────
-function filterCategory(departmentId) {
-  const filtered = allData.filter(item =>
-    Number(item.department_id) === Number(departmentId)
-  );
-  renderDashboard(filtered);
+function setActive(btn) {
+  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
 }
 
-// ────────────────────────────────────────
-// ACTIVE BUTTON
-// ────────────────────────────────────────
-function setActive(button) {
-  document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-  button.classList.add("active");
-}
-
-// ────────────────────────────────────────
-// SHOW DASHBOARD
-// ────────────────────────────────────────
 function showDashboard() {
   document.getElementById("dashboardPage").style.display = "block";
   document.getElementById("bookingPage").style.display   = "none";
 }
 
-// ────────────────────────────────────────
-// LOAD BOOKING PAGE
-// ────────────────────────────────────────
 async function loadBookingPage(button) {
   setActive(button);
-
   document.getElementById("dashboardPage").style.display = "none";
-  const bookingContainer = document.getElementById("bookingPage");
-  bookingContainer.style.display = "block";
-
-  if (bookingContainer.innerHTML.trim() !== "") return;
+  const bc = document.getElementById("bookingPage");
+  bc.style.display = "block";
+  if (bc.innerHTML.trim()) return;
 
   try {
-    const res  = await fetch("booking.html");
-    let   html = await res.text();
-
+    let html = await (await fetch("booking.html")).text();
     html = html.replace(/<!DOCTYPE html>[\s\S]*?<body>/i, "");
     html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
     html = html.replace(/<!-- SIDEBAR -->[\s\S]*?<!-- MAIN -->/i, "");
-    html = html.replace(/<div class="main">/i, "");
-    html = html.replace(/<\/div>\s*$/, "");
-
-    bookingContainer.innerHTML = html;
-
-    bookingContainer.querySelectorAll("script").forEach(oldScript => {
-      const newScript = document.createElement("script");
-      oldScript.src ? (newScript.src = oldScript.src) : (newScript.textContent = oldScript.textContent);
-      document.body.appendChild(newScript);
-      oldScript.remove();
+    html = html.replace(/<div class="main">/i, "").replace(/<\/div>\s*$/, "");
+    bc.innerHTML = html;
+    bc.querySelectorAll("script").forEach(s => {
+      const n = document.createElement("script");
+      s.src ? (n.src = s.src) : (n.textContent = s.textContent);
+      document.body.appendChild(n); s.remove();
     });
-
-  } catch (err) {
-    console.error("Booking page load error:", err);
-    bookingContainer.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
+  } catch {
+    bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
   }
 }
 
-// ────────────────────────────────────────
-// SEARCH
-// ────────────────────────────────────────
 function doSearch() {
-  const keyword  = document.getElementById("searchInput").value.toLowerCase();
-  const filtered = allData.filter(item => item.name.toLowerCase().includes(keyword));
-  renderDashboard(filtered, keyword);
+  const kw = document.getElementById("searchInput").value.toLowerCase();
+  renderDashboard(allData.filter(i => i.name.toLowerCase().includes(kw)), kw);
 }
 
 document.getElementById("searchInput").addEventListener("keyup",    doSearch);
-document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 document.getElementById("searchBtn").addEventListener("click",      doSearch);
+document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 
-// ────────────────────────────────────────
-// LOGOUT
-// ────────────────────────────────────────
-function logout() {
-  localStorage.clear();
-  sessionStorage.clear();
-  window.location.href = "login.html";
-}
+function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = "login.html"; }
 
-// ────────────────────────────────────────
-// INIT
-// ────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
   const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
   const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
   const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
 
   if (!token || !userData) { window.location.href = "login.html"; return; }
+  if (role === "admin")    { window.location.href = "admin.html"; return; }
 
-  const user = JSON.parse(userData);
-
-  if (role === "admin") { window.location.href = "admin.html"; return; }
-
-  window.currentUserId = user.id;
-
+  window.currentUserId = JSON.parse(userData).id;
   await loadDepartments();
   await loadLinks();
 });
