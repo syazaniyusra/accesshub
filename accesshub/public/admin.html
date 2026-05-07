@@ -300,13 +300,20 @@ th { background: #e2e8f0; }
 
 <!-- EDIT USER MODAL -->
 <div id="editModal" class="modal">
-  <div class="modal-content">
+  <div class="modal-content" style="width:480px;">
     <h3>Edit User</h3>
     <input type="text"     id="editName"     placeholder="Name">
     <input type="email"    id="editEmail"    placeholder="Email">
     <input type="password" id="editPassword" placeholder="New Password (optional)">
-    <h4>Departments</h4>
-    <div id="editDepartments"></div>
+
+    <h4 style="margin:14px 0 6px;font-size:13px;color:#64748b;">Department (where they work)</h4>
+    <select id="editWorkDept" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:4px;">
+      <option value="">Select department...</option>
+    </select>
+
+    <h4 style="margin:14px 0 6px;font-size:13px;color:#64748b;">Department Access (which links they can see)</h4>
+    <div id="editDepartments" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow-y:auto;"></div>
+
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="btn-update" onclick="confirmEdit()">Update</button>
@@ -606,16 +613,19 @@ async function loadDepartments() {
     });
   }
 
-  // Populate access checkboxes
+  // Populate access checkboxes — exclude Room Booking and Training Module
+  const excluded = ["room booking", "training module"];
   const checkbox = document.getElementById("departmentCheckboxes");
   checkbox.innerHTML = "";
-  data.forEach(dep => {
-    checkbox.innerHTML += `
-      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
-        <input type="checkbox" value="${dep.id}" style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
-        ${dep.name}
-      </label>`;
-  });
+  data
+    .filter(dep => !excluded.includes(dep.name.toLowerCase()))
+    .forEach(dep => {
+      checkbox.innerHTML += `
+        <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
+          <input type="checkbox" value="${dep.id}" style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
+          ${dep.name}
+        </label>`;
+    });
 }
 
 async function loadLinkDepartments() {
@@ -677,13 +687,14 @@ async function createUser() {
   if (password !== confirm)           { showToast("Passwords do not match", "error"); return; }
   if (password.length < 6)            { showToast("Password must be at least 6 characters", "error"); return; }
 
-  // If work dept selected and not already in access list, add it automatically
-  if (workDept && !deps.includes(workDept)) deps.push(workDept);
-
   const res = await fetch(`${API}/api/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
-    body: JSON.stringify({ name, email, password, role, departments: deps, work_department: workDept })
+    body: JSON.stringify({
+      name, email, password, role,
+      departments: workDept ? [workDept] : [],  // where they work
+      link_access: deps                          // which links they can see
+    })
   });
 
   const data = await res.json();
@@ -801,38 +812,59 @@ async function confirmDelete() {
 
 /* ---- EDIT USER ---- */
 async function editUser(id) {
-  const resUser = await fetch(`${API}/api/users/${id}`);
-  const user    = await resUser.json();
-  const resDep  = await fetch(`${API}/api/departments`);
+  const [resUser, resDep] = await Promise.all([
+    fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${window.authToken}` } }),
+    fetch(`${API}/api/departments`)
+  ]);
+  const user        = await resUser.json();
   const departments = await resDep.json();
 
   editingUserId = id;
-  document.getElementById("editModal").style.display = "flex";
-  document.getElementById("editName").value  = user.name  || "";
-  document.getElementById("editEmail").value = user.email || "";
+  document.getElementById("editName").value     = user.name  || "";
+  document.getElementById("editEmail").value    = user.email || "";
+  document.getElementById("editPassword").value = "";
 
+  // Populate work dept dropdown
+  const excluded = ["room booking", "training module"];
+  const workDeptSel = document.getElementById("editWorkDept");
+  workDeptSel.innerHTML = "<option value=''>Select department...</option>";
+  departments.forEach(dep => {
+    const selected = user.departments?.some(d => d.id === dep.id) ? "selected" : "";
+    workDeptSel.innerHTML += `<option value="${dep.id}" ${selected}>${dep.name}</option>`;
+  });
+
+  // Populate link access checkboxes (exclude Room Booking & Training Module)
   const container = document.getElementById("editDepartments");
   container.innerHTML = "";
-  departments.forEach(dep => {
-    const checked = user.departments?.some(d => d.id === dep.id);
-    container.innerHTML += `
-      <label class="checkbox-card">
-        <input type="checkbox" value="${dep.id}" ${checked ? "checked" : ""}>
-        <span>${dep.name}</span>
-      </label>`;
-  });
+  departments
+    .filter(dep => !excluded.includes(dep.name.toLowerCase()))
+    .forEach(dep => {
+      const checked = user.link_access?.some(d => d.id === dep.id) ? "checked" : "";
+      container.innerHTML += `
+        <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
+          <input type="checkbox" value="${dep.id}" ${checked} style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
+          ${dep.name}
+        </label>`;
+    });
+
+  document.getElementById("editModal").style.display = "flex";
 }
 
 function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
 
 async function confirmEdit() {
-  const name     = document.getElementById("editName").value;
-  const email    = document.getElementById("editEmail").value;
-  const password = document.getElementById("editPassword").value;
-  const deps = [];
-  document.querySelectorAll("#editDepartments input:checked").forEach(cb => deps.push(cb.value));
+  const name      = document.getElementById("editName").value.trim();
+  const email     = document.getElementById("editEmail").value.trim();
+  const password  = document.getElementById("editPassword").value;
+  const workDept  = document.getElementById("editWorkDept").value;
+  const linkDeps  = [];
+  document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
 
-  const body = { name, email, departments: deps };
+  const body = {
+    name, email,
+    departments: workDept ? [workDept] : [],
+    link_access: linkDeps
+  };
   if (password) body.password = password;
 
   await fetch(`${API}/api/users/${editingUserId}`, {
