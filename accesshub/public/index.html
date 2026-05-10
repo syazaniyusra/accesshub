@@ -8,20 +8,58 @@
   <script>const API = window.location.origin;</script>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* ── RE-AUTH MODAL ── */
-    .reauth-overlay {
+
+    /* ════════════════════════════════════════
+       HAMBURGER BUTTON (mobile only)
+    ════════════════════════════════════════ */
+    .hamburger {
       display: none;
       position: fixed;
-      inset: 0;
+      top: 14px; left: 14px;
+      z-index: 1001;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1.5px solid #e5e7eb;
+      background: #fff;
+      color: var(--pink);
+      font-size: 16px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s;
+    }
+    .hamburger:hover { background: var(--pink-soft); }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 899;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.open { display: block; }
+
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
+    }
+
+    /* ════════════════════════════════════════
+       RE-AUTH MODAL
+    ════════════════════════════════════════ */
+    .reauth-overlay {
+      display: none;
+      position: fixed; inset: 0;
       z-index: 999;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0,0,0,0.45);
       backdrop-filter: blur(4px);
       justify-content: center;
       align-items: center;
+      padding: 16px;
     }
     .reauth-overlay.open { display: flex; }
 
@@ -29,7 +67,7 @@
       background: #fff;
       border-radius: 18px;
       padding: 36px 32px 28px;
-      width: 380px;
+      width: 100%; max-width: 380px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.15);
       animation: reauthPop 0.25s cubic-bezier(.34,1.56,.64,1) both;
     }
@@ -37,113 +75,88 @@
       from { transform: scale(0.88); opacity: 0; }
       to   { transform: scale(1);    opacity: 1; }
     }
-
     .reauth-icon {
       width: 48px; height: 48px;
-      background: #FCE8F3;
-      border-radius: 12px;
+      background: var(--pink-soft); border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
-      color: #D4186C;
-      font-size: 20px;
+      margin-bottom: 16px; color: var(--pink); font-size: 20px;
     }
+    .reauth-box h3 { font-family: var(--font-display); font-size: 20px; color: var(--ink); margin-bottom: 4px; }
+    .reauth-box p  { font-size: 13px; color: var(--ink-mid); margin-bottom: 20px; line-height: 1.5; }
 
-    .reauth-box h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      color: #1C1C1E;
-      margin-bottom: 4px;
-    }
-
-    .reauth-box p {
-      font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .reauth-input-wrap {
-      position: relative;
-      margin-bottom: 16px;
-    }
+    .reauth-input-wrap { position: relative; margin-bottom: 16px; }
     .reauth-input-wrap input {
-      width: 100%;
-      padding: 11px 40px 11px 14px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      outline: none;
-      transition: border-color 0.2s;
-      color: #1C1C1E;
+      width: 100%; padding: 11px 40px 11px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; font-family: var(--font);
+      outline: none; transition: border-color 0.2s;
+      color: var(--ink); box-sizing: border-box;
     }
-    .reauth-input-wrap input:focus { border-color: #D4186C; }
-    .reauth-input-wrap button {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    .reauth-input-wrap input:focus { border-color: var(--pink); }
+    .reauth-input-wrap > button {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
       background: none; border: none; cursor: pointer;
-      color: #9ca3af; font-size: 14px; padding: 0;
+      color: var(--ink-light); font-size: 14px; padding: 0;
+      width: auto; margin: 0;
     }
-
     .reauth-error {
-      font-size: 12.5px;
-      color: #ef4444;
-      margin-bottom: 14px;
-      display: none;
-      padding: 8px 12px;
-      background: #fef2f2;
-      border-radius: 8px;
+      font-size: 12.5px; color: #ef4444;
+      margin-bottom: 14px; display: none;
+      padding: 8px 12px; background: #fef2f2; border-radius: 8px;
     }
-
-    .reauth-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .reauth-actions { display: flex; gap: 10px; }
     .reauth-cancel {
-      flex: 1;
-      padding: 11px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      background: #fff;
-      color: #6b7280;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      flex: 1; padding: 11px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: #fff; color: var(--ink-mid);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: var(--font);
       transition: background 0.2s;
     }
-    .reauth-cancel:hover { background: #f9fafb; }
-
+    .reauth-cancel:hover { background: var(--surface-2); }
     .reauth-confirm {
-      flex: 2;
-      padding: 11px;
-      border: none;
-      border-radius: 10px;
-      background: #D4186C;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      flex: 2; padding: 11px; border: none; border-radius: 10px;
+      background: var(--pink); color: #fff;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: var(--font);
       display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: background 0.2s, transform 0.15s;
+      width: auto; margin: 0;
     }
-    .reauth-confirm:hover   { background: #b8155d; }
-    .reauth-confirm:active  { transform: scale(0.97); }
+    .reauth-confirm:hover  { background: var(--pink-hover); }
+    .reauth-confirm:active { transform: scale(0.97); }
     .reauth-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* ── ADMIN SIDEBAR BUTTON ── */
+    @media (max-width: 600px) {
+      .reauth-box { padding: 24px 18px 20px; border-radius: 14px; }
+      .reauth-actions { flex-direction: column; }
+      .reauth-cancel, .reauth-confirm { flex: unset; width: 100%; justify-content: center; }
+    }
+
+    /* ════════════════════════════════════════
+       ADMIN BUTTON
+    ════════════════════════════════════════ */
     .admin-panel-btn {
       background: linear-gradient(135deg, #D4186C, #b8155d) !important;
       color: #fff !important;
     }
     .admin-panel-btn:hover {
       background: linear-gradient(135deg, #b8155d, #961149) !important;
-      transform: translateX(3px);
     }
     .admin-panel-btn i { color: #fff !important; }
+
   </style>
 </head>
 <body>
+
+<!-- Hamburger (mobile only) -->
+<button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <!-- ══════════════════════════════════════
      RE-AUTH MODAL
@@ -153,14 +166,11 @@
     <div class="reauth-icon"><i class="fas fa-shield-alt"></i></div>
     <h3>Admin Verification</h3>
     <p>Re-enter your password to access the Admin Panel.</p>
-
     <div class="reauth-input-wrap">
       <input type="password" id="reauthPassword" placeholder="Your password" autocomplete="current-password">
       <button type="button" onclick="toggleReauthPw(this)"><i class="fas fa-eye"></i></button>
     </div>
-
     <div class="reauth-error" id="reauthError"></div>
-
     <div class="reauth-actions">
       <button class="reauth-cancel" onclick="closeReauth()">Cancel</button>
       <button class="reauth-confirm" id="reauthConfirmBtn" onclick="verifyAndGoAdmin()">
@@ -170,13 +180,11 @@
   </div>
 </div>
 
-
 <!-- ══════════════════════════════════════
      SIDEBAR
 ══════════════════════════════════════ -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
 
-  <!-- Brand -->
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
       <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
@@ -187,10 +195,9 @@
     </div>
   </div>
 
-  <!-- Nav -->
   <nav class="sidebar-nav" id="sidebarNav">
     <span class="sidebar-section-label">Link Management</span>
-    <!-- Department buttons injected here -->
+    <!-- Department buttons injected by JS -->
 
     <span class="sidebar-section-label" id="othersLabel">Others</span>
     <button class="booking-btn" onclick="loadBookingPage(this)">
@@ -200,9 +207,8 @@
       <i class="fas fa-graduation-cap"></i> Training Module
     </button>
 
-    <!-- Admin section — visible only if role === admin (set on DOMContentLoaded) -->
     <span class="sidebar-section-label" id="adminSectionLabel" style="display:none;">Admin</span>
-    <button class="booking-btn admin-panel-btn" id="adminPanelBtn" style="display:none;" onclick="openReauth(this)">
+    <button class="booking-btn admin-panel-btn" id="adminPanelBtn" style="display:none;" onclick="openReauth()">
       <i class="fas fa-user-shield"></i> Admin Panel
     </button>
 
@@ -212,7 +218,6 @@
     </button>
   </nav>
 
-  <!-- Footer -->
   <div class="sidebar-footer">
     <button class="logout-btn" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i> Logout
@@ -221,7 +226,6 @@
 
 </div>
 
-
 <!-- ══════════════════════════════════════
      MAIN
 ══════════════════════════════════════ -->
@@ -229,7 +233,6 @@
 
   <!-- Dashboard -->
   <div id="dashboardPage">
-
     <div class="page-header">
       <h2 class="page-title">
         <div class="page-title-icon"><i class="fas fa-th-large"></i></div>
@@ -237,7 +240,6 @@
       </h2>
       <p class="page-subtitle">Welcome back — select a link below to get started</p>
     </div>
-
     <div class="search-bar">
       <div class="input-group">
         <input type="text" id="searchInput" placeholder="Search links..." aria-label="Search">
@@ -246,12 +248,10 @@
         </button>
       </div>
     </div>
-
     <div id="dashboard"></div>
-
   </div>
 
-  <!-- Booking -->
+  <!-- Booking / Training -->
   <div id="bookingPage" style="display:none;"></div>
 
   <!-- Profile -->
@@ -266,7 +266,6 @@
 
     <div class="profile-grid">
 
-      <!-- Info Card -->
       <div class="profile-card">
         <div class="profile-avatar" id="profileAvatar"></div>
         <div class="profile-info">
@@ -283,20 +282,19 @@
             <div class="profile-tags" id="profileDepts"></div>
           </div>
           <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-folder-open"></i> Access Departments</span>
+            <div class="profile-tags" id="profileAccessDepts"></div>
+          </div>
+          <div class="profile-field">
             <span class="profile-label"><i class="fas fa-shield-alt"></i> Role</span>
             <span class="profile-value" id="profileRole">—</span>
           </div>
         </div>
       </div>
 
-      <!-- Change Password Card -->
       <div class="profile-card">
-        <div class="profile-card-title">
-          <i class="fas fa-lock"></i> Change Password
-        </div>
-
+        <div class="profile-card-title"><i class="fas fa-lock"></i> Change Password</div>
         <div id="pwMsg" class="pw-msg" style="display:none;"></div>
-
         <div class="pw-field">
           <label>Current Password</label>
           <div class="pw-input-wrap">
@@ -304,7 +302,6 @@
             <button type="button" onclick="togglePw('pwCurrent', this)"><i class="fas fa-eye"></i></button>
           </div>
         </div>
-
         <div class="pw-field">
           <label>New Password</label>
           <div class="pw-input-wrap">
@@ -312,7 +309,6 @@
             <button type="button" onclick="togglePw('pwNew', this)"><i class="fas fa-eye"></i></button>
           </div>
         </div>
-
         <div class="pw-field">
           <label>Confirm New Password</label>
           <div class="pw-input-wrap">
@@ -320,7 +316,6 @@
             <button type="button" onclick="togglePw('pwConfirm', this)"><i class="fas fa-eye"></i></button>
           </div>
         </div>
-
         <button class="pw-save-btn" onclick="changePassword()">
           <i class="fas fa-save"></i> Update Password
         </button>
@@ -331,7 +326,6 @@
 
 </div>
 
-
 <!-- ══════════════════════════════════════
      SCRIPTS
 ══════════════════════════════════════ -->
@@ -339,98 +333,98 @@
 
 let allData = [];
 
-/* ── LINKS ── */
+/* ════ MOBILE SIDEBAR ════ */
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  const btn     = document.getElementById("hamburgerBtn");
+  const isOpen  = sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", !isOpen);
+  overlay.classList.toggle("open", !isOpen);
+  btn.innerHTML = isOpen ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("open");
+  document.getElementById("hamburgerBtn").innerHTML = '<i class="fas fa-bars"></i>';
+}
+function navClick() { if (window.innerWidth <= 900) closeSidebar(); }
+window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
+
+/* ════ LINKS ════ */
 async function loadLinks() {
   try {
     const res  = await fetch(`${API}/api/links`);
     const data = await res.json();
     if (!Array.isArray(data)) return;
-
     const filtered = data.filter(link =>
       !window.userDepartmentIds?.length ||
       window.userDepartmentIds.includes(Number(link.department_id))
     );
-
     allData = filtered;
     renderDashboard(filtered);
   } catch (e) { console.error(e); }
 }
 
-/* ── DEPARTMENTS ── */
+/* ════ DEPARTMENTS ════ */
 async function loadDepartments() {
-  try {
-    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
-    const user     = JSON.parse(userData);
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
+  const user     = JSON.parse(userData);
+  let workDepts, linkDepts;
 
-    let workDepts, linkDepts;
-
-    if (role === "admin" || role === "superadmin") {
-      // Admin: fetch all departments for profile, all access_dept for sidebar
-      const [resWork, resAccess] = await Promise.all([
-        fetch(`${API}/api/departments`),
-        fetch(`${API}/api/access-dept`)          // ← all access_dept rows
-      ]);
-      workDepts = await resWork.json();
-      linkDepts = await resAccess.json();
-    } else {
-      // Regular user: use GET /api/users/:id which already returns link_access from access_dept
-      const [resWork, resUser] = await Promise.all([
-        fetch(`${API}/api/users/${user.id}/departments`),
-        fetch(`${API}/api/users/${user.id}`)     // ← has link_access field
-      ]);
-      workDepts = await resWork.json();
-      const userData2 = await resUser.json();
-      linkDepts = userData2.link_access || [];   // ← from access_dept via user_access_dept
-    }
-
-    if (!Array.isArray(linkDepts)) return;
-
-    window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
-    window.userDepartmentIds = linkDepts.map(d => d.id);
-    window.userLinkDepts     = linkDepts;
-
-    generateSidebar(linkDepts);
-  } catch (e) { console.error(e); }
+  if (role === "admin" || role === "superadmin") {
+    const [resWork, resAccess] = await Promise.all([
+      fetch(`${API}/api/users/${user.id}/departments`),
+      fetch(`${API}/api/access-dept`)
+    ]);
+    if (!resWork.ok || !resAccess.ok) throw new Error("Dept fetch failed");
+    workDepts = await resWork.json();
+    linkDepts = await resAccess.json();
+  } else {
+    const [resWork, resUser] = await Promise.all([
+      fetch(`${API}/api/users/${user.id}/departments`),
+      fetch(`${API}/api/users/${user.id}`)
+    ]);
+    if (!resWork.ok || !resUser.ok) throw new Error("Dept fetch failed");
+    workDepts      = await resWork.json();
+    const userFull = await resUser.json();
+    linkDepts      = userFull.link_access || [];
+  }
+  if (!Array.isArray(linkDepts)) throw new Error("Invalid dept data");
+  window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
+  window.userDepartmentIds = linkDepts.map(d => d.id);
+  window.userLinkDepts     = linkDepts;
+  generateSidebar(linkDepts);
 }
 
-/* ── RENDER DASHBOARD ── */
+/* ════ DASHBOARD ════ */
 function renderDashboard(data, keyword = "") {
   const container = document.getElementById("dashboard");
   container.innerHTML = "";
-
   if (!data.length) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon"><i class="fas fa-search"></i></div>
-        <p>${keyword ? `No results for "${keyword}"` : "No links available"}</p>
-      </div>`;
+    container.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-search"></i></div><p>${keyword ? `No results for "${keyword}"` : "No links available"}</p></div>`;
     return;
   }
-
   data.forEach(link => {
     container.innerHTML += `
       <div class="card">
         <div class="card-icon"><i class="fas fa-link"></i></div>
         <div class="card-body"><h4>${link.name}</h4></div>
-        <a href="${link.url}" target="_blank" class="link-btn">
-          Open <i class="fas fa-arrow-up-right-from-square"></i>
-        </a>
+        <a href="${link.url}" target="_blank" class="link-btn">Open <i class="fas fa-arrow-up-right-from-square"></i></a>
       </div>`;
   });
 }
 
-/* ── SIDEBAR ── */
+/* ════ SIDEBAR GENERATION ════ */
 function generateSidebar(departments) {
-  const nav         = document.getElementById("sidebarNav");
-  const othersLabel = document.getElementById("othersLabel");
-
-  // Remove previous dept buttons
-  nav.querySelectorAll("button:not(.booking-btn)").forEach(b => b.remove());
+  const nav = document.getElementById("sidebarNav");
+  nav.querySelectorAll(".dyn-btn").forEach(b => b.remove());
 
   const allBtn = document.createElement("button");
+  allBtn.className = "dyn-btn";
   allBtn.innerHTML = '<i class="fas fa-border-all"></i> All';
-  allBtn.onclick = () => { showDashboard(); setActive(allBtn); renderDashboard(allData); };
+  allBtn.onclick = () => { showDashboard(); setActive(allBtn); renderDashboard(allData); navClick(); };
 
   const firstLabel = nav.querySelector(".sidebar-section-label");
   firstLabel.insertAdjacentElement("afterend", allBtn);
@@ -439,21 +433,21 @@ function generateSidebar(departments) {
   departments.forEach(dep => {
     if (dep.name.toLowerCase() === "room booking") return;
     const btn = document.createElement("button");
+    btn.className = "dyn-btn";
     btn.innerHTML = `<i class="fas fa-folder"></i> ${dep.name}`;
     btn.onclick = () => {
-      showDashboard();
-      setActive(btn);
+      showDashboard(); setActive(btn);
       renderDashboard(allData.filter(i => Number(i.department_id) === Number(dep.id)));
+      navClick();
     };
     insertRef.insertAdjacentElement("afterend", btn);
     insertRef = btn;
   });
-
   setActive(allBtn);
 }
 
 function setActive(btn) {
-  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 }
 
@@ -463,49 +457,45 @@ function showDashboard() {
   document.getElementById("profilePage").style.display   = "none";
 }
 
-function showPage(id) {
-  ["dashboardPage","bookingPage","profilePage"].forEach(p => {
-    document.getElementById(p).style.display = p === id ? "block" : "none";
-  });
-}
-
-/* ── TRAINING / BOOKING / PROFILE ── */
-async function loadTrainingPage(button) {
-  setActive(button);
+/* ════ TRAINING ════ */
+function loadTrainingPage(button) {
+  setActive(button); navClick();
   document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("profilePage").style.display   = "none";
   const bc = document.getElementById("bookingPage");
   bc.style.display = "block";
+  bc.dataset.loaded = "training";
   bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
 }
 
+/* ════ PROFILE ════ */
 function loadProfilePage(button) {
-  setActive(button);
-  showPage("profilePage");
+  setActive(button); navClick();
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("bookingPage").style.display   = "none";
+  document.getElementById("profilePage").style.display   = "block";
 
   const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
   const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
   const user     = JSON.parse(userData);
 
-  const initials = (user.name || user.username || "U")
-    .split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+  const initials = (user.name || user.username || "U").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
   document.getElementById("profileAvatar").textContent = initials;
-
-  document.getElementById("profileName").textContent  = user.name  || user.username || "—";
-  document.getElementById("profileEmail").textContent = user.email || "—";
-  document.getElementById("profileRole").textContent  = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+  document.getElementById("profileName").textContent   = user.name  || user.username || "—";
+  document.getElementById("profileEmail").textContent  = user.email || "—";
+  document.getElementById("profileRole").textContent   = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
 
   const deptsEl = document.getElementById("profileDepts");
   deptsEl.innerHTML = "";
   if (window.userDepartments?.length) {
-    window.userDepartments.forEach(d => {
-      const tag = document.createElement("span");
-      tag.className = "dept-tag";
-      tag.textContent = d.name;
-      deptsEl.appendChild(tag);
-    });
-  } else {
-    deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>";
-  }
+    window.userDepartments.forEach(d => { const t = document.createElement("span"); t.className = "dept-tag"; t.textContent = d.name; deptsEl.appendChild(t); });
+  } else { deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>"; }
+
+  const accessEl = document.getElementById("profileAccessDepts");
+  accessEl.innerHTML = "";
+  if (window.userLinkDepts?.length) {
+    window.userLinkDepts.forEach(d => { const t = document.createElement("span"); t.className = "dept-tag dept-tag--access"; t.textContent = d.name; accessEl.appendChild(t); });
+  } else { accessEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>"; }
 }
 
 function togglePw(inputId, btn) {
@@ -520,22 +510,16 @@ async function changePassword() {
   const newPw   = document.getElementById("pwNew").value.trim();
   const confirm = document.getElementById("pwConfirm").value.trim();
   const msgEl   = document.getElementById("pwMsg");
-
-  function showMsg(text, type) {
-    msgEl.textContent = text;
-    msgEl.className = "pw-msg " + type;
+  const showMsg = (text, type) => {
+    msgEl.textContent = text; msgEl.className = "pw-msg " + type;
     msgEl.style.display = "block";
     setTimeout(() => { msgEl.style.display = "none"; }, 4000);
-  }
-
+  };
   if (!current || !newPw || !confirm) return showMsg("Please fill in all fields.", "error");
   if (newPw.length < 6)              return showMsg("New password must be at least 6 characters.", "error");
   if (newPw !== confirm)             return showMsg("Passwords do not match.", "error");
-
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const user     = JSON.parse(userData);
-  const token    = localStorage.getItem("token") || sessionStorage.getItem("token");
-
+  const user  = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
   try {
     const res  = await fetch(`${API}/api/users/${user.id}/change-password`, {
       method: "POST",
@@ -543,117 +527,89 @@ async function changePassword() {
       body: JSON.stringify({ currentPassword: current, newPassword: newPw })
     });
     const data = await res.json();
-
     if (res.ok) {
       showMsg("Password updated successfully!", "success");
-      document.getElementById("pwCurrent").value = "";
-      document.getElementById("pwNew").value     = "";
-      document.getElementById("pwConfirm").value = "";
-    } else {
-      showMsg(data.message || "Failed to update password.", "error");
-    }
-  } catch {
-    showMsg("Server error. Please try again.", "error");
-  }
+      ["pwCurrent","pwNew","pwConfirm"].forEach(id => document.getElementById(id).value = "");
+    } else { showMsg(data.message || "Failed to update password.", "error"); }
+  } catch { showMsg("Server error. Please try again.", "error"); }
 }
 
+/* ════ BOOKING PAGE ════ */
 async function loadBookingPage(button) {
-  setActive(button);
+  setActive(button); navClick();
   document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("profilePage").style.display   = "none";
   const bc = document.getElementById("bookingPage");
   bc.style.display = "block";
-  if (bc.innerHTML.trim()) return;
-
+  if (bc.dataset.loaded === "booking") return;
+  bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading...</p></div>`;
   try {
     let html = await (await fetch("booking.html")).text();
     html = html.replace(/<!DOCTYPE html>[\s\S]*?<body>/i, "");
     html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
-    html = html.replace(/<!-- SIDEBAR -->[\s\S]*?<!-- MAIN -->/i, "");
-    html = html.replace(/<div class="main">/i, "").replace(/<\/div>\s*$/, "");
     bc.innerHTML = html;
     bc.querySelectorAll("script").forEach(s => {
       const n = document.createElement("script");
       s.src ? (n.src = s.src) : (n.textContent = s.textContent);
       document.body.appendChild(n); s.remove();
     });
+    bc.dataset.loaded = "booking";
   } catch {
+    bc.dataset.loaded = "";
     bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
   }
 }
 
-/* ── SEARCH ── */
+/* ════ SEARCH ════ */
 function doSearch() {
   const kw = document.getElementById("searchInput").value.toLowerCase();
   renderDashboard(allData.filter(i => i.name.toLowerCase().includes(kw)), kw);
 }
-
 document.getElementById("searchInput").addEventListener("keyup",    doSearch);
 document.getElementById("searchBtn").addEventListener("click",      doSearch);
 document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 
-/* ── LOGOUT ── */
+/* ════ LOGOUT ════ */
 function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = "login.html"; }
 
-
-/* ══════════════════════════════════════
-   RE-AUTH MODAL — ADMIN PANEL ACCESS
-══════════════════════════════════════ */
-let _reauthTriggerBtn = null;
-
-function openReauth(btn) {
-  _reauthTriggerBtn = btn;
+/* ════ RE-AUTH ════ */
+function openReauth() {
   document.getElementById("reauthPassword").value = "";
   document.getElementById("reauthError").style.display = "none";
-  document.getElementById("reauthConfirmBtn").disabled = false;
+  const btn = document.getElementById("reauthConfirmBtn");
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-lock-open"></i> Enter Admin Panel';
   document.getElementById("reauthOverlay").classList.add("open");
   setTimeout(() => document.getElementById("reauthPassword").focus(), 100);
 }
-
 function closeReauth() {
   document.getElementById("reauthOverlay").classList.remove("open");
   document.getElementById("reauthPassword").value = "";
   document.getElementById("reauthError").style.display = "none";
 }
-
 function toggleReauthPw(btn) {
   const input = document.getElementById("reauthPassword");
   const isText = input.type === "text";
   input.type = isText ? "password" : "text";
   btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
 }
-
 async function verifyAndGoAdmin() {
-  const password = document.getElementById("reauthPassword").value.trim();
-  const errorEl  = document.getElementById("reauthError");
+  const password   = document.getElementById("reauthPassword").value.trim();
+  const errorEl    = document.getElementById("reauthError");
   const confirmBtn = document.getElementById("reauthConfirmBtn");
-
-  if (!password) {
-    errorEl.textContent = "Please enter your password.";
-    errorEl.style.display = "block";
-    return;
-  }
-
-  // Get email from session
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const user     = JSON.parse(userData);
-
+  if (!password) { errorEl.textContent = "Please enter your password."; errorEl.style.display = "block"; return; }
+  const user = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
   confirmBtn.disabled = true;
   confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
   errorEl.style.display = "none";
-
   try {
     const res  = await fetch(`${API}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: user.email, password })
     });
     const data = await res.json();
-
-    if (res.ok && data.token) {
-      // Verified — go to admin panel
-      closeReauth();
-      window.location.href = "admin.html";
-    } else {
+    if (res.ok && data.token) { closeReauth(); window.location.href = "admin.html"; }
+    else {
       errorEl.textContent = "Incorrect password. Please try again.";
       errorEl.style.display = "block";
       confirmBtn.disabled = false;
@@ -668,19 +624,10 @@ async function verifyAndGoAdmin() {
     confirmBtn.innerHTML = '<i class="fas fa-lock-open"></i> Enter Admin Panel';
   }
 }
+document.getElementById("reauthPassword").addEventListener("keypress", e => { if (e.key === "Enter") verifyAndGoAdmin(); });
+document.getElementById("reauthOverlay").addEventListener("click", e => { if (e.target === document.getElementById("reauthOverlay")) closeReauth(); });
 
-// Allow Enter key to submit
-document.getElementById("reauthPassword").addEventListener("keypress", e => {
-  if (e.key === "Enter") verifyAndGoAdmin();
-});
-
-// Click outside overlay to close
-document.getElementById("reauthOverlay").addEventListener("click", e => {
-  if (e.target === document.getElementById("reauthOverlay")) closeReauth();
-});
-
-
-/* ── INIT ── */
+/* ════ INIT ════ */
 document.addEventListener("DOMContentLoaded", async () => {
   const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
   const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
@@ -688,14 +635,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!token || !userData) { window.location.href = "login.html"; return; }
 
-  // Show admin section for admin and superadmin
   if (role === "admin" || role === "superadmin") {
     document.getElementById("adminSectionLabel").style.display = "block";
     document.getElementById("adminPanelBtn").style.display     = "block";
   }
 
   window.currentUserId = JSON.parse(userData).id;
-  await loadDepartments();
+
+  let deptLoaded = false;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try { await loadDepartments(); deptLoaded = true; break; }
+    catch (e) {
+      console.warn(`loadDepartments attempt ${attempt} failed:`, e.message);
+      if (attempt < 3) await new Promise(r => setTimeout(r, 800));
+    }
+  }
+  if (!deptLoaded) console.error("Could not load departments after 3 attempts.");
   await loadLinks();
 });
 
