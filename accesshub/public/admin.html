@@ -21,9 +21,9 @@
   --ink-light:    #9999AA;
   --ink-faint:    #D0D0DA;
 
-  --surface:      #FFFFFF;
-  --surface-2:    #F5F4F2;
-  --border:       #EBEBEE;
+  --surface:      #FDFCFB;
+  --surface-2:    #EDE8E1;
+  --border:       #E2DDD7;
 
   --r-sm:  8px;
   --r-md:  12px;
@@ -56,7 +56,7 @@ body {
 ══════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-w);
-  background: var(--pink);
+  background: #EDE8E1;
   height: 100vh;
   position: fixed;
   top: 0; left: 0;
@@ -64,6 +64,7 @@ body {
   flex-direction: column;
   z-index: 100;
   overflow: hidden;
+  border-right: 1px solid #D9D3CB;
 }
 
 .sidebar-brand {
@@ -71,15 +72,17 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  border-bottom: 1px solid #D9D3CB;
 }
 
 .sidebar-logo-wrap {
   width: 40px; height: 40px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.2);
+  background: #fff;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid #D9D3CB;
 }
 
 .sidebar-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
@@ -88,7 +91,7 @@ body {
 .sidebar-brand-name {
   font-family: var(--font-display);
   font-size: 22px;
-  color: #fff;
+  color: var(--ink);
   line-height: 1;
 }
 .sidebar-brand-sub {
@@ -96,16 +99,16 @@ body {
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
+  color: var(--pink);
 }
 
 .back-btn {
-  margin: 0 12px 8px;
+  margin: 14px 12px 8px;
   padding: 10px 14px;
-  background: rgba(255,255,255,0.18);
-  border: none;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid #D9D3CB;
   border-radius: 10px;
-  color: #fff;
+  color: var(--ink-mid);
   font-size: 13px;
   font-weight: 600;
   display: flex;
@@ -117,8 +120,8 @@ body {
   width: calc(100% - 24px);
   text-align: left;
 }
-.back-btn:hover { background: rgba(255,255,255,0.26); }
-.back-btn i { color: rgba(255,255,255,0.8); font-size: 12px; }
+.back-btn:hover { background: rgba(0,0,0,0.09); }
+.back-btn i { color: var(--ink-light); font-size: 12px; }
 
 .sidebar-nav {
   flex: 1;
@@ -135,17 +138,17 @@ body {
   font-weight: 700;
   letter-spacing: 1.3px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  color: #B0A89E;
   padding: 12px 20px 5px;
   user-select: none;
 }
 
 .sidebar-nav button {
   width: 100%;
-  padding: 9px 20px;
+  padding: 9px 12px;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,0.72);
+  color: var(--ink-mid);
   cursor: pointer;
   text-align: left;
   font-family: var(--font);
@@ -155,25 +158,28 @@ body {
   align-items: center;
   gap: 11px;
   transition: background var(--t), color var(--t);
+  margin: 1px 10px;
+  width: calc(100% - 20px);
+  border-radius: 8px;
 }
 
 .sidebar-nav button i {
   width: 17px;
   text-align: center;
   font-size: 13px;
-  color: rgba(255,255,255,0.55);
+  color: #B0A89E;
   transition: color var(--t);
   flex-shrink: 0;
 }
 
 .sidebar-nav button:hover {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
+  background: rgba(0,0,0,0.06);
+  color: var(--ink);
 }
-.sidebar-nav button:hover i { color: #fff; }
+.sidebar-nav button:hover i { color: var(--ink-mid); }
 
 .sidebar-nav button.active {
-  background: rgba(255,255,255,0.2);
+  background: var(--pink);
   color: #fff;
   font-weight: 700;
 }
@@ -181,7 +187,7 @@ body {
 
 .sidebar-footer {
   padding: 12px;
-  border-top: 1px solid rgba(255,255,255,0.12);
+  border-top: 1px solid #D9D3CB;
 }
 
 .sidebar-footer .user-info {
@@ -190,12 +196,13 @@ body {
   gap: 10px;
   padding: 9px 10px;
   border-radius: 10px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.05);
+  border: 1px solid #D9D3CB;
 }
 
 .user-avatar-sm {
   width: 32px; height: 32px;
-  background: rgba(255,255,255,0.25);
+  background: var(--pink);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700;
@@ -206,12 +213,12 @@ body {
 .user-meta { flex: 1; min-width: 0; }
 .user-meta-name {
   font-size: 12.5px; font-weight: 600;
-  color: #fff;
+  color: var(--ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .user-meta-role {
   font-size: 10px;
-  color: rgba(255,255,255,0.5);
+  color: var(--ink-light);
   text-transform: capitalize;
   margin-top: 1px;
 }
