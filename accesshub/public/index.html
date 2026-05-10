@@ -272,7 +272,7 @@
 
   </div>
 
-  <!-- Booking -->
+  <!-- Booking / Training shared container -->
   <div id="bookingPage" style="display:none;"></div>
 
   <!-- Profile -->
@@ -383,43 +383,39 @@ async function loadLinks() {
 
 /* ── DEPARTMENTS ── */
 async function loadDepartments() {
-  try {
-    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
-    const user     = JSON.parse(userData);
+  // Throws on failure so the retry loop in DOMContentLoaded can catch it
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
+  const user     = JSON.parse(userData);
 
-    let workDepts, linkDepts;
+  let workDepts, linkDepts;
 
-    if (role === "admin" || role === "superadmin") {
-      // Admin/superadmin: own work dept for profile, all access_dept rows for sidebar
-      const [resWork, resAccess] = await Promise.all([
-        fetch(`${API}/api/users/${user.id}/departments`),
-        fetch(`${API}/api/access-dept`)
-      ]);
-      workDepts = await resWork.json();
-      linkDepts = await resAccess.json();
-    } else {
-      // Regular user: work departments for profile, link_access from access_dept for sidebar
-      const [resWork, resUser] = await Promise.all([
-        fetch(`${API}/api/users/${user.id}/departments`),
-        fetch(`${API}/api/users/${user.id}`)
-      ]);
-      workDepts       = await resWork.json();
-      const userFull  = await resUser.json();
-      linkDepts       = userFull.link_access || [];
-    }
+  if (role === "admin" || role === "superadmin") {
+    const [resWork, resAccess] = await Promise.all([
+      fetch(`${API}/api/users/${user.id}/departments`),
+      fetch(`${API}/api/access-dept`)
+    ]);
+    if (!resWork.ok || !resAccess.ok) throw new Error("Dept fetch failed");
+    workDepts = await resWork.json();
+    linkDepts = await resAccess.json();
+  } else {
+    const [resWork, resUser] = await Promise.all([
+      fetch(`${API}/api/users/${user.id}/departments`),
+      fetch(`${API}/api/users/${user.id}`)
+    ]);
+    if (!resWork.ok || !resUser.ok) throw new Error("Dept fetch failed");
+    workDepts      = await resWork.json();
+    const userFull = await resUser.json();
+    linkDepts      = userFull.link_access || [];
+  }
 
-    if (!Array.isArray(linkDepts)) return;
+  if (!Array.isArray(linkDepts)) throw new Error("Invalid dept data");
 
-    // Work depts shown on profile page
-    window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
+  window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
+  window.userDepartmentIds = linkDepts.map(d => d.id);
+  window.userLinkDepts     = linkDepts;
 
-    // Link access depts used for sidebar and link filtering
-    window.userDepartmentIds = linkDepts.map(d => d.id);
-    window.userLinkDepts     = linkDepts;
-
-    generateSidebar(linkDepts);
-  } catch (e) { console.error(e); }
+  generateSidebar(linkDepts);
 }
 
 /* ── RENDER DASHBOARD ── */
@@ -450,10 +446,9 @@ function renderDashboard(data, keyword = "") {
 
 /* ── SIDEBAR ── */
 function generateSidebar(departments) {
-  const nav         = document.getElementById("sidebarNav");
-  const othersLabel = document.getElementById("othersLabel");
+  const nav = document.getElementById("sidebarNav");
 
-  // Remove previous dept buttons (non-booking-btn buttons)
+  // Remove all previously injected dept buttons (those without the booking-btn class)
   nav.querySelectorAll("button:not(.booking-btn)").forEach(b => b.remove());
 
   const allBtn = document.createElement("button");
@@ -497,15 +492,21 @@ function showPage(id) {
   });
 }
 
-/* ── TRAINING / BOOKING / PROFILE ── */
+/* ── TRAINING PAGE ── */
 async function loadTrainingPage(button) {
   setActive(button);
   document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("profilePage").style.display   = "none";
+
   const bc = document.getElementById("bookingPage");
   bc.style.display = "block";
+
+  // FIX: always reset the loaded flag so Room Booking reloads properly next time
+  bc.dataset.loaded = "training";
   bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
 }
 
+/* ── PROFILE PAGE ── */
 function loadProfilePage(button) {
   setActive(button);
   showPage("profilePage");
@@ -536,7 +537,7 @@ function loadProfilePage(button) {
     deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>";
   }
 
-  // Access departments (from access_dept table)
+  // Access departments
   const accessDeptsEl = document.getElementById("profileAccessDepts");
   accessDeptsEl.innerHTML = "";
   if (window.userLinkDepts?.length) {
@@ -600,12 +601,21 @@ async function changePassword() {
   }
 }
 
+/* ── BOOKING PAGE ── */
 async function loadBookingPage(button) {
   setActive(button);
   document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("profilePage").style.display   = "none";
+
   const bc = document.getElementById("bookingPage");
   bc.style.display = "block";
-  if (bc.innerHTML.trim()) return;
+
+  // FIX: only skip reload if the booking form is already loaded
+  // (not if training placeholder is sitting there)
+  if (bc.dataset.loaded === "booking") return;
+
+  // Show loading state while fetching
+  bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading booking page...</p></div>`;
 
   try {
     let html = await (await fetch("booking.html")).text();
@@ -619,7 +629,12 @@ async function loadBookingPage(button) {
       s.src ? (n.src = s.src) : (n.textContent = s.textContent);
       document.body.appendChild(n); s.remove();
     });
+
+    // FIX: mark as fully loaded only after successful inject
+    bc.dataset.loaded = "booking";
+
   } catch {
+    bc.dataset.loaded = ""; // allow retry next click
     bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
   }
 }
@@ -666,8 +681,8 @@ function toggleReauthPw(btn) {
 }
 
 async function verifyAndGoAdmin() {
-  const password = document.getElementById("reauthPassword").value.trim();
-  const errorEl  = document.getElementById("reauthError");
+  const password   = document.getElementById("reauthPassword").value.trim();
+  const errorEl    = document.getElementById("reauthError");
   const confirmBtn = document.getElementById("reauthConfirmBtn");
 
   if (!password) {
@@ -721,7 +736,9 @@ document.getElementById("reauthOverlay").addEventListener("click", e => {
 });
 
 
-/* ── INIT ── */
+/* ══════════════════════════════════════
+   INIT — with retry for sidebar depts
+══════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
   const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
   const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
@@ -736,7 +753,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   window.currentUserId = JSON.parse(userData).id;
-  await loadDepartments();
+
+  // FIX: Retry loadDepartments up to 3 times with 800ms delay between attempts
+  // This prevents the sidebar from being empty due to a slow/failed API response
+  let deptLoaded = false;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await loadDepartments();
+      deptLoaded = true;
+      break; // success — stop retrying
+    } catch (e) {
+      console.warn(`loadDepartments attempt ${attempt} failed:`, e.message);
+      if (attempt < 3) {
+        await new Promise(r => setTimeout(r, 800));
+      }
+    }
+  }
+
+  if (!deptLoaded) {
+    console.error("Could not load departments after 3 attempts. Sidebar may be incomplete.");
+  }
+
   await loadLinks();
 });
 
