@@ -82,15 +82,15 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
     const userIds = Object.keys(usersMap);
     if (userIds.length > 0) {
       const [accessRows] = await db.query(`
-        SELECT ula.user_id, d.id AS department_id, d.name AS department_name
-        FROM user_link_access ula
-        JOIN departments d ON d.id = ula.department_id
-        WHERE ula.user_id IN (?)
+        SELECT uad.user_id, ad.id, ad.name
+        FROM user_access_dept uad
+        JOIN access_dept ad ON ad.id = uad.access_dept_id
+        WHERE uad.user_id IN (?)
       `, [userIds]);
-
+      
       accessRows.forEach(row => {
         if (usersMap[row.user_id]) {
-          usersMap[row.user_id].link_access.push({ id: row.department_id, name: row.department_name });
+          usersMap[row.user_id].link_access.push({ id: row.id, name: row.name });
         }
       });
     }
