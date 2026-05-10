@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 
-/* ── VARIABLES (matching styles.css) ── */
+/* ── VARIABLES ── */
 :root {
   --pink:         #D4186C;
   --pink-hover:   #B5135C;
@@ -25,13 +25,6 @@
   --surface-2:    #F5F4F2;
   --border:       #EBEBEE;
 
-  /* Admin sidebar — deep charcoal with pink soul */
-  --admin-bg:     #16111A;
-  --admin-bg-2:   #1F1828;
-  --admin-border: rgba(255,255,255,0.07);
-  --admin-text:   #C8BFD4;
-  --admin-text-2: rgba(200,191,212,0.5);
-
   --r-sm:  8px;
   --r-md:  12px;
   --r-lg:  18px;
@@ -43,6 +36,8 @@
   --font:         'Plus Jakarta Sans', sans-serif;
   --font-display: 'DM Serif Display', serif;
   --t: 160ms;
+
+  --sidebar-w: 235px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,11 +52,11 @@ body {
 }
 
 /* ══════════════════════════════════════
-   ADMIN SIDEBAR
+   ADMIN SIDEBAR — KOKI STYLE
 ══════════════════════════════════════ */
 .sidebar {
-  width: 252px;
-  background: var(--admin-bg);
+  width: var(--sidebar-w);
+  background: var(--pink);
   height: 100vh;
   position: fixed;
   top: 0; left: 0;
@@ -69,178 +64,142 @@ body {
   flex-direction: column;
   z-index: 100;
   overflow: hidden;
-  border-right: 1px solid var(--admin-border);
 }
 
-/* pink glow strip at top */
-.sidebar::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--pink), #ff6bb5, var(--pink));
-}
-
-/* brand */
 .sidebar-brand {
-  padding: 28px 20px 20px;
+  padding: 24px 20px 16px;
   display: flex;
   align-items: center;
-  gap: 11px;
-  border-bottom: 1px solid var(--admin-border);
+  gap: 12px;
 }
 
 .sidebar-logo-wrap {
-  width: 42px; height: 42px;
-  border-radius: var(--r-md);
-  background: rgba(212,24,108,0.18);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.2);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid rgba(212,24,108,0.3);
 }
 
-.sidebar-logo { width: 30px; height: 30px; object-fit: contain; }
+.sidebar-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
 
-.sidebar-brand-text { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
 .sidebar-brand-name {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   color: #fff;
   line-height: 1;
 }
 .sidebar-brand-sub {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  color: var(--pink);
-}
-
-/* admin badge */
-.admin-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(212,24,108,0.15);
-  border: 1px solid rgba(212,24,108,0.3);
-  color: #f9a8d4;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: 20px;
-  margin: 12px 20px 4px;
-}
-
-/* nav */
-.sidebar-nav {
-  flex: 1;
-  padding: 8px 12px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
-}
-
-.sidebar-nav::-webkit-scrollbar { width: 0; }
-
-.sidebar-section-label {
-  font-size: 10px;
+  font-size: 8.5px;
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--admin-text-2);
-  padding: 14px 10px 6px;
+  color: rgba(255,255,255,0.6);
+}
+
+.back-btn {
+  margin: 0 12px 8px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.18);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background var(--t);
+  font-family: var(--font);
+  width: calc(100% - 24px);
+  text-align: left;
+}
+.back-btn:hover { background: rgba(255,255,255,0.26); }
+.back-btn i { color: rgba(255,255,255,0.8); font-size: 12px; }
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+.sidebar-nav::-webkit-scrollbar { width: 0; }
+
+.sidebar-section-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  padding: 12px 20px 5px;
   user-select: none;
 }
 
 .sidebar-nav button {
   width: 100%;
-  padding: 10px 13px;
+  padding: 9px 20px;
   border: none;
   background: transparent;
-  color: var(--admin-text);
+  color: rgba(255,255,255,0.72);
   cursor: pointer;
-  border-radius: 10px;
   text-align: left;
   font-family: var(--font);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   transition: background var(--t), color var(--t);
 }
 
 .sidebar-nav button i {
-  width: 18px;
+  width: 17px;
   text-align: center;
   font-size: 13px;
-  color: var(--admin-text-2);
+  color: rgba(255,255,255,0.55);
   transition: color var(--t);
   flex-shrink: 0;
 }
 
 .sidebar-nav button:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.12);
   color: #fff;
 }
-.sidebar-nav button:hover i { color: var(--pink); }
+.sidebar-nav button:hover i { color: #fff; }
 
 .sidebar-nav button.active {
-  background: rgba(212,24,108,0.18);
-  color: #f9a8d4;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
   font-weight: 700;
 }
-.sidebar-nav button.active i { color: var(--pink); }
+.sidebar-nav button.active i { color: #fff; }
 
-/* back to dashboard */
-.back-btn {
-  margin: 16px 12px 0;
-  padding: 10px 14px;
-  background: rgba(212,24,108,0.12);
-  border: 1px solid rgba(212,24,108,0.25);
-  border-radius: 10px;
-  color: #f9a8d4 !important;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: background var(--t), transform var(--t);
-  font-family: var(--font);
-}
-.back-btn:hover {
-  background: rgba(212,24,108,0.22) !important;
-  transform: translateX(-2px) !important;
-}
-.back-btn i { color: var(--pink) !important; font-size: 12px; }
-
-/* sidebar footer */
 .sidebar-footer {
-  padding: 14px 12px;
-  border-top: 1px solid var(--admin-border);
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.12);
 }
 
 .sidebar-footer .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 9px 10px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.15);
 }
 
 .user-avatar-sm {
-  width: 34px; height: 34px;
-  background: rgba(212,24,108,0.25);
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.25);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700;
-  color: #f9a8d4;
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -251,22 +210,22 @@ body {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .user-meta-role {
-  font-size: 10.5px;
-  color: var(--admin-text-2);
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
   text-transform: capitalize;
+  margin-top: 1px;
 }
 
 /* ══════════════════════════════════════
    MAIN
 ══════════════════════════════════════ */
 .main {
-  margin-left: 252px;
+  margin-left: var(--sidebar-w);
   padding: 36px 40px;
-  width: calc(100% - 252px);
+  width: calc(100% - var(--sidebar-w));
   min-height: 100vh;
 }
 
-/* page header */
 .page-header { margin-bottom: 24px; }
 
 .page-title {
@@ -309,7 +268,6 @@ body {
   align-items: center;
   gap: 8px;
 }
-
 .card-title i { color: var(--pink); font-size: 14px; }
 
 /* ── FORM ELEMENTS ── */
@@ -335,7 +293,6 @@ body {
   letter-spacing: 0.8px;
   color: var(--ink-light);
 }
-
 .form-label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
 
 .form-group input,
@@ -354,7 +311,6 @@ body {
   transition: border-color var(--t), box-shadow var(--t);
   margin: 0;
 }
-
 .form-group input:focus,
 .form-group select:focus,
 .form-input:focus,
@@ -362,7 +318,6 @@ body {
   border-color: var(--pink);
   box-shadow: var(--shadow-focus);
 }
-
 .form-group input:disabled,
 .form-group input[disabled] {
   background: var(--surface-2);
@@ -390,13 +345,11 @@ body {
   cursor: pointer;
   transition: border-color var(--t), background var(--t);
 }
-
 .checkbox-label:hover {
   border-color: var(--pink-pill);
   background: var(--pink-soft);
   color: var(--pink);
 }
-
 .checkbox-label input[type="checkbox"] {
   width: 15px; height: 15px;
   margin: 0;
@@ -420,8 +373,7 @@ body {
   align-items: center;
   gap: 8px;
   transition: background var(--t), transform var(--t);
-  width: auto;
-  margin: 0;
+  width: auto; margin: 0;
 }
 .btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
 
@@ -439,8 +391,7 @@ body {
   align-items: center;
   gap: 7px;
   transition: background var(--t);
-  width: auto;
-  margin: 0;
+  width: auto; margin: 0;
 }
 .btn-secondary:hover { background: var(--surface-2); }
 
@@ -458,8 +409,7 @@ body {
   align-items: center;
   gap: 7px;
   transition: background var(--t);
-  width: auto;
-  margin: 0;
+  width: auto; margin: 0;
 }
 .btn-danger:hover { background: #fecaca; }
 
@@ -477,8 +427,7 @@ body {
   align-items: center;
   gap: 7px;
   transition: background var(--t);
-  width: auto;
-  margin: 0;
+  width: auto; margin: 0;
 }
 .btn-success:hover { background: #bbf7d0; }
 
@@ -551,7 +500,6 @@ tbody tr:hover { background: var(--surface-2); }
 .status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 .status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
-/* link in table */
 table a { color: var(--pink); text-decoration: none; font-weight: 600; }
 table a:hover { text-decoration: underline; }
 
@@ -572,10 +520,10 @@ table a:hover { text-decoration: underline; }
 .action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
 .action-buttons button:active { transform: scale(0.95); }
 
-.edit-btn   { background: #fef9c3; color: #854d0e; }
-.delete-btn { background: #fee2e2; color: #b91c1c; }
-.cancel-btn { background: #ffedd5; color: #c2410c; }
-.restore-btn{ background: #dcfce7; color: #166534; }
+.edit-btn    { background: #fef9c3; color: #854d0e; }
+.delete-btn  { background: #fee2e2; color: #b91c1c; }
+.cancel-btn  { background: #ffedd5; color: #c2410c; }
+.restore-btn { background: #dcfce7; color: #166534; }
 
 /* ── FILTER BAR ── */
 .filter-bar {
@@ -624,7 +572,6 @@ table a:hover { text-decoration: underline; }
   box-shadow: 0 24px 60px rgba(0,0,0,0.15);
   animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both;
 }
-
 .modal-box.wide { width: 500px; }
 
 @keyframes modalPop {
@@ -664,11 +611,7 @@ table a:hover { text-decoration: underline; }
   border-top: 1px solid var(--border);
 }
 
-.modal-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
-}
+.modal-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 
 .modal-sub {
   font-size: 11px;
@@ -715,10 +658,9 @@ table a:hover { text-decoration: underline; }
 .toast.success { border-left-color: #22c55e; }
 .toast.error   { border-left-color: #ef4444; }
 
-/* ── BOOKING DETAIL ── */
+/* ── MISC ── */
 .booking-detail-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
 
-/* ── EMPTY STATE ── */
 .tbl-empty {
   text-align: center;
   padding: 40px 20px;
@@ -742,7 +684,6 @@ table a:hover { text-decoration: underline; }
       <div class="modal-icon"><i class="fas fa-user-pen"></i></div>
       <h3 class="modal-title">Edit User</h3>
     </div>
-
     <div class="form-grid-2">
       <div class="form-group">
         <label class="form-label">Full Name</label>
@@ -757,16 +698,13 @@ table a:hover { text-decoration: underline; }
       <label class="form-label">New Password <span>(leave blank to keep current)</span></label>
       <input type="password" id="editPassword" placeholder="New password (optional)">
     </div>
-
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">Department <span>(where they work)</span></label>
       <select id="editWorkDept"></select>
     </div>
-
     <div class="modal-sub">Access Departments</div>
     <div class="modal-hint">Check all access departments for this user.</div>
     <div class="checkbox-grid" id="editDepartments" style="max-height:220px;overflow-y:auto;"></div>
-
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
       <button class="btn-primary" onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
@@ -825,8 +763,8 @@ table a:hover { text-decoration: underline; }
     <div id="bookingDetailRows"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-danger"   id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel Booking</button>
-      <button class="btn-success"  id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
+      <button class="btn-danger"  id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel Booking</button>
+      <button class="btn-success" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
     </div>
   </div>
 </div>
@@ -846,8 +784,6 @@ table a:hover { text-decoration: underline; }
     </div>
   </div>
 
-  <div class="admin-badge"><i class="fas fa-shield-halved"></i> Admin Panel</div>
-
   <button class="back-btn" onclick="goBackToDashboard()">
     <i class="fas fa-arrow-left"></i> Back to Dashboard
   </button>
@@ -861,7 +797,7 @@ table a:hover { text-decoration: underline; }
       <i class="fas fa-link"></i> Links
     </button>
     <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)">
-      <i class="fas fa-door-open"></i> Bookings
+      <i class="fas fa-calendar-days"></i> Bookings
     </button>
   </nav>
 
@@ -886,7 +822,6 @@ table a:hover { text-decoration: underline; }
 
 <!-- USERS SECTION -->
 <div id="usersSection">
-
   <div class="page-header">
     <h2 class="page-title">
       <div class="page-title-icon"><i class="fas fa-users"></i></div>
@@ -897,7 +832,6 @@ table a:hover { text-decoration: underline; }
 
   <div class="card">
     <div class="card-title"><i class="fas fa-user-plus"></i> Create User</div>
-
     <div class="form-grid-2">
       <div class="form-group">
         <label class="form-label">Full Name</label>
@@ -908,7 +842,6 @@ table a:hover { text-decoration: underline; }
         <input id="email" type="email" placeholder="Enter email">
       </div>
     </div>
-
     <div class="form-grid-2" style="margin-bottom:14px;">
       <div class="form-group">
         <label class="form-label">Password</label>
@@ -919,12 +852,10 @@ table a:hover { text-decoration: underline; }
         <input id="confirmPassword" type="password" placeholder="Repeat password">
       </div>
     </div>
-
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">Department <span>(where they work)</span></label>
       <select id="userDepartment"></select>
     </div>
-
     <div class="form-group" style="margin-bottom:14px;" id="roleGroup">
       <label class="form-label">Role</label>
       <select id="role">
@@ -932,13 +863,11 @@ table a:hover { text-decoration: underline; }
         <option value="admin">Admin (Department Admin)</option>
       </select>
     </div>
-
     <div style="margin-bottom:20px;">
       <div class="form-label" style="margin-bottom:4px;">Access Departments <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(which access group they belong to)</span></div>
       <div class="modal-hint">Check all access departments for this user.</div>
       <div class="checkbox-grid" id="departmentCheckboxes"></div>
     </div>
-
     <button class="btn-primary" onclick="createUser()">
       <i class="fas fa-user-plus"></i> Create User
     </button>
@@ -961,7 +890,6 @@ table a:hover { text-decoration: underline; }
 
 <!-- LINKS SECTION -->
 <div id="linksSection" style="display:none;">
-
   <div class="page-header">
     <h2 class="page-title">
       <div class="page-title-icon"><i class="fas fa-link"></i></div>
@@ -1006,7 +934,6 @@ table a:hover { text-decoration: underline; }
 
 <!-- BOOKINGS SECTION -->
 <div id="bookingsSection" style="display:none;">
-
   <div class="page-header">
     <h2 class="page-title">
       <div class="page-title-icon"><i class="fas fa-calendar"></i></div>
@@ -1498,22 +1425,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.authToken = token;
   window.userRole  = role;
 
-  // Sidebar user info
   try {
-    const user = JSON.parse(userData);
+    const user     = JSON.parse(userData);
     const initials = (user.name || "A").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
     document.getElementById("sidebarAvatar").textContent = initials;
     document.getElementById("sidebarName").textContent   = user.name || user.email || "Admin";
     document.getElementById("sidebarRole").textContent   = role;
   } catch(e) {}
 
-  // Hide bookings for regular admin
   if (role === "admin") {
     document.getElementById("bookingsNavBtn").style.display = "none";
-    // Lock role select to User only
     const roleGroup = document.getElementById("roleGroup");
     if (roleGroup) {
-      const roleInput = document.createElement("input");
+      const roleInput    = document.createElement("input");
       roleInput.type     = "text";
       roleInput.value    = "User (Staff)";
       roleInput.disabled = true;
