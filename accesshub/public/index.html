@@ -366,19 +366,22 @@ async function loadDepartments() {
     let workDepts, linkDepts;
 
     if (role === "admin" || role === "superadmin") {
-      // Admin sees all departments for both sidebar and profile
-      const res = await fetch(`${API}/api/departments`);
-      const all = await res.json();
-      workDepts = all;
-      linkDepts = all;
-    } else {
-      // Regular user: work dept for profile, link-access for sidebar
-      const [resWork, resLink] = await Promise.all([
-        fetch(`${API}/api/users/${user.id}/departments`),
-        fetch(`${API}/api/users/${user.id}/link-access`)
+      // Admin: fetch all work departments for profile, all access_dept rows for sidebar
+      const [resWork, resAccess] = await Promise.all([
+        fetch(`${API}/api/departments`),
+        fetch(`${API}/api/access-dept`)
       ]);
       workDepts = await resWork.json();
-      linkDepts = await resLink.json();
+      linkDepts = await resAccess.json();
+    } else {
+      // Regular user: work departments for profile, link_access from access_dept for sidebar
+      const [resWork, resUser] = await Promise.all([
+        fetch(`${API}/api/users/${user.id}/departments`),
+        fetch(`${API}/api/users/${user.id}`)
+      ]);
+      workDepts       = await resWork.json();
+      const userFull  = await resUser.json();
+      linkDepts       = userFull.link_access || [];
     }
 
     if (!Array.isArray(linkDepts)) return;
@@ -386,7 +389,7 @@ async function loadDepartments() {
     // Work depts shown on profile page
     window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
 
-    // Link access depts used for sidebar filter and link filtering
+    // Link access depts used for sidebar and link filtering
     window.userDepartmentIds = linkDepts.map(d => d.id);
     window.userLinkDepts     = linkDepts;
 
@@ -425,7 +428,7 @@ function generateSidebar(departments) {
   const nav         = document.getElementById("sidebarNav");
   const othersLabel = document.getElementById("othersLabel");
 
-  // Remove previous dept buttons
+  // Remove previous dept buttons (non-booking-btn buttons)
   nav.querySelectorAll("button:not(.booking-btn)").forEach(b => b.remove());
 
   const allBtn = document.createElement("button");
@@ -633,7 +636,6 @@ async function verifyAndGoAdmin() {
     return;
   }
 
-  // Get email from session
   const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
   const user     = JSON.parse(userData);
 
@@ -650,7 +652,6 @@ async function verifyAndGoAdmin() {
     const data = await res.json();
 
     if (res.ok && data.token) {
-      // Verified — go to admin panel
       closeReauth();
       window.location.href = "admin.html";
     } else {
