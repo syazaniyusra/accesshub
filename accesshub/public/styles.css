@@ -11,9 +11,9 @@
   --ink-light:    #9999AA;
   --ink-faint:    #D0D0DA;
 
-  /* ── Pic 2 colours ── */
-  --surface:      #F8F4EF;   /* main page bg — warm off-white like pic 2 */
-  --surface-2:    #EDE8E1;   /* sidebar bg — warm cream/taupe */
+  /* ── Pic 1 colours ── */
+  --surface:      #EDEBE8;   /* main page bg — light warm gray like pic 1 */
+  --surface-2:    #FFFFFF;   /* sidebar bg — pure white like pic 1 */
   --surface-card: #F2EDE7;   /* cards — slightly deeper than bg so they're visible */
   --border:       #E0D9D1;
 
