@@ -19,6 +19,7 @@ app.use("/api/departments", require("./routes/departments"));
 app.use("/api/links", require("./routes/links"));
 const bookingRoutes = require("./routes/booking");
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/access-dept", require("./routes/accessDept"));
 
 // FRONTEND
 app.get("/", (req, res) => {
