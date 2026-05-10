@@ -11,19 +11,21 @@
   --ink-light:    #9999AA;
   --ink-faint:    #D0D0DA;
 
-  --surface:      #FDFAF7;   /* warm white — cards & inputs */
-  --surface-2:    #F5F0EA;   /* warm cream — was main bg, now sidebar */
-  --border:       #E2DDD7;
+  /* ── Pic 2 colours ── */
+  --surface:      #F8F4EF;   /* main page bg — warm off-white like pic 2 */
+  --surface-2:    #EDE8E1;   /* sidebar bg — warm cream/taupe */
+  --surface-card: #F2EDE7;   /* cards — slightly deeper than bg so they're visible */
+  --border:       #E0D9D1;
 
   --r-sm:         8px;
   --r-md:         12px;
-  --r-lg:         18px;
-  --shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
-  --shadow-hover: 0 4px 20px rgba(212,24,108,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  --r-lg:         16px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-hover: 0 4px 20px rgba(212,24,108,0.10), 0 1px 4px rgba(0,0,0,0.05);
   --shadow-focus: 0 0 0 3px rgba(212,24,108,0.18);
   --font:         'Plus Jakarta Sans', sans-serif;
   --font-display: 'DM Serif Display', serif;
-  --t:            160ms;
+  --t:            180ms;
   --sidebar-w:    235px;
 }
 
@@ -31,7 +33,6 @@
 
 body {
   font-family: var(--font);
-  /* Main page background = surface (warm white) */
   background: var(--surface);
   color: var(--ink);
   display: flex;
@@ -40,11 +41,10 @@ body {
 }
 
 /* ══════════════════════════════════════
-   SIDEBAR — now uses surface-2 (warm cream)
+   SIDEBAR
 ══════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-w);
-  /* Sidebar background = surface-2 (warm cream) */
   background: var(--surface-2);
   height: 100vh;
   position: fixed;
@@ -150,7 +150,7 @@ body {
 
 .sidebar-nav button:hover,
 .booking-btn:hover {
-  background: rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.05);
   color: var(--ink);
 }
 .sidebar-nav button:hover i,
@@ -239,7 +239,7 @@ body {
 .input-group {
   display: flex;
   align-items: center;
-  background: var(--surface-2);
+  background: var(--surface-card);
   border: 1.5px solid var(--border);
   border-radius: var(--r-md);
   overflow: hidden;
@@ -278,30 +278,33 @@ body {
 .input-group button:hover { color: var(--pink); }
 
 /* ══════════════════════════════════════
-   DASHBOARD CARDS
+   DASHBOARD CARDS — pic 2 style
+   Subtle, rounded, blends with bg
 ══════════════════════════════════════ */
 #dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  gap: 14px;
   width: 100%;
 }
 
 .card {
-  background: var(--surface-2);
-  border: 1.5px solid var(--border);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: 20px;
+  padding: 22px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-shadow: var(--shadow-card);
+  /* Smooth lift on hover — like pic 2 */
   transition: border-color var(--t), box-shadow var(--t), transform var(--t);
+  cursor: default;
 }
 .card:hover {
   border-color: var(--pink-pill);
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .card-icon {
@@ -311,7 +314,10 @@ body {
   display: flex; align-items: center; justify-content: center;
   color: var(--pink);
   font-size: 14px;
+  /* Subtle pulse on card hover */
+  transition: transform var(--t);
 }
+.card:hover .card-icon { transform: scale(1.08); }
 
 .card-body h4 {
   font-size: 14px;
@@ -327,16 +333,20 @@ body {
   background: var(--pink-soft);
   color: var(--pink);
   border: 1px solid var(--pink-pill);
-  border-radius: var(--r-sm);
-  padding: 7px 14px;
+  border-radius: 20px;
+  padding: 6px 14px;
   font-size: 12.5px;
   font-weight: 600;
   text-decoration: none;
-  transition: background var(--t), border-color var(--t);
+  transition: background var(--t), border-color var(--t), transform var(--t);
   margin-top: auto;
   width: fit-content;
 }
-.link-btn:hover { background: var(--pink-pill); border-color: var(--pink); }
+.link-btn:hover {
+  background: var(--pink-pill);
+  border-color: var(--pink);
+  transform: translateX(2px);
+}
 .link-btn i { font-size: 10px; }
 
 /* ══════════════════════════════════════
@@ -365,8 +375,8 @@ body {
 }
 
 .profile-card {
-  background: var(--surface-2);
-  border: 1.5px solid var(--border);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 28px;
   box-shadow: var(--shadow-card);
@@ -495,7 +505,7 @@ body {
     height: 100dvh; z-index: 900;
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.10);
   }
   .sidebar.open { transform: translateX(0); }
 
