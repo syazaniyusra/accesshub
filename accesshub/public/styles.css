@@ -187,20 +187,24 @@ body {
 .logout-btn {
   width: 100%;
   padding: 11px 14px;
-  background: var(--pink-soft);
-  border: 1px solid var(--pink-pill);
+  background: rgba(0,0,0,0.05);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  color: var(--pink);
+  color: var(--ink-mid);
   font-size: 13px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--t);
+  transition: background var(--t), color var(--t), border-color var(--t);
   font-family: var(--font);
 }
-.logout-btn:hover { background: var(--pink-pill); color: var(--pink-hover); }
+.logout-btn:hover {
+  background: var(--pink-soft);
+  border-color: var(--pink-pill);
+  color: var(--pink);
+}
 .logout-btn i { display: none; }
 
 /* ══════════════════════════════════════
