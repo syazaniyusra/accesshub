@@ -11,9 +11,9 @@
   --ink-light:    #9999AA;
   --ink-faint:    #D0D0DA;
 
-  --surface:      #FFFFFF;
-  --surface-2:    #F5F4F2;
-  --border:       #EBEBEE;
+  --surface:      #FDFAF7;   /* warm white — cards & inputs */
+  --surface-2:    #F5F0EA;   /* warm cream — was main bg, now sidebar */
+  --border:       #E2DDD7;
 
   --r-sm:         8px;
   --r-md:         12px;
@@ -31,7 +31,8 @@
 
 body {
   font-family: var(--font);
-  background: var(--surface-2);
+  /* Main page background = surface (warm white) */
+  background: var(--surface);
   color: var(--ink);
   display: flex;
   min-height: 100vh;
@@ -39,11 +40,12 @@ body {
 }
 
 /* ══════════════════════════════════════
-   SIDEBAR
+   SIDEBAR — now uses surface-2 (warm cream)
 ══════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-w);
-  background: #EDE8E1;
+  /* Sidebar background = surface-2 (warm cream) */
+  background: var(--surface-2);
   height: 100vh;
   position: fixed;
   top: 0; left: 0;
@@ -51,7 +53,7 @@ body {
   flex-direction: column;
   z-index: 100;
   overflow: hidden;
-  border-right: 1px solid #D9D3CB;
+  border-right: 1px solid var(--border);
 }
 
 .sidebar-brand {
@@ -59,7 +61,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid #D9D3CB;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -70,7 +72,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid #D9D3CB;
+  border: 1px solid var(--border);
 }
 
 .sidebar-logo {
@@ -164,11 +166,11 @@ body {
 .booking-btn.active i { color: #fff; }
 
 /* ══════════════════════════════════════
-   LOGOUT BUTTON — centered, no icon
+   LOGOUT — centered, no icon
 ══════════════════════════════════════ */
 .sidebar-footer {
   padding: 12px;
-  border-top: 1px solid #D9D3CB;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -176,12 +178,11 @@ body {
   width: 100%;
   padding: 11px 14px;
   background: rgba(0,0,0,0.05);
-  border: 1px solid #D9D3CB;
+  border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--ink-mid);
   font-size: 13px;
   font-weight: 600;
-  /* Center the text */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,8 +191,6 @@ body {
   font-family: var(--font);
 }
 .logout-btn:hover { background: rgba(0,0,0,0.09); color: var(--ink); }
-
-/* Hide the icon inside logout button */
 .logout-btn i { display: none; }
 
 /* ══════════════════════════════════════
@@ -233,14 +232,14 @@ body {
 .page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
 
 /* ══════════════════════════════════════
-   SEARCH BAR — full width
+   SEARCH BAR
 ══════════════════════════════════════ */
 .search-bar { margin-bottom: 16px; }
 
 .input-group {
   display: flex;
   align-items: center;
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: var(--r-md);
   overflow: hidden;
@@ -280,18 +279,16 @@ body {
 
 /* ══════════════════════════════════════
    DASHBOARD CARDS
-   — same width as search bar (100%)
 ══════════════════════════════════════ */
 #dashboard {
   display: grid;
-  /* Cards fill full width of the container */
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
   width: 100%;
 }
 
 .card {
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
   padding: 20px;
@@ -368,7 +365,7 @@ body {
 }
 
 .profile-card {
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
   padding: 28px;
@@ -512,7 +509,6 @@ body {
   .profile-card { height: auto; }
 }
 
-/* ── Mobile ≤ 600px ── */
 @media (max-width: 600px) {
   .sidebar { width: 82vw; }
   .main { padding: 14px 12px 24px; padding-top: 62px; }
@@ -522,7 +518,6 @@ body {
   .profile-card { padding: 20px; }
 }
 
-/* ── Very small ≤ 400px ── */
 @media (max-width: 400px) {
   .sidebar { width: 90vw; }
   .main { padding: 12px 10px 20px; padding-top: 58px; }
