@@ -101,11 +101,6 @@ body {
 input, select { width: 100%; padding: 10px; margin: 10px 0; }
 button.primary { background: #3b82f6; color: white; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
 
-/* CHECKBOX */
-.checkbox-card { display: flex; align-items: center; gap: 10px; }
-.checkbox-card input { width: 16px; height: 16px; }
-#departmentCheckboxes label { display: flex; align-items: center; gap: 10px; }
-
 /* TABLE */
 .table-container { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
@@ -145,14 +140,14 @@ th { background: #e2e8f0; }
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.edit-btn    { background: #facc15; color: #1e293b; }
-.edit-btn:hover    { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
-.delete-btn  { background: #ef4444; color: white; }
-.delete-btn:hover  { background: #dc2626; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
-.cancel-btn  { background: #f97316; color: white; }
-.cancel-btn:hover  { background: #ea580c; transform: translateY(-2px); }
-.restore-btn { background: #22c55e; color: white; }
-.restore-btn:hover { background: #16a34a; transform: translateY(-2px); }
+.edit-btn         { background: #facc15; color: #1e293b; }
+.edit-btn:hover   { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
+.delete-btn       { background: #ef4444; color: white; }
+.delete-btn:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
+.cancel-btn       { background: #f97316; color: white; }
+.cancel-btn:hover { background: #ea580c; transform: translateY(-2px); }
+.restore-btn      { background: #22c55e; color: white; }
+.restore-btn:hover{ background: #16a34a; transform: translateY(-2px); }
 .action-buttons button:active { transform: scale(0.95); }
 .action-buttons i { font-size: 12px; }
 .icon-only { padding: 8px; width: 34px; height: 34px; justify-content: center; }
@@ -167,7 +162,6 @@ th { background: #e2e8f0; }
   justify-content: center;
   align-items: center;
 }
-
 .modal-content {
   background: white;
   padding: 25px;
@@ -176,16 +170,13 @@ th { background: #e2e8f0; }
   max-height: 80vh;
   overflow-y: auto;
 }
-
 .modal-content h3 { margin-bottom: 5px; }
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
 }
-
 .btn-cancel  { background: #e5e7eb; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
 .btn-update  { background: #3b82f6; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
 .btn-delete  { background: #ef4444; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
@@ -213,27 +204,6 @@ th { background: #e2e8f0; }
   word-wrap: break-word;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
-
-/* EDIT DEPARTMENTS */
-#editDepartments {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 10px 0;
-  max-height: 200px;
-  overflow-y: auto;
-}
-#editDepartments label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: #f8fafc;
-  cursor: pointer;
-}
-#editDepartments label:hover { background: #e2e8f0; }
-#editDepartments input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; }
 
 /* BOOKING STATUS BADGES */
 .status-badge {
@@ -272,32 +242,6 @@ th { background: #e2e8f0; }
 #bookingsTable td:last-child { text-align: center; }
 .booking-detail { font-size: 12px; color: #64748b; margin-top: 2px; }
 
-/* ACCESS DEPT SECTION */
-.access-dept-user-card {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.access-dept-user-card .user-info { flex: 1; }
-.access-dept-user-card .user-name { font-weight: 600; font-size: 14px; color: #1e293b; }
-.access-dept-user-card .user-email { font-size: 12px; color: #64748b; margin-top: 2px; }
-.access-dept-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.access-dept-badge {
-  background: #ede9fe;
-  color: #6d28d9;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-}
-.access-dept-badge.none { background: #f1f5f9; color: #94a3b8; }
-
 @keyframes pop {
   from { transform: scale(0.9); opacity: 0; }
   to   { transform: scale(1);   opacity: 1; }
@@ -321,6 +265,7 @@ th { background: #e2e8f0; }
     </select>
 
     <h4 style="margin:14px 0 6px;font-size:13px;color:#64748b;">Access Department</h4>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Check all access departments for this user.</p>
     <div id="editDepartments" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow-y:auto;"></div>
 
     <div class="modal-actions">
@@ -396,19 +341,6 @@ th { background: #e2e8f0; }
   </div>
 </div>
 
-<!-- EDIT ACCESS DEPT MODAL -->
-<div id="editAccessDeptModal" class="modal">
-  <div class="modal-content" style="width:460px;">
-    <h3>Edit Access Department</h3>
-    <p id="editAccessDeptUserLabel" style="font-size:13px;color:#64748b;margin:6px 0 14px;"></p>
-    <div id="editAccessDeptCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeEditAccessDeptModal()">Cancel</button>
-      <button class="btn-update" onclick="saveAccessDept()">Save</button>
-    </div>
-  </div>
-</div>
-
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h2 id="adminPanelTitle">Admin Panel</h2>
@@ -421,7 +353,6 @@ th { background: #e2e8f0; }
 
   <button onclick="showSection('usersSection', this)"><i class="fa-solid fa-users"></i> Users</button>
   <button onclick="showSection('linksSection', this)"><i class="fa-solid fa-link"></i> Links</button>
-  <button id="accessDeptNavBtn" onclick="showSection('accessDeptSection', this)"><i class="fa-solid fa-shield-halved"></i> Access Dept</button>
   <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)"><i class="fa-solid fa-door-open"></i> Bookings</button>
 
   <button class="logout-btn" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
@@ -476,7 +407,7 @@ th { background: #e2e8f0; }
       </select>
     </div>
 
-    <!-- ACCESS DEPT CHECKBOXES (from access_dept table) -->
+    <!-- ACCESS DEPT CHECKBOXES -->
     <div style="margin-bottom:16px;">
       <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
         Access Department <span style="font-weight:400;color:#94a3b8;">(which access group they belong to)</span>
@@ -528,17 +459,6 @@ th { background: #e2e8f0; }
   </div>
 </div>
 
-<!-- ACCESS DEPT SECTION -->
-<div id="accessDeptSection" style="display:none;">
-  <div class="card">
-    <h3>Access Department Management</h3>
-    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">
-      Manage which access department group each user belongs to.
-    </p>
-    <div id="accessDeptUserList"></div>
-  </div>
-</div>
-
 <!-- BOOKINGS SECTION -->
 <div id="bookingsSection" style="display:none;">
   <div class="card">
@@ -573,29 +493,25 @@ th { background: #e2e8f0; }
 
 <script>
 
-let editingUserId       = null;
-let editingLinkId       = null;
-let editingAccessUserId = null;
-let deleteType          = null;
-let deleteId            = null;
-let allBookings         = [];
-let viewingBookingId    = null;
-let allAccessDepts      = [];
+let editingUserId    = null;
+let editingLinkId    = null;
+let deleteType       = null;
+let deleteId         = null;
+let allBookings      = [];
+let viewingBookingId = null;
+let allAccessDepts   = [];
 
 /* ── BACK TO DASHBOARD ── */
 function goBackToDashboard() { window.location.href = "index.html"; }
 
 /* ---- SECTION SWITCHING ---- */
 function showSection(id, btn) {
-  ["usersSection","linksSection","accessDeptSection","bookingsSection"].forEach(s => {
+  ["usersSection","linksSection","bookingsSection"].forEach(s => {
     document.getElementById(s).style.display = "none";
   });
   document.getElementById(id).style.display = "block";
   document.querySelectorAll(".sidebar button:not(.back-dashboard-btn):not(.logout-btn)").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
-
-  // Load access dept list when switching to that section
-  if (id === "accessDeptSection") loadAccessDeptSection();
 }
 
 /* ---- TOAST ---- */
@@ -609,22 +525,33 @@ function showToast(message, type = "default") {
   setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
-/* ---- LOAD ACCESS DEPTS (from access_dept table) ---- */
+/* ---- LOAD ACCESS DEPTS (from access_dept table — only 4 rows) ---- */
 async function loadAccessDepts() {
-  const res     = await fetch(`${API}/api/access-dept`);
+  const res      = await fetch(`${API}/api/access-dept`);
   allAccessDepts = await res.json();
+
+  // Safety dedup in case of DB duplicates
+  const seen = new Set();
+  allAccessDepts = allAccessDepts.filter(d => {
+    if (seen.has(d.name.toLowerCase())) return false;
+    seen.add(d.name.toLowerCase());
+    return true;
+  });
+
   return allAccessDepts;
 }
 
-/* ---- POPULATE DEPT CHECKBOXES IN CREATE USER FORM ---- */
-async function loadDepartmentCheckboxes() {
-  const deps    = allAccessDepts.length ? allAccessDepts : await loadAccessDepts();
-  const checkbox = document.getElementById("departmentCheckboxes");
-  checkbox.innerHTML = "";
-  deps.forEach(dep => {
-    checkbox.innerHTML += `
-      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
-        <input type="checkbox" value="${dep.id}" style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
+/* ---- POPULATE ACCESS DEPT CHECKBOXES (Create User form) ---- */
+function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  allAccessDepts.forEach(dep => {
+    const checked = checkedIds.includes(String(dep.id)) ? "checked" : "";
+    container.innerHTML += `
+      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;
+        border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
+        <input type="checkbox" value="${dep.id}" ${checked}
+          style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
         ${dep.name}
       </label>`;
   });
@@ -743,7 +670,7 @@ async function createUser() {
   ["name","email","password","confirmPassword"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("role").value = "user";
   document.getElementById("userDepartment").value = "";
-  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => cb.checked = false);
+  renderAccessDeptCheckboxes("departmentCheckboxes");
   loadUsers();
 }
 
@@ -798,9 +725,17 @@ async function editLink(id, name, url, department_id) {
   const deps = await res.json();
   const dropdown = document.getElementById("editLinkDepartment");
   dropdown.innerHTML = "";
-  deps.forEach(dep => {
+
+  // Deduplicate
+  const seen = new Set();
+  deps.filter(dep => {
+    if (seen.has(dep.name.toLowerCase())) return false;
+    seen.add(dep.name.toLowerCase());
+    return true;
+  }).forEach(dep => {
     dropdown.innerHTML += `<option value="${dep.id}" ${dep.id == department_id ? "selected" : ""}>${dep.name}</option>`;
   });
+
   document.getElementById("editLinkModal").style.display = "flex";
 }
 
@@ -851,10 +786,10 @@ async function editUser(id) {
     fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${window.authToken}` } }),
     fetch(`${API}/api/departments`)
   ]);
-  const user        = await resUser.json();
-  let departments   = await resDep.json();
+  const user      = await resUser.json();
+  let departments = await resDep.json();
 
-  // Deduplicate
+  // Deduplicate work departments
   const seen = new Set();
   departments = departments.filter(dep => {
     if (seen.has(dep.name.toLowerCase())) return false;
@@ -875,17 +810,9 @@ async function editUser(id) {
     workDeptSel.innerHTML += `<option value="${dep.id}" ${selected}>${dep.name}</option>`;
   });
 
-  // Access dept checkboxes (from access_dept table)
-  const container = document.getElementById("editDepartments");
-  container.innerHTML = "";
-  allAccessDepts.forEach(dep => {
-    const checked = user.link_access?.some(d => d.id === dep.id) ? "checked" : "";
-    container.innerHTML += `
-      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
-        <input type="checkbox" value="${dep.id}" ${checked} style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
-        ${dep.name}
-      </label>`;
-  });
+  // Access dept checkboxes — use allAccessDepts (already deduped, only 4)
+  const checkedIds = (user.link_access || []).map(d => String(d.id));
+  renderAccessDeptCheckboxes("editDepartments", checkedIds);
 
   document.getElementById("editModal").style.display = "flex";
 }
@@ -916,88 +843,6 @@ async function confirmEdit() {
   showToast("User updated!");
   closeEditModal();
   loadUsers();
-}
-
-/* ---- ACCESS DEPT SECTION ---- */
-async function loadAccessDeptSection() {
-  const [users] = await Promise.all([
-    fetch(`${API}/api/users`, {
-      headers: { "Authorization": `Bearer ${window.authToken}` }
-    }).then(r => r.json())
-  ]);
-
-  const container = document.getElementById("accessDeptUserList");
-  container.innerHTML = "";
-
-  if (!users.length) {
-    container.innerHTML = `<p style="color:#94a3b8;font-size:13px;">No users found.</p>`;
-    return;
-  }
-
-  users.forEach(user => {
-    const badges = user.link_access?.length
-      ? user.link_access.map(d => `<span class="access-dept-badge">${d.name}</span>`).join("")
-      : `<span class="access-dept-badge none">No access assigned</span>`;
-
-    container.innerHTML += `
-      <div class="access-dept-user-card">
-        <div class="user-info">
-          <div class="user-name">${user.name || "-"}</div>
-          <div class="user-email">${user.email}</div>
-          <div class="access-dept-badges">${badges}</div>
-        </div>
-        <button class="edit-btn" style="white-space:nowrap;" onclick="openEditAccessDeptModal(${user.id}, '${user.name}')">
-          <i class="fa-solid fa-pen"></i> Edit
-        </button>
-      </div>`;
-  });
-}
-
-async function openEditAccessDeptModal(userId, userName) {
-  editingAccessUserId = userId;
-  document.getElementById("editAccessDeptUserLabel").textContent = `User: ${userName}`;
-
-  // Get this user's current access_dept
-  const resUser = await fetch(`${API}/api/users/${userId}`, {
-    headers: { "Authorization": `Bearer ${window.authToken}` }
-  });
-  const user = await resUser.json();
-
-  const container = document.getElementById("editAccessDeptCheckboxes");
-  container.innerHTML = "";
-  allAccessDepts.forEach(dep => {
-    const checked = user.link_access?.some(d => d.id === dep.id) ? "checked" : "";
-    container.innerHTML += `
-      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
-        <input type="checkbox" value="${dep.id}" ${checked} style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
-        ${dep.name}
-      </label>`;
-  });
-
-  document.getElementById("editAccessDeptModal").style.display = "flex";
-}
-
-function closeEditAccessDeptModal() {
-  document.getElementById("editAccessDeptModal").style.display = "none";
-}
-
-async function saveAccessDept() {
-  const linkDeps = [];
-  document.querySelectorAll("#editAccessDeptCheckboxes input:checked").forEach(cb => linkDeps.push(cb.value));
-
-  const res = await fetch(`${API}/api/access-dept/user/${editingAccessUserId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
-    body: JSON.stringify({ access_dept_ids: linkDeps })
-  });
-
-  if (res.ok) {
-    showToast("Access departments saved!");
-    closeEditAccessDeptModal();
-    loadAccessDeptSection();
-  } else {
-    showToast("Failed to save", "error");
-  }
 }
 
 /* ---- LOGOUT ---- */
@@ -1067,11 +912,11 @@ function filterBookings() {
   const status = document.getElementById("filterStatus").value;
   const roomId = document.getElementById("filterRoom").value;
   const date   = document.getElementById("filterDate").value;
-  const filtered = allBookings.filter(b => {
-    return (!status || b.status === status)
-        && (!roomId || String(b.room_id) === roomId)
-        && (!date   || b.date.slice(0,10) === date);
-  });
+  const filtered = allBookings.filter(b =>
+    (!status || b.status === status) &&
+    (!roomId || String(b.room_id) === roomId) &&
+    (!date   || b.date.slice(0,10) === date)
+  );
   renderBookings(filtered);
 }
 
@@ -1088,8 +933,12 @@ async function updateBookingStatus(id, status) {
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ status })
   });
-  if (res.ok) { showToast(status === 'cancelled' ? 'Booking cancelled' : 'Booking restored'); loadBookings(); }
-  else showToast("Failed to update status","error");
+  if (res.ok) {
+    showToast(status === 'cancelled' ? 'Booking cancelled' : 'Booking restored');
+    loadBookings();
+  } else {
+    showToast("Failed to update status","error");
+  }
 }
 
 function viewBookingDetail(id) {
@@ -1145,9 +994,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.userRole  = role;
 
   if (role === "admin") {
-    document.getElementById("bookingsNavBtn").style.display    = "none";
-    document.getElementById("accessDeptNavBtn").style.display  = "none";
-    document.getElementById("adminPanelTitle").textContent     = "Admin Panel";
+    document.getElementById("bookingsNavBtn").style.display = "none";
+    document.getElementById("adminPanelTitle").textContent  = "Admin Panel";
 
     const roleSelect = document.getElementById("role");
     roleSelect.style.display = "none";
@@ -1161,10 +1009,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    await loadAccessDepts();          // load access_dept first (needed by checkboxes)
-    await loadDepartments();          // work departments dropdown
-    await loadDepartmentCheckboxes(); // access_dept checkboxes in create form
-    await loadLinkDepartments();      // links dropdown
+    await loadAccessDepts();                          // load the 4 access depts first
+    await loadDepartments();                          // work dept dropdown
+    renderAccessDeptCheckboxes("departmentCheckboxes"); // create user checkboxes
+    await loadLinkDepartments();                      // links dropdown
     await loadUsers();
     await loadLinks();
     if (role === "superadmin") await loadBookings();
