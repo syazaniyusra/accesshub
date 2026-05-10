@@ -142,19 +142,63 @@
     }
     .admin-panel-btn i { color: #fff !important; }
 
-    /* ── PROFILE LAYOUT FIX ── */
+    /* ── PROFILE PAGE FULL-SCREEN LAYOUT ── */
+    #profilePage {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 48px); /* subtract typical main padding */
+      box-sizing: border-box;
+    }
+
     .profile-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
-      align-items: start;
-    }
-    @media (max-width: 900px) {
-      .profile-grid { grid-template-columns: 1fr; }
+      align-items: stretch;   /* cards stretch to equal height */
+      flex: 1;                /* grid takes remaining vertical space */
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    /* profile info card stretches to match content */
-    .profile-card { height: auto; }
+    /* Both cards fill full height of the row */
+    .profile-card {
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Push Update Password button to the bottom of the password card */
+    #profilePage .profile-card:last-child {
+      justify-content: space-between;
+    }
+
+    /* profile-info fills space so fields spread naturally */
+    .profile-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Tablet: stack cards */
+    @media (max-width: 900px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+      #profilePage {
+        min-height: unset;
+      }
+      .profile-card {
+        height: auto;
+      }
+    }
+
+    /* Mobile: tighter padding */
+    @media (max-width: 600px) {
+      .profile-grid {
+        gap: 14px;
+      }
+    }
 
     /* Access dept tags — teal/green tint to distinguish from work depts */
     .dept-tag--access {
@@ -276,7 +320,7 @@
   <div id="bookingPage" style="display:none;"></div>
 
   <!-- Profile -->
-  <div id="profilePage" style="display:none;">
+  <div id="profilePage" class="profile-page-wrap" style="display:none;">
     <div class="page-header">
       <h2 class="page-title">
         <div class="page-title-icon"><i class="fas fa-user"></i></div>
@@ -487,8 +531,9 @@ function showDashboard() {
 }
 
 function showPage(id) {
+  const displayMap = { dashboardPage: "block", bookingPage: "block", profilePage: "flex" };
   ["dashboardPage","bookingPage","profilePage"].forEach(p => {
-    document.getElementById(p).style.display = p === id ? "block" : "none";
+    document.getElementById(p).style.display = p === id ? displayMap[p] : "none";
   });
 }
 
