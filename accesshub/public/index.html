@@ -159,6 +159,25 @@
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <!-- ══════════════════════════════════════
+     LOGOUT CONFIRM MODAL
+══════════════════════════════════════ -->
+<div class="reauth-overlay" id="logoutOverlay">
+  <div class="reauth-box" style="max-width:340px;">
+    <div class="reauth-icon" style="background:#fff0f5;">
+      <i class="fas fa-sign-out-alt" style="color:var(--pink);"></i>
+    </div>
+    <h3>Log Out?</h3>
+    <p>Are you sure you want to log out of your account?</p>
+    <div class="reauth-actions">
+      <button class="reauth-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="reauth-confirm" onclick="confirmLogout()" style="background:var(--pink);">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      RE-AUTH MODAL
 ══════════════════════════════════════ -->
 <div class="reauth-overlay" id="reauthOverlay">
@@ -579,7 +598,19 @@ document.getElementById("searchBtn").addEventListener("click",      doSearch);
 document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 
 /* ════ LOGOUT ════ */
-function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = "login.html"; }
+function logout() {
+  document.getElementById("logoutOverlay").classList.add("open");
+}
+function closeLogoutModal() {
+  document.getElementById("logoutOverlay").classList.remove("open");
+}
+function confirmLogout() {
+  localStorage.clear(); sessionStorage.clear();
+  window.location.href = "login.html";
+}
+document.getElementById("logoutOverlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("logoutOverlay")) closeLogoutModal();
+});
 
 /* ════ RE-AUTH ════ */
 function openReauth() {
