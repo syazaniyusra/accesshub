@@ -391,9 +391,9 @@ async function loadDepartments() {
     let workDepts, linkDepts;
 
     if (role === "admin" || role === "superadmin") {
-      // Admin: fetch all work departments for profile, all access_dept rows for sidebar
+      // Admin/superadmin: own work dept for profile, all access_dept rows for sidebar
       const [resWork, resAccess] = await Promise.all([
-        fetch(`${API}/api/departments`),
+        fetch(`${API}/api/users/${user.id}/departments`),
         fetch(`${API}/api/access-dept`)
       ]);
       workDepts = await resWork.json();
