@@ -11,11 +11,11 @@
   --ink-light:    #9999AA;
   --ink-faint:    #D0D0DA;
 
-  /* ── Pic 1 colours ── */
-  --surface:      #EDEBE8;   /* main page bg — light warm gray like pic 1 */
-  --surface-2:    #FFFFFF;   /* sidebar bg — pure white like pic 1 */
-  --surface-card: #F2EDE7;   /* cards — slightly deeper than bg so they're visible */
-  --border:       #E0D9D1;
+  /* ── colours ── */
+  --surface:      #F0EDE8;   /* main page bg — lighter warm beige */
+  --surface-2:    #FAF8F5;   /* sidebar bg — very light warm beige */
+  --surface-card: #F2EDE7;   /* cards */
+  --border:       #E4DDD5;
 
   --r-sm:         8px;
   --r-md:         12px;
@@ -66,19 +66,19 @@ body {
 }
 
 .sidebar-logo-wrap {
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
   border-radius: 10px;
-  background: #fff;
+  background: transparent;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid var(--border);
+  border: none;
 }
 
 .sidebar-logo {
-  width: 28px; height: 28px;
+  width: 44px; height: 44px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
@@ -158,12 +158,22 @@ body {
 
 .sidebar-nav button.active,
 .booking-btn.active {
+  background: var(--pink-soft);
+  color: var(--pink);
+  font-weight: 700;
+}
+.sidebar-nav button.active i,
+.booking-btn.active i { color: var(--pink); }
+
+/* Admin/special items stay full pink — add class .active-solid in HTML for those */
+.sidebar-nav button.active-solid,
+.booking-btn.active-solid {
   background: var(--pink);
   color: #fff;
   font-weight: 700;
 }
-.sidebar-nav button.active i,
-.booking-btn.active i { color: #fff; }
+.sidebar-nav button.active-solid i,
+.booking-btn.active-solid i { color: #fff; }
 
 /* ══════════════════════════════════════
    LOGOUT — centered, no icon
@@ -177,10 +187,10 @@ body {
 .logout-btn {
   width: 100%;
   padding: 11px 14px;
-  background: rgba(0,0,0,0.05);
-  border: 1px solid var(--border);
+  background: var(--pink-soft);
+  border: 1px solid var(--pink-pill);
   border-radius: 10px;
-  color: var(--ink-mid);
+  color: var(--pink);
   font-size: 13px;
   font-weight: 600;
   display: flex;
@@ -190,7 +200,7 @@ body {
   transition: background var(--t);
   font-family: var(--font);
 }
-.logout-btn:hover { background: rgba(0,0,0,0.09); color: var(--ink); }
+.logout-btn:hover { background: var(--pink-pill); color: var(--pink-hover); }
 .logout-btn i { display: none; }
 
 /* ══════════════════════════════════════
