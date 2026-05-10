@@ -158,12 +158,12 @@ body {
 
 .sidebar-nav button.active,
 .booking-btn.active {
-  background: var(--pink);
-  color: #fff;
+  background: #FCE4EF;
+  color: #B5135C;
   font-weight: 700;
 }
 .sidebar-nav button.active i,
-.booking-btn.active i { color: #fff; }
+.booking-btn.active i { color: #B5135C; }
 
 /* ══════════════════════════════════════
    LOGOUT — centered, no icon
