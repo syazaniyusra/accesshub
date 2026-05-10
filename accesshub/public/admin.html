@@ -2,432 +2,955 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <script>
-    const API = window.location.origin;
-  </script>
-<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>const API = window.location.origin;</script>
+<title>Bismi — Admin Panel</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── VARIABLES (matching styles.css) ── */
+:root {
+  --pink:         #D4186C;
+  --pink-hover:   #B5135C;
+  --pink-soft:    #FCE8F3;
+  --pink-pill:    #F9D5EA;
+
+  --ink:          #1C1C1E;
+  --ink-mid:      #5A5A6E;
+  --ink-light:    #9999AA;
+  --ink-faint:    #D0D0DA;
+
+  --surface:      #FFFFFF;
+  --surface-2:    #F5F4F2;
+  --border:       #EBEBEE;
+
+  /* Admin sidebar — deep charcoal with pink soul */
+  --admin-bg:     #16111A;
+  --admin-bg-2:   #1F1828;
+  --admin-border: rgba(255,255,255,0.07);
+  --admin-text:   #C8BFD4;
+  --admin-text-2: rgba(200,191,212,0.5);
+
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  18px;
+
+  --shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 20px rgba(212,24,108,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-focus: 0 0 0 3px rgba(212,24,108,0.18);
+
+  --font:         'Plus Jakarta Sans', sans-serif;
+  --font-display: 'DM Serif Display', serif;
+  --t: 160ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: "Segoe UI", sans-serif;
-  background: #f1f5f9;
+  font-family: var(--font);
+  background: var(--surface-2);
+  color: var(--ink);
   display: flex;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* SIDEBAR */
+/* ══════════════════════════════════════
+   ADMIN SIDEBAR
+══════════════════════════════════════ */
 .sidebar {
-  width: 240px;
-  background: #1e293b;
-  color: white;
-  padding: 20px;
-  position: fixed;
+  width: 252px;
+  background: var(--admin-bg);
   height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
   display: flex;
   flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+  border-right: 1px solid var(--admin-border);
 }
 
-.sidebar button {
+/* pink glow strip at top */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pink), #ff6bb5, var(--pink));
+}
+
+/* brand */
+.sidebar-brand {
+  padding: 28px 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.sidebar-logo-wrap {
+  width: 42px; height: 42px;
+  border-radius: var(--r-md);
+  background: rgba(212,24,108,0.18);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(212,24,108,0.3);
+}
+
+.sidebar-logo { width: 30px; height: 30px; object-fit: contain; }
+
+.sidebar-brand-text { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-brand-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: #fff;
+  line-height: 1;
+}
+.sidebar-brand-sub {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+/* admin badge */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(212,24,108,0.15);
+  border: 1px solid rgba(212,24,108,0.3);
+  color: #f9a8d4;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin: 12px 20px 4px;
+}
+
+/* nav */
+.sidebar-nav {
+  flex: 1;
+  padding: 8px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 0; }
+
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--admin-text-2);
+  padding: 14px 10px 6px;
+  user-select: none;
+}
+
+.sidebar-nav button {
   width: 100%;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  padding: 10px 13px;
   border: none;
-  border-radius: 10px;
-  background: #334155;
-  color: #e2e8f0;
-  font-size: 14px;
-  font-weight: 500;
+  background: transparent;
+  color: var(--admin-text);
   cursor: pointer;
+  border-radius: 10px;
+  text-align: left;
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  transition: all 0.25s ease;
+  transition: background var(--t), color var(--t);
 }
 
-.sidebar button:hover { background: #475569; transform: translateX(3px); }
-.sidebar button.active { background: #3b82f6; color: white; border: 2px solid rgba(255,255,255,0.6); }
-.sidebar h2 { text-align: center; margin-bottom: 20px; }
+.sidebar-nav button i {
+  width: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--admin-text-2);
+  transition: color var(--t);
+  flex-shrink: 0;
+}
 
-.back-dashboard-btn {
-  background: rgba(212, 24, 108, 0.15) !important;
+.sidebar-nav button:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+.sidebar-nav button:hover i { color: var(--pink); }
+
+.sidebar-nav button.active {
+  background: rgba(212,24,108,0.18);
+  color: #f9a8d4;
+  font-weight: 700;
+}
+.sidebar-nav button.active i { color: var(--pink); }
+
+/* back to dashboard */
+.back-btn {
+  margin: 16px 12px 0;
+  padding: 10px 14px;
+  background: rgba(212,24,108,0.12);
+  border: 1px solid rgba(212,24,108,0.25);
+  border-radius: 10px;
   color: #f9a8d4 !important;
-  border: 1px solid rgba(212, 24, 108, 0.3) !important;
-  margin-bottom: 20px !important;
-}
-.back-dashboard-btn:hover {
-  background: rgba(212, 24, 108, 0.28) !important;
-  color: #fff !important;
-  transform: translateX(-3px) !important;
-}
-.back-dashboard-btn i { color: inherit !important; }
-
-.sidebar-divider {
-  border: none;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  margin: 4px 0 16px;
-}
-
-.logout-btn {
-  margin-top: auto;
-  background: #334155;
-  color: #e2e8f0;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 15px;
-  transition: all 0.25s ease;
+  transition: background var(--t), transform var(--t);
+  font-family: var(--font);
+}
+.back-btn:hover {
+  background: rgba(212,24,108,0.22) !important;
+  transform: translateX(-2px) !important;
+}
+.back-btn i { color: var(--pink) !important; font-size: 12px; }
+
+/* sidebar footer */
+.sidebar-footer {
+  padding: 14px 12px;
+  border-top: 1px solid var(--admin-border);
 }
 
-.sidebar .logout-btn:hover { background: #ef4444; color: white; transform: translateX(3px); }
-.sidebar .logout-btn:active { transform: scale(0.97); }
-
-/* MAIN */
-.main { margin-left: 240px; padding: 30px; width: calc(100% - 240px); }
-
-/* CARD */
-.card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-
-/* FORM */
-input, select { width: 100%; padding: 10px; margin: 10px 0; }
-button.primary { background: #3b82f6; color: white; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
-
-/* TABLE */
-.table-container { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px; }
-th { background: #e2e8f0; }
-
-#userTable th:nth-child(1), #userTable td:nth-child(1) { text-align: left; }
-#userTable th:nth-child(2), #userTable td:nth-child(2) { text-align: left; }
-#userTable th:nth-child(3), #userTable td:nth-child(3) { text-align: left; width: 120px; }
-#userTable th:nth-child(4), #userTable td:nth-child(4) { text-align: left; padding-left: 40px; }
-#userTable th:last-child,   #userTable td:last-child   { text-align: center; }
-
-#linkTable th:nth-child(1), #linkTable td:nth-child(1) { text-align: left; }
-#linkTable th:nth-child(2), #linkTable td:nth-child(2) { text-align: center; }
-#linkTable th:nth-child(3), #linkTable td:nth-child(3) { text-align: left; }
-#linkTable th:last-child,   #linkTable td:last-child   { text-align: center; }
-#linkTable a { color: #3b82f6; text-decoration: none; font-weight: 500; }
-#linkTable a:hover { text-decoration: underline; }
-
-/* BADGES */
-.badge { background: #e2e8f0; padding: 4px 10px; border-radius: 6px; margin: 2px 4px 2px 0; display: inline-block; }
-
-/* ACTION BUTTONS */
-.action-buttons { display: flex; justify-content: center; gap: 10px; }
-
-.action-buttons button {
+.sidebar-footer .user-info {
   display: flex;
   align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+}
+
+.user-avatar-sm {
+  width: 34px; height: 34px;
+  background: rgba(212,24,108,0.25);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  color: #f9a8d4;
+  flex-shrink: 0;
+}
+
+.user-meta { flex: 1; min-width: 0; }
+.user-meta-name {
+  font-size: 12.5px; font-weight: 600;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.user-meta-role {
+  font-size: 10.5px;
+  color: var(--admin-text-2);
+  text-transform: capitalize;
+}
+
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
+.main {
+  margin-left: 252px;
+  padding: 36px 40px;
+  width: calc(100% - 252px);
+  min-height: 100vh;
+}
+
+/* page header */
+.page-header { margin-bottom: 24px; }
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title-icon {
+  width: 36px; height: 36px;
+  background: var(--pink-soft);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--pink);
+  font-size: 15px;
+}
+
+.page-title .accent { color: var(--pink); }
+.page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title i { color: var(--pink); font-size: 14px; }
+
+/* ── FORM ELEMENTS ── */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 8px;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ink-light);
+}
+
+.form-label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
+
+.form-group input,
+.form-group select,
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--t), box-shadow var(--t);
+  margin: 0;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--pink);
+  box-shadow: var(--shadow-focus);
+}
+
+.form-group input:disabled,
+.form-group input[disabled] {
+  background: var(--surface-2);
+  color: var(--ink-light);
+  cursor: not-allowed;
+}
+
+/* ── CHECKBOXES ── */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
   font-size: 13px;
   font-weight: 500;
+  color: var(--ink-mid);
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: border-color var(--t), background var(--t);
 }
 
-.edit-btn         { background: #facc15; color: #1e293b; }
-.edit-btn:hover   { background: #eab308; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
-.delete-btn       { background: #ef4444; color: white; }
-.delete-btn:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
-.cancel-btn       { background: #f97316; color: white; }
-.cancel-btn:hover { background: #ea580c; transform: translateY(-2px); }
-.restore-btn      { background: #22c55e; color: white; }
-.restore-btn:hover{ background: #16a34a; transform: translateY(-2px); }
-.action-buttons button:active { transform: scale(0.95); }
-.action-buttons i { font-size: 12px; }
-.icon-only { padding: 8px; width: 34px; height: 34px; justify-content: center; }
+.checkbox-label:hover {
+  border-color: var(--pink-pill);
+  background: var(--pink-soft);
+  color: var(--pink);
+}
 
-/* MODAL */
+.checkbox-label input[type="checkbox"] {
+  width: 15px; height: 15px;
+  margin: 0;
+  accent-color: var(--pink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── BUTTONS ── */
+.btn-primary {
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 11px 22px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background var(--t), transform var(--t);
+  width: auto;
+  margin: 0;
+}
+.btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink-mid);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background var(--t);
+  width: auto;
+  margin: 0;
+}
+.btn-secondary:hover { background: var(--surface-2); }
+
+.btn-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fecaca;
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background var(--t);
+  width: auto;
+  margin: 0;
+}
+.btn-danger:hover { background: #fecaca; }
+
+.btn-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1.5px solid #bbf7d0;
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background var(--t);
+  width: auto;
+  margin: 0;
+}
+.btn-success:hover { background: #bbf7d0; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+thead tr {
+  background: var(--surface-2);
+  border-bottom: 1.5px solid var(--border);
+}
+
+th {
+  padding: 11px 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--ink-light);
+  text-align: left;
+  white-space: nowrap;
+}
+
+td {
+  padding: 13px 14px;
+  color: var(--ink-mid);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--surface-2); }
+
+/* ── BADGES ── */
+.badge {
+  background: var(--pink-soft);
+  color: var(--pink);
+  border: 1px solid var(--pink-pill);
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 2px 3px 2px 0;
+  display: inline-block;
+}
+
+.badge-role {
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+}
+.badge-role.user       { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+.badge-role.admin      { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); }
+.badge-role.superadmin { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+.status-badge {
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-block;
+}
+.status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* link in table */
+table a { color: var(--pink); text-decoration: none; font-weight: 600; }
+table a:hover { text-decoration: underline; }
+
+/* ── ACTION BUTTONS ── */
+.action-buttons { display: flex; gap: 6px; }
+
+.action-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: transform var(--t), opacity var(--t);
+  font-size: 12px;
+}
+.action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
+.action-buttons button:active { transform: scale(0.95); }
+
+.edit-btn   { background: #fef9c3; color: #854d0e; }
+.delete-btn { background: #fee2e2; color: #b91c1c; }
+.cancel-btn { background: #ffedd5; color: #c2410c; }
+.restore-btn{ background: #dcfce7; color: #166534; }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-bar select,
+.filter-bar input {
+  padding: 9px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  margin: 0;
+  width: auto;
+}
+.filter-bar select:focus,
+.filter-bar input:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
+
+/* ── MODAL ── */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
   justify-content: center;
   align-items: center;
 }
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 400px;
-  max-height: 80vh;
+
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  width: 440px;
+  max-height: 85vh;
   overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+  animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both;
 }
-.modal-content h3 { margin-bottom: 5px; }
+
+.modal-box.wide { width: 500px; }
+
+@keyframes modalPop {
+  from { transform: scale(0.90); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--pink-soft);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--pink);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ink);
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
-.btn-cancel  { background: #e5e7eb; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
-.btn-update  { background: #3b82f6; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
-.btn-delete  { background: #ef4444; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
-.btn-confirm { background: #22c55e; color: white; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; }
 
-/* TOAST */
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+.modal-sub {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ink-light);
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.modal-hint { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; }
+
+.modal-detail-row {
+  display: flex;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+.modal-detail-row:last-child { border-bottom: none; }
+.modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; }
+.modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; }
+
+/* ── TOAST ── */
 .toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #ffffff;
-  color: #1e293b;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 14px;
+  top: 22px; right: 22px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 13px 18px;
+  border-radius: var(--r-md);
+  font-size: 13.5px;
   font-weight: 500;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  width: auto;
-  max-width: 300px;
-  display: inline-block;
+  font-family: var(--font);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  max-width: 320px;
   opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.3s ease;
+  transform: translateY(-16px);
+  transition: opacity 0.25s, transform 0.25s;
   z-index: 1000;
-  word-wrap: break-word;
+  border-left: 4px solid var(--border);
 }
 .toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-left-color: #22c55e; }
+.toast.error   { border-left-color: #ef4444; }
 
-/* BOOKING STATUS BADGES */
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-block;
-}
-.status-confirmed { background: #dcfce7; color: #166534; }
-.status-cancelled { background: #fee2e2; color: #991b1b; }
+/* ── BOOKING DETAIL ── */
+.booking-detail-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
 
-/* BOOKING FILTER BAR */
-.filter-bar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  align-items: center;
+/* ── EMPTY STATE ── */
+.tbl-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-light);
+  font-size: 13.5px;
 }
-.filter-bar select,
-.filter-bar input {
-  width: auto;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1.5px solid #e2e8f0;
-  font-size: 13px;
-  color: #1e293b;
-  background: #f8fafc;
-  margin: 0;
-}
-.filter-bar select:focus,
-.filter-bar input:focus { border-color: #3b82f6; outline: none; }
+.tbl-empty i { font-size: 28px; color: var(--pink-pill); display: block; margin-bottom: 10px; }
 
-#bookingsTable th:last-child,
-#bookingsTable td:last-child { text-align: center; }
-.booking-detail { font-size: 12px; color: #64748b; margin-top: 2px; }
-
-@keyframes pop {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
 </style>
 </head>
-
 <body>
 
-<!-- EDIT USER MODAL -->
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- EDIT USER -->
 <div id="editModal" class="modal">
-  <div class="modal-content" style="width:480px;">
-    <h3>Edit User</h3>
-    <input type="text"     id="editName"     placeholder="Name">
-    <input type="email"    id="editEmail"    placeholder="Email">
-    <input type="password" id="editPassword" placeholder="New Password (optional)">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <div class="modal-icon"><i class="fas fa-user-pen"></i></div>
+      <h3 class="modal-title">Edit User</h3>
+    </div>
 
-    <h4 style="margin:14px 0 6px;font-size:13px;color:#64748b;">Department (where they work)</h4>
-    <select id="editWorkDept" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:4px;">
-      <option value="">Select department...</option>
-    </select>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="editName" placeholder="Full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="editEmail" placeholder="Email">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">New Password <span>(leave blank to keep current)</span></label>
+      <input type="password" id="editPassword" placeholder="New password (optional)">
+    </div>
 
-    <h4 style="margin:14px 0 6px;font-size:13px;color:#64748b;">Access Department</h4>
-    <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Check all access departments for this user.</p>
-    <div id="editDepartments" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;overflow-y:auto;"></div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">Department <span>(where they work)</span></label>
+      <select id="editWorkDept"></select>
+    </div>
+
+    <div class="modal-sub">Access Departments</div>
+    <div class="modal-hint">Check all access departments for this user.</div>
+    <div class="checkbox-grid" id="editDepartments" style="max-height:220px;overflow-y:auto;"></div>
 
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-      <button class="btn-update" onclick="confirmEdit()">Update</button>
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
     </div>
   </div>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- DELETE -->
 <div id="deleteModal" class="modal">
-  <div class="modal-content">
-    <h3>Confirm Delete</h3>
-    <p id="deleteMessage">Are you sure you want to delete this?</p>
+  <div class="modal-box" style="width:380px;">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:#fee2e2;color:#b91c1c;"><i class="fas fa-trash"></i></div>
+      <h3 class="modal-title">Confirm Delete</h3>
+    </div>
+    <p id="deleteMessage" style="font-size:13.5px;color:var(--ink-mid);line-height:1.6;">Are you sure you want to delete this?</p>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+      <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
     </div>
   </div>
 </div>
 
-<!-- EDIT LINK MODAL -->
+<!-- EDIT LINK -->
 <div id="editLinkModal" class="modal">
-  <div class="modal-content">
-    <h3>Edit Link</h3>
-    <input type="text" id="editLinkName" placeholder="Link Name">
-    <input type="text" id="editLinkURL"  placeholder="URL">
-    <select id="editLinkDepartment"></select>
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-icon"><i class="fas fa-link"></i></div>
+      <h3 class="modal-title">Edit Link</h3>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">Link Name</label>
+      <input type="text" id="editLinkName" placeholder="Link name">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">URL</label>
+      <input type="text" id="editLinkURL" placeholder="https://...">
+    </div>
+    <div class="form-group" style="margin-bottom:4px;">
+      <label class="form-label">Department</label>
+      <select id="editLinkDepartment"></select>
+    </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeEditLinkModal()">Cancel</button>
-      <button class="btn-update" onclick="updateLink()">Update</button>
+      <button class="btn-secondary" onclick="closeEditLinkModal()">Cancel</button>
+      <button class="btn-primary" onclick="updateLink()"><i class="fas fa-save"></i> Update</button>
     </div>
   </div>
 </div>
 
-<!-- LOGOUT MODAL -->
-<div id="logoutModal" class="modal">
-  <div class="modal-content">
-    <h3>Confirm Logout</h3>
-    <p>Are you sure you want to logout?</p>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-      <button class="btn-delete" onclick="confirmLogout()">Logout</button>
-    </div>
-  </div>
-</div>
-
-<!-- BOOKING DETAIL MODAL -->
+<!-- BOOKING DETAIL -->
 <div id="bookingDetailModal" class="modal">
-  <div class="modal-content" style="width:480px;">
-    <h3>Booking Details</h3>
-    <table style="width:100%; margin:16px 0; border-collapse:collapse;">
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:40%;">Room</td>       <td id="dRoom"     style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Event</td>      <td id="dEvent"    style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Date</td>       <td id="dDate"     style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Time</td>       <td id="dTime"     style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Duration</td>   <td id="dDuration" style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Name</td>       <td id="dName"     style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Department</td> <td id="dDept"     style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Phone</td>      <td id="dPhone"    style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Status</td>     <td id="dStatus"   style="font-size:13px;font-weight:500;"></td></tr>
-      <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Submitted</td>  <td id="dCreated"  style="font-size:13px;font-weight:500;"></td></tr>
-    </table>
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <div class="modal-icon"><i class="fas fa-calendar-check"></i></div>
+      <h3 class="modal-title">Booking Details</h3>
+    </div>
+    <div id="bookingDetailRows"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-delete"  id="detailCancelBtn"  onclick="cancelFromDetail()">
-        <i class="fa-solid fa-ban"></i> Cancel Booking
-      </button>
-      <button class="btn-confirm" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;">
-        <i class="fa-solid fa-rotate-left"></i> Restore
-      </button>
+      <button class="btn-secondary" onclick="closeBookingDetailModal()">Close</button>
+      <button class="btn-danger"   id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel Booking</button>
+      <button class="btn-success"  id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
     </div>
   </div>
 </div>
 
-<!-- SIDEBAR -->
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
 <div class="sidebar">
-  <h2 id="adminPanelTitle">Admin Panel</h2>
 
-  <button class="back-dashboard-btn" onclick="goBackToDashboard()">
-    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+  <div class="sidebar-brand">
+    <div class="sidebar-logo-wrap">
+      <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
+    </div>
+    <div class="sidebar-brand-text">
+      <span class="sidebar-brand-name">Bismi</span>
+      <span class="sidebar-brand-sub">Segar Halal Suci</span>
+    </div>
+  </div>
+
+  <div class="admin-badge"><i class="fas fa-shield-halved"></i> Admin Panel</div>
+
+  <button class="back-btn" onclick="goBackToDashboard()">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
   </button>
 
-  <hr class="sidebar-divider">
+  <nav class="sidebar-nav">
+    <span class="sidebar-section-label">Manage</span>
+    <button onclick="showSection('usersSection', this)" class="active">
+      <i class="fas fa-users"></i> Users
+    </button>
+    <button onclick="showSection('linksSection', this)">
+      <i class="fas fa-link"></i> Links
+    </button>
+    <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)">
+      <i class="fas fa-door-open"></i> Bookings
+    </button>
+  </nav>
 
-  <button onclick="showSection('usersSection', this)"><i class="fa-solid fa-users"></i> Users</button>
-  <button onclick="showSection('linksSection', this)"><i class="fa-solid fa-link"></i> Links</button>
-  <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)"><i class="fa-solid fa-door-open"></i> Bookings</button>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar-sm" id="sidebarAvatar">A</div>
+      <div class="user-meta">
+        <div class="user-meta-name" id="sidebarName">Admin</div>
+        <div class="user-meta-role" id="sidebarRole">superadmin</div>
+      </div>
+    </div>
+  </div>
 
-  <button class="logout-btn" onclick="openLogoutModal()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 </div>
 
-<!-- MAIN -->
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
 <div class="main">
 
 <div id="toast" class="toast"></div>
 
 <!-- USERS SECTION -->
 <div id="usersSection">
-  <div class="card">
-    <h3>Create User</h3>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Full Name</label>
+  <div class="page-header">
+    <h2 class="page-title">
+      <div class="page-title-icon"><i class="fas fa-users"></i></div>
+      Manage <span class="accent">Users</span>
+    </h2>
+    <p class="page-subtitle">Create and manage user accounts and their access</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-user-plus"></i> Create User</div>
+
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
         <input id="name" placeholder="Enter full name">
       </div>
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Email</label>
+      <div class="form-group">
+        <label class="form-label">Email</label>
         <input id="email" type="email" placeholder="Enter email">
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Password</label>
+    <div class="form-grid-2" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label class="form-label">Password</label>
         <input id="password" type="password" placeholder="Create password">
       </div>
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Confirm Password</label>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
         <input id="confirmPassword" type="password" placeholder="Repeat password">
       </div>
     </div>
 
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
-        Department <span style="font-weight:400;color:#94a3b8;">(where they work)</span>
-      </label>
-      <select id="userDepartment">
-        <option value="">Select department...</option>
-      </select>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">Department <span>(where they work)</span></label>
+      <select id="userDepartment"></select>
     </div>
 
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Role</label>
+    <div class="form-group" style="margin-bottom:14px;" id="roleGroup">
+      <label class="form-label">Role</label>
       <select id="role">
         <option value="user">User (Staff)</option>
         <option value="admin">Admin (Department Admin)</option>
       </select>
     </div>
 
-    <!-- ACCESS DEPT CHECKBOXES -->
-    <div style="margin-bottom:16px;">
-      <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
-        Access Department <span style="font-weight:400;color:#94a3b8;">(which access group they belong to)</span>
-      </label>
-      <p style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Check all access departments for this user.</p>
-      <div id="departmentCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+    <div style="margin-bottom:20px;">
+      <div class="form-label" style="margin-bottom:4px;">Access Departments <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(which access group they belong to)</span></div>
+      <div class="modal-hint">Check all access departments for this user.</div>
+      <div class="checkbox-grid" id="departmentCheckboxes"></div>
     </div>
 
-    <button class="primary" onclick="createUser()">
-      <i class="fa-solid fa-user-plus"></i> Create User
+    <button class="btn-primary" onclick="createUser()">
+      <i class="fas fa-user-plus"></i> Create User
     </button>
   </div>
 
   <div class="card">
-    <h3>Users List</h3>
-    <div class="table-container">
+    <div class="card-title"><i class="fas fa-list"></i> Users List</div>
+    <div class="table-wrap">
       <table id="userTable">
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Role</th><th>Departments</th><th>Action</th>
+            <th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -438,17 +961,39 @@ th { background: #e2e8f0; }
 
 <!-- LINKS SECTION -->
 <div id="linksSection" style="display:none;">
-  <div class="card">
-    <h3>Add Link</h3>
-    <input id="linkName" placeholder="Link Name">
-    <input id="linkURL"  placeholder="URL">
-    <select id="linkDepartment"></select>
-    <button class="primary" onclick="createLink()">Add Link</button>
+
+  <div class="page-header">
+    <h2 class="page-title">
+      <div class="page-title-icon"><i class="fas fa-link"></i></div>
+      Manage <span class="accent">Links</span>
+    </h2>
+    <p class="page-subtitle">Add and manage links for each department</p>
   </div>
 
   <div class="card">
-    <h3>Links List</h3>
-    <div class="table-container">
+    <div class="card-title"><i class="fas fa-plus"></i> Add Link</div>
+    <div class="form-grid-2" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label class="form-label">Link Name</label>
+        <input id="linkName" placeholder="e.g. Leave System">
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL</label>
+        <input id="linkURL" placeholder="https://...">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label class="form-label">Department</label>
+      <select id="linkDepartment"></select>
+    </div>
+    <button class="btn-primary" onclick="createLink()">
+      <i class="fas fa-plus"></i> Add Link
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="fas fa-list"></i> Links List</div>
+    <div class="table-wrap">
       <table id="linkTable">
         <thead>
           <tr><th>Link Name</th><th>URL</th><th>Department</th><th>Action</th></tr>
@@ -461,8 +1006,17 @@ th { background: #e2e8f0; }
 
 <!-- BOOKINGS SECTION -->
 <div id="bookingsSection" style="display:none;">
+
+  <div class="page-header">
+    <h2 class="page-title">
+      <div class="page-title-icon"><i class="fas fa-calendar"></i></div>
+      Room <span class="accent">Bookings</span>
+    </h2>
+    <p class="page-subtitle">View and manage all room bookings</p>
+  </div>
+
   <div class="card">
-    <h3>Room Bookings</h3>
+    <div class="card-title"><i class="fas fa-filter"></i> Filter Bookings</div>
     <div class="filter-bar">
       <select id="filterStatus" onchange="filterBookings()">
         <option value="">All Status</option>
@@ -473,9 +1027,11 @@ th { background: #e2e8f0; }
         <option value="">All Rooms</option>
       </select>
       <input type="date" id="filterDate" onchange="filterBookings()">
-      <button class="primary" onclick="clearBookingFilters()" style="width:auto;padding:8px 14px;border-radius:8px;">Clear</button>
+      <button class="btn-secondary" onclick="clearBookingFilters()">
+        <i class="fas fa-xmark"></i> Clear
+      </button>
     </div>
-    <div class="table-container">
+    <div class="table-wrap">
       <table id="bookingsTable">
         <thead>
           <tr>
@@ -491,6 +1047,9 @@ th { background: #e2e8f0; }
 
 </div><!-- end .main -->
 
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
 <script>
 
 let editingUserId    = null;
@@ -501,89 +1060,72 @@ let allBookings      = [];
 let viewingBookingId = null;
 let allAccessDepts   = [];
 
-/* ── BACK TO DASHBOARD ── */
 function goBackToDashboard() { window.location.href = "index.html"; }
 
-/* ---- SECTION SWITCHING ---- */
+/* ── SECTION SWITCHING ── */
 function showSection(id, btn) {
   ["usersSection","linksSection","bookingsSection"].forEach(s => {
     document.getElementById(s).style.display = "none";
   });
   document.getElementById(id).style.display = "block";
-  document.querySelectorAll(".sidebar button:not(.back-dashboard-btn):not(.logout-btn)").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
 }
 
-/* ---- TOAST ---- */
-function showToast(message, type = "default") {
+/* ── TOAST ── */
+function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
-  toast.classList.remove("show");
+  toast.classList.remove("show","success","error");
   void toast.offsetWidth;
-  toast.innerText = message;
-  toast.style.borderLeft = type === "error" ? "4px solid #ef4444" : "4px solid #22c55e";
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2500);
+  toast.textContent = message;
+  toast.classList.add("show", type);
+  setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-/* ---- LOAD ACCESS DEPTS (from access_dept table — only 4 rows) ---- */
+/* ── LOAD ACCESS DEPTS ── */
 async function loadAccessDepts() {
   const res      = await fetch(`${API}/api/access-dept`);
   allAccessDepts = await res.json();
-
-  // Safety dedup in case of DB duplicates
-  const seen = new Set();
+  const seen     = new Set();
   allAccessDepts = allAccessDepts.filter(d => {
     if (seen.has(d.name.toLowerCase())) return false;
-    seen.add(d.name.toLowerCase());
-    return true;
+    seen.add(d.name.toLowerCase()); return true;
   });
-
   return allAccessDepts;
 }
 
-/* ---- POPULATE ACCESS DEPT CHECKBOXES (Create User form) ---- */
+/* ── CHECKBOX RENDERER ── */
 function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
   allAccessDepts.forEach(dep => {
     const checked = checkedIds.includes(String(dep.id)) ? "checked" : "";
-    container.innerHTML += `
-      <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;
-        border:1.5px solid #EBEBEE;font-size:13px;font-weight:500;color:#5A5A6E;cursor:pointer;">
-        <input type="checkbox" value="${dep.id}" ${checked}
-          style="width:15px;height:15px;margin:0;accent-color:#D4186C;cursor:pointer;">
-        ${dep.name}
-      </label>`;
+    const label   = document.createElement("label");
+    label.className = "checkbox-label";
+    label.innerHTML = `<input type="checkbox" value="${dep.id}" ${checked}> ${dep.name}`;
+    container.appendChild(label);
   });
 }
 
-/* ---- LOAD WORK DEPARTMENTS (from departments table) ---- */
+/* ── WORK DEPARTMENTS ── */
 async function loadDepartments() {
   let data;
   if (window.userRole === "admin") {
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const user = JSON.parse(userData);
-    const res  = await fetch(`${API}/api/users/${user.id}/departments`);
-    data = await res.json();
+    const user     = JSON.parse(userData);
+    const res      = await fetch(`${API}/api/users/${user.id}/departments`);
+    data           = await res.json();
   } else {
     const res = await fetch(`${API}/api/departments`);
-    data = await res.json();
+    data      = await res.json();
   }
-
-  // Deduplicate by name
   const seen = new Set();
-  data = data.filter(dep => {
-    if (seen.has(dep.name.toLowerCase())) return false;
-    seen.add(dep.name.toLowerCase());
-    return true;
-  });
+  data = data.filter(d => { if (seen.has(d.name.toLowerCase())) return false; seen.add(d.name.toLowerCase()); return true; });
 
-  const deptDropdown = document.getElementById("userDepartment");
-  if (deptDropdown) {
-    deptDropdown.innerHTML = "<option value=''>Select department...</option>";
-    data.forEach(dep => {
-      deptDropdown.innerHTML += `<option value="${dep.id}">${dep.name}</option>`;
-    });
+  const sel = document.getElementById("userDepartment");
+  if (sel) {
+    sel.innerHTML = "<option value=''>Select department...</option>";
+    data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
   }
 }
 
@@ -591,48 +1133,44 @@ async function loadLinkDepartments() {
   let data;
   if (window.userRole === "admin") {
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const user = JSON.parse(userData);
-    const res  = await fetch(`${API}/api/users/${user.id}/departments`);
-    data = await res.json();
+    const user     = JSON.parse(userData);
+    const res      = await fetch(`${API}/api/users/${user.id}/departments`);
+    data           = await res.json();
   } else {
     const res = await fetch(`${API}/api/departments`);
-    data = await res.json();
+    data      = await res.json();
   }
-
-  // Deduplicate by name
   const seen = new Set();
-  data = data.filter(dep => {
-    if (seen.has(dep.name.toLowerCase())) return false;
-    seen.add(dep.name.toLowerCase());
-    return true;
-  });
+  data = data.filter(d => { if (seen.has(d.name.toLowerCase())) return false; seen.add(d.name.toLowerCase()); return true; });
 
-  const dropdown = document.getElementById("linkDepartment");
-  dropdown.innerHTML = "<option value=''>Select Department</option>";
-  data.forEach(dep => {
-    dropdown.innerHTML += `<option value="${dep.id}">${dep.name}</option>`;
-  });
+  const sel = document.getElementById("linkDepartment");
+  sel.innerHTML = "<option value=''>Select Department</option>";
+  data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
 }
 
-/* ---- USERS ---- */
+/* ── USERS ── */
 async function loadUsers() {
-  const res   = await fetch(`${API}/api/users`, {
-    headers: { "Authorization": `Bearer ${window.authToken}` }
-  });
+  const res   = await fetch(`${API}/api/users`, { headers: { "Authorization": `Bearer ${window.authToken}` } });
   const users = await res.json();
   const tbody = document.querySelector("#userTable tbody");
   tbody.innerHTML = "";
+  if (!users.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="tbl-empty"><i class="fas fa-users"></i>No users found</td></tr>`;
+    return;
+  }
   users.forEach(user => {
+    const roleBadge = `<span class="badge-role ${user.role}">${user.role}</span>`;
+    const depts     = user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "—";
     tbody.innerHTML += `
       <tr>
-        <td>${user.name || "-"}</td>
+        <td style="font-weight:600;color:var(--ink);">${user.name || "—"}</td>
         <td>${user.email}</td>
-        <td>${user.role}</td>
-        <td>${user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "-"}</td>
+        <td>${roleBadge}</td>
+        <td>${depts}</td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only" onclick="editUser(${user.id})"><i class="fa-solid fa-pen"></i></button>
-            <button class="delete-btn icon-only" onclick="openDeleteModal('user', ${user.id})"><i class="fa-solid fa-trash"></i></button>
+            <button class="edit-btn" title="Edit" onclick="editUser(${user.id})"><i class="fas fa-pen"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('user', ${user.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -653,16 +1191,11 @@ async function createUser() {
   if (password !== confirm)          { showToast("Passwords do not match", "error"); return; }
   if (password.length < 6)           { showToast("Password must be at least 6 characters", "error"); return; }
 
-  const res = await fetch(`${API}/api/users`, {
+  const res  = await fetch(`${API}/api/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
-    body: JSON.stringify({
-      name, email, password, role,
-      departments: workDept ? [workDept] : [],
-      link_access: deps
-    })
+    body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
   });
-
   const data = await res.json();
   if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
 
@@ -674,22 +1207,26 @@ async function createUser() {
   loadUsers();
 }
 
-/* ---- LINKS ---- */
+/* ── LINKS ── */
 async function loadLinks() {
   const res   = await fetch(`${API}/api/links`);
   const links = await res.json();
   const tbody = document.querySelector("#linkTable tbody");
   tbody.innerHTML = "";
+  if (!links.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="tbl-empty"><i class="fas fa-link"></i>No links found</td></tr>`;
+    return;
+  }
   links.forEach(link => {
     tbody.innerHTML += `
       <tr>
-        <td>${link.name}</td>
-        <td><a href="${link.url}" target="_blank">Open</a></td>
-        <td>${link.department_name}</td>
+        <td style="font-weight:600;color:var(--ink);">${link.name}</td>
+        <td><a href="${link.url}" target="_blank">Open <i class="fas fa-arrow-up-right-from-square" style="font-size:10px;"></i></a></td>
+        <td><span class="badge">${link.department_name}</span></td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only" onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fa-solid fa-pen"></i></button>
-            <button class="delete-btn icon-only" onclick="openDeleteModal('link', ${link.id})"><i class="fa-solid fa-trash"></i></button>
+            <button class="edit-btn" title="Edit" onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fas fa-pen"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('link', ${link.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -697,19 +1234,19 @@ async function loadLinks() {
 }
 
 async function createLink() {
-  const name          = document.getElementById("linkName").value;
-  const url           = document.getElementById("linkURL").value;
-  const department_id = document.getElementById("linkDepartment").value;
-  if (!name || !url || !department_id) { showToast("Please fill all fields","error"); return; }
+  const name = document.getElementById("linkName").value;
+  const url  = document.getElementById("linkURL").value;
+  const dept = document.getElementById("linkDepartment").value;
+  if (!name || !url || !dept) { showToast("Please fill all fields","error"); return; }
 
   const res = await fetch(`${API}/api/links`, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name, url, department_id })
+    body: JSON.stringify({ name, url, department_id: dept })
   });
   if (!res.ok) { showToast("Failed to add link","error"); return; }
 
-  showToast("Link added!");
+  showToast("Link added successfully!");
   document.getElementById("linkName").value = "";
   document.getElementById("linkURL").value  = "";
   document.getElementById("linkDepartment").value = "";
@@ -722,19 +1259,13 @@ async function editLink(id, name, url, department_id) {
   document.getElementById("editLinkURL").value  = url;
 
   const res  = await fetch(`${API}/api/departments`);
-  const deps = await res.json();
-  const dropdown = document.getElementById("editLinkDepartment");
-  dropdown.innerHTML = "";
-
-  // Deduplicate
+  let   deps = await res.json();
   const seen = new Set();
-  deps.filter(dep => {
-    if (seen.has(dep.name.toLowerCase())) return false;
-    seen.add(dep.name.toLowerCase());
-    return true;
-  }).forEach(dep => {
-    dropdown.innerHTML += `<option value="${dep.id}" ${dep.id == department_id ? "selected" : ""}>${dep.name}</option>`;
-  });
+  deps = deps.filter(d => { if (seen.has(d.name.toLowerCase())) return false; seen.add(d.name.toLowerCase()); return true; });
+
+  const sel = document.getElementById("editLinkDepartment");
+  sel.innerHTML = "";
+  deps.forEach(d => sel.innerHTML += `<option value="${d.id}" ${d.id == department_id ? "selected" : ""}>${d.name}</option>`);
 
   document.getElementById("editLinkModal").style.display = "flex";
 }
@@ -742,75 +1273,65 @@ async function editLink(id, name, url, department_id) {
 function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
 
 async function updateLink() {
-  const name          = document.getElementById("editLinkName").value;
-  const url           = document.getElementById("editLinkURL").value;
-  const department_id = document.getElementById("editLinkDepartment").value;
+  const name = document.getElementById("editLinkName").value;
+  const url  = document.getElementById("editLinkURL").value;
+  const dept = document.getElementById("editLinkDepartment").value;
 
   await fetch(`${API}/api/links/${editingLinkId}`, {
     method: "PUT",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name, url, department_id })
+    body: JSON.stringify({ name, url, department_id: dept })
   });
   showToast("Link updated!");
   closeEditLinkModal();
   loadLinks();
 }
 
-/* ---- DELETE ---- */
+/* ── DELETE ── */
 function openDeleteModal(type, id) {
-  deleteType = type;
-  deleteId   = id;
+  deleteType = type; deleteId = id;
+  document.getElementById("deleteMessage").textContent =
+    `Are you sure you want to delete this ${type}? This action cannot be undone.`;
   document.getElementById("deleteModal").style.display = "flex";
 }
 function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; }
 
 async function confirmDelete() {
-  const url = deleteType === "link"
-    ? `${API}/api/links/${deleteId}`
-    : deleteType === "booking"
-    ? `${API}/api/bookings/${deleteId}`
-    : `${API}/api/users/${deleteId}`;
+  const url = deleteType === "link"    ? `${API}/api/links/${deleteId}`
+            : deleteType === "booking" ? `${API}/api/bookings/${deleteId}`
+            : `${API}/api/users/${deleteId}`;
 
   await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${window.authToken}` } });
-  showToast("Deleted!");
+  showToast("Deleted successfully!");
   closeDeleteModal();
-
   if (deleteType === "link")         loadLinks();
   else if (deleteType === "booking") loadBookings();
   else                               loadUsers();
 }
 
-/* ---- EDIT USER ---- */
+/* ── EDIT USER ── */
 async function editUser(id) {
   const [resUser, resDep] = await Promise.all([
     fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${window.authToken}` } }),
     fetch(`${API}/api/departments`)
   ]);
-  const user      = await resUser.json();
-  let departments = await resDep.json();
-
-  // Deduplicate work departments
+  const user = await resUser.json();
+  let   deps = await resDep.json();
   const seen = new Set();
-  departments = departments.filter(dep => {
-    if (seen.has(dep.name.toLowerCase())) return false;
-    seen.add(dep.name.toLowerCase());
-    return true;
-  });
+  deps = deps.filter(d => { if (seen.has(d.name.toLowerCase())) return false; seen.add(d.name.toLowerCase()); return true; });
 
   editingUserId = id;
   document.getElementById("editName").value     = user.name  || "";
   document.getElementById("editEmail").value    = user.email || "";
   document.getElementById("editPassword").value = "";
 
-  // Work dept dropdown
-  const workDeptSel = document.getElementById("editWorkDept");
-  workDeptSel.innerHTML = "<option value=''>Select department...</option>";
-  departments.forEach(dep => {
-    const selected = user.departments?.some(d => d.id === dep.id) ? "selected" : "";
-    workDeptSel.innerHTML += `<option value="${dep.id}" ${selected}>${dep.name}</option>`;
+  const workSel = document.getElementById("editWorkDept");
+  workSel.innerHTML = "<option value=''>Select department...</option>";
+  deps.forEach(d => {
+    const sel = user.departments?.some(ud => ud.id === d.id) ? "selected" : "";
+    workSel.innerHTML += `<option value="${d.id}" ${sel}>${d.name}</option>`;
   });
 
-  // Access dept checkboxes — use allAccessDepts (already deduped, only 4)
   const checkedIds = (user.link_access || []).map(d => String(d.id));
   renderAccessDeptCheckboxes("editDepartments", checkedIds);
 
@@ -827,11 +1348,7 @@ async function confirmEdit() {
   const linkDeps = [];
   document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
 
-  const body = {
-    name, email,
-    departments: workDept ? [workDept] : [],
-    link_access: linkDeps
-  };
+  const body = { name, email, departments: workDept ? [workDept] : [], link_access: linkDeps };
   if (password) body.password = password;
 
   await fetch(`${API}/api/users/${editingUserId}`, {
@@ -839,24 +1356,12 @@ async function confirmEdit() {
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
     body: JSON.stringify(body)
   });
-
-  showToast("User updated!");
+  showToast("User updated successfully!");
   closeEditModal();
   loadUsers();
 }
 
-/* ---- LOGOUT ---- */
-function openLogoutModal()  { document.getElementById("logoutModal").style.display = "flex"; }
-function closeLogoutModal() { document.getElementById("logoutModal").style.display = "none"; }
-
-function confirmLogout() {
-  localStorage.clear();
-  sessionStorage.clear();
-  showToast("Logged out successfully");
-  setTimeout(() => window.location.href = "login.html", 800);
-}
-
-/* ---- BOOKINGS ---- */
+/* ── BOOKINGS ── */
 async function loadBookings() {
   const res   = await fetch(`${API}/api/bookings`);
   allBookings = await res.json();
@@ -869,39 +1374,35 @@ async function loadBookingRoomFilter() {
   const rooms = await res.json();
   const sel   = document.getElementById("filterRoom");
   sel.innerHTML = `<option value="">All Rooms</option>`;
-  rooms.forEach(r => {
-    sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
-  });
+  rooms.forEach(r => sel.innerHTML += `<option value="${r.id}">${r.name}</option>`);
 }
 
 function renderBookings(bookings) {
   const tbody = document.querySelector("#bookingsTable tbody");
   tbody.innerHTML = "";
-  if (!Array.isArray(bookings) || bookings.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">No bookings found</td></tr>`;
+  if (!Array.isArray(bookings) || !bookings.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="tbl-empty"><i class="fas fa-calendar-times"></i>No bookings found</td></tr>`;
     return;
   }
   bookings.forEach(b => {
-    const isConfirmed = b.status === 'confirmed';
+    const isConfirmed = b.status === "confirmed";
     tbody.innerHTML += `
       <tr>
-        <td>${b.room_name}</td>
+        <td style="font-weight:600;color:var(--ink);">${b.room_name}</td>
         <td>${b.event_name}</td>
         <td>${formatBookingDate(b.date)}</td>
         <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
-        <td>${b.name}<div class="booking-detail">${b.department}</div></td>
+        <td>${b.name}<div class="booking-detail-sub">${b.department}</div></td>
         <td>${b.phone}</td>
         <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
         <td>
           <div class="action-buttons">
-            <button class="edit-btn icon-only" title="View Details" onclick="viewBookingDetail(${b.id})">
-              <i class="fa-solid fa-eye"></i>
-            </button>
+            <button class="edit-btn" title="View" onclick="viewBookingDetail(${b.id})"><i class="fas fa-eye"></i></button>
             ${isConfirmed
-              ? `<button class="cancel-btn icon-only" onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fa-solid fa-ban"></i></button>`
-              : `<button class="restore-btn icon-only" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fa-solid fa-rotate-left"></i></button>`
+              ? `<button class="cancel-btn" title="Cancel" onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fas fa-ban"></i></button>`
+              : `<button class="restore-btn" title="Restore" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fas fa-rotate-left"></i></button>`
             }
-            <button class="delete-btn icon-only" onclick="openDeleteModal('booking', ${b.id})"><i class="fa-solid fa-trash"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('booking', ${b.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -912,18 +1413,15 @@ function filterBookings() {
   const status = document.getElementById("filterStatus").value;
   const roomId = document.getElementById("filterRoom").value;
   const date   = document.getElementById("filterDate").value;
-  const filtered = allBookings.filter(b =>
+  renderBookings(allBookings.filter(b =>
     (!status || b.status === status) &&
     (!roomId || String(b.room_id) === roomId) &&
     (!date   || b.date.slice(0,10) === date)
-  );
-  renderBookings(filtered);
+  ));
 }
 
 function clearBookingFilters() {
-  document.getElementById("filterStatus").value = "";
-  document.getElementById("filterRoom").value   = "";
-  document.getElementById("filterDate").value   = "";
+  ["filterStatus","filterRoom","filterDate"].forEach(id => document.getElementById(id).value = "");
   renderBookings(allBookings);
 }
 
@@ -934,7 +1432,7 @@ async function updateBookingStatus(id, status) {
     body: JSON.stringify({ status })
   });
   if (res.ok) {
-    showToast(status === 'cancelled' ? 'Booking cancelled' : 'Booking restored');
+    showToast(status === "cancelled" ? "Booking cancelled" : "Booking restored");
     loadBookings();
   } else {
     showToast("Failed to update status","error");
@@ -945,80 +1443,95 @@ function viewBookingDetail(id) {
   const b = allBookings.find(x => x.id === id);
   if (!b) return;
   viewingBookingId = id;
-  document.getElementById("dRoom").textContent     = b.room_name;
-  document.getElementById("dEvent").textContent    = b.event_name;
-  document.getElementById("dDate").textContent     = formatBookingDate(b.date);
-  document.getElementById("dTime").textContent     = formatBookingTime(b.start_time) + " – " + formatBookingTime(b.end_time);
-  document.getElementById("dDuration").textContent = (b.duration_hours > 0 ? b.duration_hours + " hr " : "") + (b.duration_minutes > 0 ? b.duration_minutes + " min" : "");
-  document.getElementById("dName").textContent     = b.name;
-  document.getElementById("dDept").textContent     = b.department;
-  document.getElementById("dPhone").textContent    = b.phone;
-  document.getElementById("dStatus").innerHTML     = `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`;
-  document.getElementById("dCreated").textContent  = new Date(b.created_at).toLocaleString("en-MY");
-  document.getElementById("detailCancelBtn").style.display  = b.status === 'confirmed' ? 'inline-flex' : 'none';
-  document.getElementById("detailRestoreBtn").style.display = b.status === 'cancelled'  ? 'inline-flex' : 'none';
+
+  const rows = [
+    ["Room",      b.room_name],
+    ["Event",     b.event_name],
+    ["Date",      formatBookingDate(b.date)],
+    ["Time",      `${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}`],
+    ["Duration",  (b.duration_hours > 0 ? b.duration_hours + " hr " : "") + (b.duration_minutes > 0 ? b.duration_minutes + " min" : "")],
+    ["Name",      b.name],
+    ["Dept",      b.department],
+    ["Phone",     b.phone],
+    ["Status",    `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`],
+    ["Submitted", new Date(b.created_at).toLocaleString("en-MY")],
+  ];
+
+  document.getElementById("bookingDetailRows").innerHTML = rows.map(([label, val]) => `
+    <div class="modal-detail-row">
+      <div class="modal-detail-label">${label}</div>
+      <div class="modal-detail-value">${val}</div>
+    </div>`).join("");
+
+  document.getElementById("detailCancelBtn").style.display  = b.status === "confirmed" ? "inline-flex" : "none";
+  document.getElementById("detailRestoreBtn").style.display = b.status === "cancelled"  ? "inline-flex" : "none";
   document.getElementById("bookingDetailModal").style.display = "flex";
 }
 
 function closeBookingDetailModal() { document.getElementById("bookingDetailModal").style.display = "none"; }
-async function cancelFromDetail()  { await updateBookingStatus(viewingBookingId, 'cancelled'); closeBookingDetailModal(); }
-async function restoreFromDetail() { await updateBookingStatus(viewingBookingId, 'confirmed'); closeBookingDetailModal(); }
+async function cancelFromDetail()  { await updateBookingStatus(viewingBookingId, "cancelled"); closeBookingDetailModal(); }
+async function restoreFromDetail() { await updateBookingStatus(viewingBookingId, "confirmed"); closeBookingDetailModal(); }
 
-/* ---- HELPERS ---- */
+/* ── HELPERS ── */
 function formatBookingDate(d) {
   return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
 }
 function formatBookingTime(t) {
   if (!t) return "";
   const [h, m] = t.slice(0,5).split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour  = h % 12 || 12;
+  const ampm   = h >= 12 ? "PM" : "AM";
+  const hour   = h % 12 || 12;
   return `${hour}:${String(m).padStart(2,"0")} ${ampm}`;
 }
-function capitalize(s) {
-  if (!s) return "";
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
-/* ---- INIT ---- */
+/* ── INIT ── */
 document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-  const role  = localStorage.getItem("role")  || sessionStorage.getItem("role");
+  const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
+  const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
+  const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
 
   if (!token || (role !== "admin" && role !== "superadmin")) {
-    window.location.href = "login.html";
-    return;
+    window.location.href = "login.html"; return;
   }
 
   window.authToken = token;
   window.userRole  = role;
 
+  // Sidebar user info
+  try {
+    const user = JSON.parse(userData);
+    const initials = (user.name || "A").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+    document.getElementById("sidebarAvatar").textContent = initials;
+    document.getElementById("sidebarName").textContent   = user.name || user.email || "Admin";
+    document.getElementById("sidebarRole").textContent   = role;
+  } catch(e) {}
+
+  // Hide bookings for regular admin
   if (role === "admin") {
     document.getElementById("bookingsNavBtn").style.display = "none";
-    document.getElementById("adminPanelTitle").textContent  = "Admin Panel";
-
-    const roleSelect = document.getElementById("role");
-    roleSelect.style.display = "none";
-    const roleLabel = document.createElement("input");
-    roleLabel.type     = "text";
-    roleLabel.value    = "User";
-    roleLabel.disabled = true;
-    roleLabel.style.background = "#f1f5f9";
-    roleLabel.style.color      = "#64748b";
-    roleSelect.insertAdjacentElement("afterend", roleLabel);
+    // Lock role select to User only
+    const roleGroup = document.getElementById("roleGroup");
+    if (roleGroup) {
+      const roleInput = document.createElement("input");
+      roleInput.type     = "text";
+      roleInput.value    = "User (Staff)";
+      roleInput.disabled = true;
+      document.getElementById("role").replaceWith(roleInput);
+    }
   }
 
   try {
-    await loadAccessDepts();                          // load the 4 access depts first
-    await loadDepartments();                          // work dept dropdown
-    renderAccessDeptCheckboxes("departmentCheckboxes"); // create user checkboxes
-    await loadLinkDepartments();                      // links dropdown
+    await loadAccessDepts();
+    renderAccessDeptCheckboxes("departmentCheckboxes");
+    await loadDepartments();
+    await loadLinkDepartments();
     await loadUsers();
     await loadLinks();
     if (role === "superadmin") await loadBookings();
   } catch (err) {
     console.error("INIT ERROR:", err);
-    showToast("Failed to load data","error");
+    showToast("Failed to load data", "error");
   }
 });
 
