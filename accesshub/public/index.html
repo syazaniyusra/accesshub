@@ -266,13 +266,16 @@
 
     <div class="profile-grid">
 
+      <!-- LEFT CARD: avatar header + info fields -->
       <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar"></div>
-        <div class="profile-info">
-          <div class="profile-field">
-            <span class="profile-label"><i class="fas fa-user"></i> Full Name</span>
-            <span class="profile-value" id="profileName">—</span>
+        <div class="profile-card-header">
+          <div class="profile-avatar" id="profileAvatar"></div>
+          <div>
+            <div class="profile-header-name" id="profileName">—</div>
+            <div class="profile-header-role" id="profileRoleHeader">—</div>
           </div>
+        </div>
+        <div class="profile-info">
           <div class="profile-field">
             <span class="profile-label"><i class="fas fa-envelope"></i> Email</span>
             <span class="profile-value" id="profileEmail">—</span>
@@ -292,33 +295,36 @@
         </div>
       </div>
 
+      <!-- RIGHT CARD: change password -->
       <div class="profile-card">
-        <div class="profile-card-title"><i class="fas fa-lock"></i> Change Password</div>
-        <div id="pwMsg" class="pw-msg" style="display:none;"></div>
-        <div class="pw-field">
-          <label>Current Password</label>
-          <div class="pw-input-wrap">
-            <input type="password" id="pwCurrent" placeholder="Enter current password">
-            <button type="button" onclick="togglePw('pwCurrent', this)"><i class="fas fa-eye"></i></button>
+        <div class="profile-card-body">
+          <div class="profile-card-title"><i class="fas fa-lock"></i> Change Password</div>
+          <div id="pwMsg" class="pw-msg" style="display:none;"></div>
+          <div class="pw-field">
+            <label>Current Password</label>
+            <div class="pw-input-wrap">
+              <input type="password" id="pwCurrent" placeholder="Enter current password">
+              <button type="button" onclick="togglePw('pwCurrent', this)"><i class="fas fa-eye"></i></button>
+            </div>
           </div>
-        </div>
-        <div class="pw-field">
-          <label>New Password</label>
-          <div class="pw-input-wrap">
-            <input type="password" id="pwNew" placeholder="Min. 6 characters">
-            <button type="button" onclick="togglePw('pwNew', this)"><i class="fas fa-eye"></i></button>
+          <div class="pw-field">
+            <label>New Password</label>
+            <div class="pw-input-wrap">
+              <input type="password" id="pwNew" placeholder="Min. 6 characters">
+              <button type="button" onclick="togglePw('pwNew', this)"><i class="fas fa-eye"></i></button>
+            </div>
           </div>
-        </div>
-        <div class="pw-field">
-          <label>Confirm New Password</label>
-          <div class="pw-input-wrap">
-            <input type="password" id="pwConfirm" placeholder="Repeat new password">
-            <button type="button" onclick="togglePw('pwConfirm', this)"><i class="fas fa-eye"></i></button>
+          <div class="pw-field">
+            <label>Confirm New Password</label>
+            <div class="pw-input-wrap">
+              <input type="password" id="pwConfirm" placeholder="Repeat new password">
+              <button type="button" onclick="togglePw('pwConfirm', this)"><i class="fas fa-eye"></i></button>
+            </div>
           </div>
+          <button class="pw-save-btn" onclick="changePassword()">
+            <i class="fas fa-save"></i> Update Password
+          </button>
         </div>
-        <button class="pw-save-btn" onclick="changePassword()">
-          <i class="fas fa-save"></i> Update Password
-        </button>
       </div>
 
     </div>
@@ -480,10 +486,13 @@ function loadProfilePage(button) {
   const user     = JSON.parse(userData);
 
   const initials = (user.name || user.username || "U").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
-  document.getElementById("profileAvatar").textContent = initials;
-  document.getElementById("profileName").textContent   = user.name  || user.username || "—";
-  document.getElementById("profileEmail").textContent  = user.email || "—";
-  document.getElementById("profileRole").textContent   = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+  const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
+
+  document.getElementById("profileAvatar").textContent      = initials;
+  document.getElementById("profileName").textContent        = user.name  || user.username || "—";
+  document.getElementById("profileRoleHeader").textContent  = roleLabel;
+  document.getElementById("profileEmail").textContent       = user.email || "—";
+  document.getElementById("profileRole").textContent        = roleLabel;
 
   const deptsEl = document.getElementById("profileDepts");
   deptsEl.innerHTML = "";
