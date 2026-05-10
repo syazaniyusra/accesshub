@@ -2,6 +2,7 @@
 
 <style>
 
+/* ── inherit CSS vars from styles.css ── */
 .top-actions {
   display: flex;
   gap: 10px;
@@ -12,111 +13,130 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 10px;
-  border: none;
+  border: 1.5px solid var(--border);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  background: #e2e8f0;
-  color: #1e293b;
+  font-weight: 600;
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--ink-mid);
   transition: 0.2s;
 }
 
 .tab-btn.active {
-  background: #2563eb;
+  background: var(--pink);
   color: white;
+  border-color: var(--pink);
 }
 
-.tab-btn:hover:not(.active) { opacity: 0.85; }
+.tab-btn:hover:not(.active) {
+  background: var(--pink-soft);
+  color: var(--pink);
+  border-color: var(--pink-pill);
+}
 
+/* ── FORM ── */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .form-group.full { grid-column: 1 / -1; }
 
 .form-group label {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #374151 !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ink-light) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
   line-height: 1.4 !important;
   display: block !important;
 }
 
-.form-group label span.required { color: #ef4444; margin-left: 2px; }
+.form-group label span.required { color: var(--pink); margin-left: 2px; }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
   font-size: 14px;
-  color: #1e293b;
-  background: #f8fafc;
-  transition: border 0.2s;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--surface);
+  transition: border 0.2s, box-shadow 0.2s;
   outline: none;
   box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #2563eb;
-  background: white;
+  border-color: var(--pink);
+  box-shadow: var(--shadow-focus);
 }
 
 .form-group input:read-only {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--surface-2);
+  color: var(--ink-light);
   cursor: not-allowed;
 }
-
-.duration-row { display: flex; gap: 8px; }
-.duration-row select { flex: 1; }
 
 .form-divider {
   grid-column: 1 / -1;
   border: none;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   margin: 4px 0;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 12px;
-  background: #2563eb;
+  padding: 13px;
+  background: var(--pink);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font);
   cursor: pointer;
-  margin-top: 18px;
-  transition: 0.2s;
+  margin-top: 16px;
+  transition: background 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.submit-btn:hover { background: #1d4ed8; }
+.submit-btn:hover {
+  background: var(--pink-hover);
+  transform: translateY(-1px);
+}
 
 .check-btn {
   width: 100%;
   padding: 11px;
-  border: 1.5px solid #e2e8f0;
-  background: #f8fafc;
-  color: #1e293b;
-  border-radius: 8px;
+  border: 1.5px solid var(--pink-pill);
+  background: var(--pink-soft);
+  color: var(--pink);
+  border-radius: var(--r-sm);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: var(--font);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -126,19 +146,24 @@
 }
 
 .check-btn:hover:not(:disabled) {
-  background: #eff6ff;
-  border-color: #2563eb;
-  color: #2563eb;
+  background: var(--pink-pill);
+  border-color: var(--pink);
 }
 
-.check-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.check-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--ink-light);
+}
 
 .avail-hint {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--ink-light);
   margin-top: 5px;
 }
 
@@ -156,7 +181,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #475569;
+  color: var(--ink-mid);
 }
 
 .swatch {
@@ -166,9 +191,9 @@
   flex-shrink: 0;
 }
 
-.swatch.selected { background: #f472b6; }
+.swatch.selected { background: var(--pink); }
 .swatch.booked   { background: #ef4444; }
-.swatch.avail    { background: #fff; border: 1px solid #d1d5db; }
+.swatch.avail    { background: #fff; border: 1px solid var(--border); }
 
 .availability-grid {
   display: none;
@@ -179,65 +204,68 @@
 
 .time-slot-btn {
   padding: 11px 4px;
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   border: 1px solid transparent;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--font);
   text-align: center;
   transition: 0.15s;
 }
 
 .time-slot-btn.available {
-  background: #ffffff;
-  color: #374151;
-  border-color: #d1d5db;
+  background: var(--surface);
+  color: var(--ink-mid);
+  border-color: var(--border);
 }
 
 .time-slot-btn.available:hover {
-  background: #fdf2f8;
-  border-color: #f9a8d4;
+  background: var(--pink-soft);
+  border-color: var(--pink-pill);
+  color: var(--pink);
 }
 
 .time-slot-btn.booked {
-  background: #ef4444;
-  color: #ffffff;
-  border-color: #dc2626;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
   cursor: not-allowed;
 }
 
 .time-slot-btn.selected {
-  background: #f472b6;
+  background: var(--pink);
   color: #ffffff;
-  border-color: #ec4899;
+  border-color: var(--pink-hover);
 }
 
-/* HISTORY */
-
+/* ── HISTORY ── */
 .inner-tabs {
   display: flex;
   margin-bottom: 1.25rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
   overflow: hidden;
   width: fit-content;
+  background: var(--surface);
 }
 
 .inner-tab {
-  padding: 8px 18px;
+  padding: 9px 20px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--font);
   cursor: pointer;
   border: none;
-  background: #ffffff;
-  color: #64748b;
+  background: var(--surface);
+  color: var(--ink-mid);
   transition: 0.15s;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1.5px solid var(--border);
 }
 
 .inner-tab:last-child { border-right: none; }
-.inner-tab.active { background: #2563eb; color: #ffffff; }
-.inner-tab:hover:not(.active) { background: #f8fafc; }
+.inner-tab.active { background: var(--pink); color: #ffffff; }
+.inner-tab:hover:not(.active) { background: var(--pink-soft); color: var(--pink); }
 
 .stats-row {
   display: grid;
@@ -246,130 +274,144 @@
   margin-bottom: 1.25rem;
 }
 
-.stat-card { background: #f8fafc; border-radius: 8px; padding: 12px 14px; }
-.stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-.stat-val   { font-size: 22px; font-weight: 500; color: #1e293b; }
-
-/* FIND THIS: */
-.hist-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin-bottom: 1rem;
-  width: fit-content;
-  min-width: 260px;
-  max-width: 340px;
+.stat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-card);
 }
 
-.hist-search i { font-size: 14px; color: #94a3b8; flex-shrink: 0; }
-
-.hist-search input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 13px;
-  color: #1e293b;
-  width: 220px;
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
 }
 
-/* REPLACE WITH: */
+.stat-val { font-size: 24px; font-weight: 700; color: var(--ink); }
+
 .hist-search {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 30px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
   padding: 10px 18px;
   margin-bottom: 1rem;
   width: 100%;
-  max-width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .hist-search:focus-within {
-  box-shadow: 0 4px 18px rgba(59,130,246,0.2);
-  border-color: #93c5fd;
+  border-color: var(--pink);
+  box-shadow: var(--shadow-focus);
 }
 
-.hist-search i { font-size: 15px; color: #94a3b8; flex-shrink: 0; }
+.hist-search i { font-size: 14px; color: var(--ink-faint); flex-shrink: 0; }
 
 .hist-search input {
   border: none;
   background: transparent;
   outline: none;
   font-size: 14px;
-  color: #1e293b;
+  font-family: var(--font);
+  color: var(--ink);
   width: 100%;
 }
 
 .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
 
 .filter-btn {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #64748b;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-mid);
   font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font);
   cursor: pointer;
   transition: 0.15s;
 }
 
-.filter-btn.active { background: #2563eb; color: #ffffff; border-color: #2563eb; }
-.filter-btn:hover:not(.active) { background: #f8fafc; }
+.filter-btn.active {
+  background: var(--pink);
+  color: #ffffff;
+  border-color: var(--pink);
+}
+
+.filter-btn:hover:not(.active) {
+  background: var(--pink-soft);
+  color: var(--pink);
+  border-color: var(--pink-pill);
+}
 
 .room-pill {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #64748b;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-mid);
   font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font);
   cursor: pointer;
   transition: 0.15s;
 }
 
-.room-pill.active { background: #7c3aed; color: #ffffff; border-color: #7c3aed; }
-.room-pill:hover:not(.active) { background: #f8fafc; }
+.room-pill.active {
+  background: var(--pink);
+  color: #ffffff;
+  border-color: var(--pink);
+}
+
+.room-pill:hover:not(.active) {
+  background: var(--pink-soft);
+  color: var(--pink);
+  border-color: var(--pink-pill);
+}
 
 .booking-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
   padding: 1rem 1.25rem;
   margin-bottom: 10px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  transition: 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-card);
 }
 
-.booking-card:hover { border-color: #cbd5e1; }
+.booking-card:hover {
+  border-color: var(--pink-pill);
+  box-shadow: var(--shadow-hover);
+}
 
 .date-block {
   min-width: 48px;
   text-align: center;
-  background: #f8fafc;
-  border-radius: 8px;
+  background: var(--pink-soft);
+  border-radius: var(--r-sm);
   padding: 8px 6px;
   flex-shrink: 0;
 }
 
-.date-day { font-size: 20px; font-weight: 500; color: #1e293b; line-height: 1; }
-.date-mon { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.date-day { font-size: 20px; font-weight: 700; color: var(--pink); line-height: 1; }
+.date-mon { font-size: 11px; color: var(--pink); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; font-weight: 600; }
 
 .booking-info { flex: 1; min-width: 0; }
 
 .booking-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #1e293b;
+  font-weight: 600;
+  color: var(--ink);
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -383,23 +425,23 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--ink-mid);
 }
 
-.meta-item i { font-size: 14px; }
+.meta-item i { font-size: 12px; color: var(--pink); }
 
 .status-badge {
   flex-shrink: 0;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
-.badge-upcoming  { background: #eff6ff; color: #1d4ed8; }
+.badge-upcoming  { background: var(--pink-soft); color: var(--pink); }
 .badge-completed { background: #f0fdf4; color: #15803d; }
 .badge-cancelled { background: #fef2f2; color: #b91c1c; }
-.badge-confirmed { background: #f0fdf4; color: #15803d; }
+.badge-confirmed { background: var(--pink-soft); color: var(--pink); }
 
 .booker-avatar {
   width: 36px;
@@ -409,18 +451,43 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
-.hist-empty { text-align: center; padding: 3rem 1rem; color: #94a3b8; }
-.hist-empty i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.4; }
-.hist-empty p { font-size: 14px; }
+.hist-empty { text-align: center; padding: 3rem 1rem; color: var(--ink-light); }
+.hist-empty i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.4; color: var(--pink); }
+.hist-empty p { font-size: 14px; font-weight: 500; }
 
 .section { display: none; }
 .section.active { display: block; }
 .inner-section { display: none; }
 .inner-section.active { display: block; }
+
+/* section heading */
+.booking-section-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--ink);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.booking-section-title .page-title-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--pink-soft);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pink);
+  font-size: 14px;
+}
+
+.booking-section-title .accent { color: var(--pink); }
 
 </style>
 
@@ -492,7 +559,7 @@
       <option value="23:00">11:00 PM</option>
     </select>
     <div class="avail-hint" id="startHint" style="display:none">
-      <i class="fas fa-info-circle"></i> Or pick a slot from availability below
+      <i class="fas fa-info-circle" style="color:var(--pink)"></i> Or pick a slot from availability below
     </div>
   </div>
 
@@ -553,10 +620,10 @@
       <option>HRAISC</option>
       <option>Marketing</option>
       <option>Sales</option>
-       <option>Logistic</option>
-      <option>M & F</option>
-       <option>Finance And Account</option>
-      <option>Business Development & IT</option>
+      <option>Logistic</option>
+      <option>M &amp; F</option>
+      <option>Finance And Account</option>
+      <option>Business Development &amp; IT</option>
       <option>Outlet Operation</option>
       <option>PJU</option>
       <option>Factory</option>
@@ -611,7 +678,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-label">Upcoming</div>
-        <div class="stat-val" id="myUpcoming" style="color:#1d4ed8">0</div>
+        <div class="stat-val" id="myUpcoming" style="color:var(--pink)">0</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Completed</div>
@@ -646,6 +713,33 @@
 </div>
 
 <script>
+
+/* ---- AUTO-FILL from session ---- */
+(function prefillUser() {
+  try {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (!userData) return;
+    const user = JSON.parse(userData);
+
+    // Full name
+    if (user.name) {
+      const nameEl = document.getElementById('bookerName');
+      if (nameEl) nameEl.value = user.name;
+    }
+
+    // Department — match against work department
+    if (window.userDepartments?.length) {
+      const deptName = window.userDepartments[0]?.name || '';
+      const deptEl   = document.getElementById('bookerDept');
+      if (deptEl && deptName) {
+        const opt = Array.from(deptEl.options).find(o =>
+          o.value.toLowerCase() === deptName.toLowerCase()
+        );
+        if (opt) deptEl.value = opt.value;
+      }
+    }
+  } catch(e) { console.error('prefillUser:', e); }
+})();
 
 /* ---- SHARED SLOTS ---- */
 const ALL_SLOTS = [
@@ -687,7 +781,6 @@ function onFieldChange() {
 
 /* ---- END TIME CALC ---- */
 function updateEndTime() {
-
   const start    = document.getElementById('startTime').value;
   const duration = parseInt(document.getElementById('duration').value) || 0;
 
@@ -712,9 +805,8 @@ function updateEndTime() {
 
 /* ---- HIGHLIGHT DURATION RANGE ---- */
 function highlightSelectedSlots() {
-
-  const startTime  = document.getElementById('startTime').value;
-  const totalMins  = parseInt(document.getElementById('duration').value) || 0;
+  const startTime   = document.getElementById('startTime').value;
+  const totalMins   = parseInt(document.getElementById('duration').value) || 0;
   const bookedTimes = Array.from(
     document.querySelectorAll('.time-slot-btn.booked')
   ).map(b => b.dataset.time);
@@ -724,12 +816,12 @@ function highlightSelectedSlots() {
 
   if (!startTime || totalMins === 0) return;
 
-  const [sh, sm] = startTime.split(':').map(Number);
+  const [sh, sm]  = startTime.split(':').map(Number);
   const startMins = sh * 60 + sm;
   const endMins   = startMins + totalMins;
 
   ALL_SLOTS.forEach(slot => {
-    const [h, m]   = slot.split(':').map(Number);
+    const [h, m]    = slot.split(':').map(Number);
     const slotStart = h * 60 + m;
     if (slotStart >= startMins && slotStart < endMins) {
       const btn = document.querySelector(`.time-slot-btn[data-time="${slot}"]`);
@@ -754,8 +846,8 @@ async function checkAvailability() {
   grid.style.display   = 'grid';
   legend.style.display = 'none';
   btnTxt.textContent   = 'Checking...';
-  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:14px;color:#94a3b8;font-size:13px;">
-    <i class="fas fa-spinner fa-spin"></i> Loading slots...
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:14px;color:var(--ink-light);font-size:13px;">
+    <i class="fas fa-spinner fa-spin" style="color:var(--pink)"></i> Loading slots...
   </div>`;
 
   let bookedTimes = [];
@@ -851,7 +943,6 @@ async function submitBooking() {
       resetForm();
     } else {
       const err = await res.json().catch(() => ({}));
-      // 409 = conflict / room not available
       if (res.status === 409) {
         _toast('⚠️ Room not available for this time slot. Please choose another time.', 'error');
       } else {
@@ -864,7 +955,6 @@ async function submitBooking() {
   }
 }
 
-/* helper so we don't crash if showToast isn't defined yet */
 function _toast(msg, type) {
   if (typeof showToast === 'function') showToast(msg, type);
   else alert(msg);
@@ -874,9 +964,17 @@ function resetForm() {
   ['roomSelect','startTime','duration','bookerDept'].forEach(id =>
     document.getElementById(id).selectedIndex = 0
   );
-  ['bookingDate','eventName','bookerName','bookerPhone','endTime'].forEach(id =>
+  ['bookingDate','eventName','bookerPhone','endTime'].forEach(id =>
     document.getElementById(id).value = ''
   );
+  // Re-prefill name after reset
+  try {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.name) document.getElementById('bookerName').value = user.name;
+    }
+  } catch(e) {}
   document.getElementById('availabilityGrid').style.display = 'none';
   document.getElementById('availLegend').style.display      = 'none';
   document.getElementById('checkHint').style.display        = 'flex';
@@ -886,8 +984,8 @@ function resetForm() {
 
 /* ---- AVATAR HELPERS ---- */
 const avatarPalette = [
+  { color:'#FCE8F3', textColor:'#D4186C' },
   { color:'#dbeafe', textColor:'#1e40af' },
-  { color:'#fce7f3', textColor:'#9d174d' },
   { color:'#d1fae5', textColor:'#065f46' },
   { color:'#fef3c7', textColor:'#92400e' },
   { color:'#ede9fe', textColor:'#5b21b6' },
@@ -908,7 +1006,6 @@ function getInitials(name) {
 }
 
 /* ---- BOOKING STATUS HELPER ---- */
-// Uses the actual DB status; falls back to date-based logic for display
 function getBookingStatus(b) {
   if (b.status === 'cancelled') return 'cancelled';
   const today = new Date(); today.setHours(0,0,0,0);
@@ -932,7 +1029,7 @@ async function loadMyBookings() {
       start:  (b.start_time||'').slice(0,5),
       end:    (b.end_time||'').slice(0,5),
       dept:   b.department,
-      status: getBookingStatus(b),       // ← uses real DB status
+      status: getBookingStatus(b),
     })) : [];
   } catch(e) { console.error(e); myData = []; }
   renderMine();
@@ -1049,7 +1146,7 @@ function renderRoom() {
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">
         <div class="booker-avatar" style="background:${av.color};color:${av.textColor}">${getInitials(b.booker)}</div>
-        <span style="font-size:11px;color:#94a3b8;white-space:nowrap">${(b.booker||'').split(' ')[0]}</span>
+        <span style="font-size:11px;color:var(--ink-light);white-space:nowrap">${(b.booker||'').split(' ')[0]}</span>
       </div>
     </div>`;
   }).join('');
