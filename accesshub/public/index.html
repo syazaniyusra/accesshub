@@ -163,15 +163,13 @@
 ══════════════════════════════════════ -->
 <div class="reauth-overlay" id="logoutOverlay">
   <div class="reauth-box" style="max-width:340px;">
-    <div class="reauth-icon" style="background:#fff0f5;">
-      <i class="fas fa-sign-out-alt" style="color:var(--pink);"></i>
-    </div>
+    <div class="reauth-icon" style="background:#fff0f5;display:none;"></div>
     <h3>Log Out?</h3>
     <p>Are you sure you want to log out of your account?</p>
     <div class="reauth-actions">
       <button class="reauth-cancel" onclick="closeLogoutModal()">Cancel</button>
       <button class="reauth-confirm" onclick="confirmLogout()" style="background:var(--pink);">
-        <i class="fas fa-sign-out-alt"></i> Log Out
+        Log Out
       </button>
     </div>
   </div>
