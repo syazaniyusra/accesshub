@@ -158,22 +158,12 @@ body {
 
 .sidebar-nav button.active,
 .booking-btn.active {
-  background: var(--pink-soft);
-  color: var(--pink);
-  font-weight: 700;
-}
-.sidebar-nav button.active i,
-.booking-btn.active i { color: var(--pink); }
-
-/* Admin/special items stay full pink — add class .active-solid in HTML for those */
-.sidebar-nav button.active-solid,
-.booking-btn.active-solid {
   background: var(--pink);
   color: #fff;
   font-weight: 700;
 }
-.sidebar-nav button.active-solid i,
-.booking-btn.active-solid i { color: #fff; }
+.sidebar-nav button.active i,
+.booking-btn.active i { color: #fff; }
 
 /* ══════════════════════════════════════
    LOGOUT — centered, no icon
@@ -394,7 +384,7 @@ body {
 }
 
 .profile-card {
-  background: var(--surface-card);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 28px;
@@ -472,10 +462,10 @@ body {
 .pw-input-wrap {
   display: flex;
   align-items: center;
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
   overflow: hidden;
-  background: var(--surface);
+  background: #FFFFFF;
   transition: border-color var(--t), box-shadow var(--t);
 }
 .pw-input-wrap:focus-within { border-color: var(--pink); box-shadow: var(--shadow-focus); }
