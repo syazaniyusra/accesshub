@@ -141,6 +141,27 @@
       transform: translateX(3px);
     }
     .admin-panel-btn i { color: #fff !important; }
+
+    /* ── PROFILE LAYOUT FIX ── */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+
+    /* profile info card stretches to match content */
+    .profile-card { height: auto; }
+
+    /* Access dept tags — teal/green tint to distinguish from work depts */
+    .dept-tag--access {
+      background: #e6f4f1 !important;
+      color: #0e7a6a !important;
+      border: 1px solid #b2ddd6 !important;
+    }
   </style>
 </head>
 <body>
@@ -281,6 +302,10 @@
           <div class="profile-field">
             <span class="profile-label"><i class="fas fa-layer-group"></i> Departments</span>
             <div class="profile-tags" id="profileDepts"></div>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label"><i class="fas fa-folder-open"></i> Access Departments</span>
+            <div class="profile-tags" id="profileAccessDepts"></div>
           </div>
           <div class="profile-field">
             <span class="profile-label"><i class="fas fa-shield-alt"></i> Role</span>
@@ -497,6 +522,7 @@ function loadProfilePage(button) {
   document.getElementById("profileEmail").textContent = user.email || "—";
   document.getElementById("profileRole").textContent  = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
 
+  // Work departments
   const deptsEl = document.getElementById("profileDepts");
   deptsEl.innerHTML = "";
   if (window.userDepartments?.length) {
@@ -508,6 +534,20 @@ function loadProfilePage(button) {
     });
   } else {
     deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>";
+  }
+
+  // Access departments (from access_dept table)
+  const accessDeptsEl = document.getElementById("profileAccessDepts");
+  accessDeptsEl.innerHTML = "";
+  if (window.userLinkDepts?.length) {
+    window.userLinkDepts.forEach(d => {
+      const tag = document.createElement("span");
+      tag.className = "dept-tag dept-tag--access";
+      tag.textContent = d.name;
+      accessDeptsEl.appendChild(tag);
+    });
+  } else {
+    accessDeptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>";
   }
 }
 
