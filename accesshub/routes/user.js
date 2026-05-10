@@ -4,7 +4,6 @@ const db      = require("../db");
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
 
-// ── INLINE MIDDLEWARE (avoids path resolution issues) ──
 const SECRET_KEY = "accesshub_secret";
 
 function verifyToken(req, res, next) {
@@ -28,8 +27,6 @@ function requireRole(...roles) {
 
 // =====================================
 // GET ALL USERS
-// superadmin → all users
-// admin      → only users in their department
 // =====================================
 router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res) => {
   try {
@@ -87,7 +84,7 @@ router.get("/", verifyToken, requireRole("superadmin", "admin"), async (req, res
         JOIN access_dept ad ON ad.id = uad.access_dept_id
         WHERE uad.user_id IN (?)
       `, [userIds]);
-      
+
       accessRows.forEach(row => {
         if (usersMap[row.user_id]) {
           usersMap[row.user_id].link_access.push({ id: row.id, name: row.name });
@@ -148,10 +145,10 @@ router.post("/", verifyToken, requireRole("superadmin", "admin"), async (req, re
     }
 
     if (link_access && link_access.length > 0) {
-      for (const depId of link_access) {
+      for (const adId of link_access) {
         await db.query(
-          "INSERT INTO user_link_access (user_id, department_id) VALUES (?, ?)",
-          [userId, depId]
+          "INSERT INTO user_access_dept (user_id, access_dept_id) VALUES (?, ?)",
+          [userId, adId]
         );
       }
     }
@@ -202,14 +199,20 @@ router.put("/:id", verifyToken, requireRole("superadmin", "admin"), async (req, 
     await db.query("DELETE FROM user_departments WHERE user_id = ?", [userId]);
     if (departments && departments.length > 0) {
       for (const depId of departments) {
-        await db.query("INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)", [userId, depId]);
+        await db.query(
+          "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)",
+          [userId, depId]
+        );
       }
     }
 
-    await db.query("DELETE FROM user_link_access WHERE user_id = ?", [userId]);
+    await db.query("DELETE FROM user_access_dept WHERE user_id = ?", [userId]);
     if (link_access && link_access.length > 0) {
-      for (const depId of link_access) {
-        await db.query("INSERT INTO user_link_access (user_id, department_id) VALUES (?, ?)", [userId, depId]);
+      for (const adId of link_access) {
+        await db.query(
+          "INSERT INTO user_access_dept (user_id, access_dept_id) VALUES (?, ?)",
+          [userId, adId]
+        );
       }
     }
 
@@ -241,7 +244,7 @@ router.delete("/:id", verifyToken, requireRole("superadmin", "admin"), async (re
     }
 
     await db.query("DELETE FROM user_departments WHERE user_id = ?", [userId]);
-    await db.query("DELETE FROM user_link_access WHERE user_id = ?", [userId]);
+    await db.query("DELETE FROM user_access_dept WHERE user_id = ?", [userId]);
     await db.query("DELETE FROM users WHERE id = ?", [userId]);
     res.json({ message: "User deleted successfully" });
 
@@ -277,9 +280,10 @@ router.get("/:id", verifyToken, async (req, res) => {
     };
 
     const [accessRows] = await db.query(`
-      SELECT d.id, d.name FROM user_link_access ula
-      JOIN departments d ON d.id = ula.department_id
-      WHERE ula.user_id = ?
+      SELECT ad.id, ad.name
+      FROM user_access_dept uad
+      JOIN access_dept ad ON ad.id = uad.access_dept_id
+      WHERE uad.user_id = ?
     `, [userId]);
     user.link_access = accessRows;
 
@@ -304,22 +308,6 @@ router.get("/:id/departments", async (req, res) => {
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch user departments" });
-  }
-});
-
-// =====================================
-// GET USER'S LINK ACCESS DEPARTMENTS
-// =====================================
-router.get("/:id/link-access", async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT d.id, d.name FROM departments d
-      JOIN user_link_access ula ON d.id = ula.department_id
-      WHERE ula.user_id = ?
-    `, [req.params.id]);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch link access" });
   }
 });
 
