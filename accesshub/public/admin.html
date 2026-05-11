@@ -87,6 +87,18 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .form-group input:focus, .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 .form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
 
+/* ── PASSWORD INPUT WRAP ── */
+.pw-input-wrap { position: relative; display: flex; align-items: center; }
+.pw-input-wrap input { width: 100%; padding-right: 40px; }
+.pw-toggle-btn {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-light); font-size: 14px; padding: 0;
+  width: auto; margin: 0; line-height: 1;
+  transition: color var(--t);
+}
+.pw-toggle-btn:hover { color: var(--pink); }
+
 /* ── CHECKBOXES ── */
 .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .checkbox-label { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer; transition: border-color var(--t), background var(--t); }
@@ -128,7 +140,7 @@ table a:hover { text-decoration: underline; }
 
 /* ── ACTION BUTTONS ── */
 .action-buttons { display: flex; gap: 6px; }
-.action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t); font-size: 12px; }
+.action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t)); font-size: 12px; }
 .action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
 .action-buttons button:active { transform: scale(0.95); }
 .edit-btn    { background: #fef9c3; color: #854d0e; }
@@ -190,7 +202,10 @@ table a:hover { text-decoration: underline; }
     </div>
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">New Password <span>(leave blank to keep current)</span></label>
-      <input type="password" id="editPassword" placeholder="New password (optional)">
+      <div class="pw-input-wrap">
+        <input type="password" id="editPassword" placeholder="New password (optional)">
+        <button type="button" class="pw-toggle-btn" onclick="togglePw('editPassword', this)"><i class="fas fa-eye"></i></button>
+      </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">Department <span>(where they work)</span></label>
@@ -275,7 +290,6 @@ table a:hover { text-decoration: underline; }
     </div>
   </div>
 
-  <!-- FIX: goes to index.html (dashboard), no role redirect blocks it now -->
   <button class="back-btn" onclick="goBackToDashboard()">
     <i class="fas fa-arrow-left"></i> Back to Dashboard
   </button>
@@ -333,11 +347,17 @@ table a:hover { text-decoration: underline; }
     <div class="form-grid-2" style="margin-bottom:14px;">
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input id="password" type="password" placeholder="Create password">
+        <div class="pw-input-wrap">
+          <input id="password" type="password" placeholder="Create password">
+          <button type="button" class="pw-toggle-btn" onclick="togglePw('password', this)"><i class="fas fa-eye"></i></button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
-        <input id="confirmPassword" type="password" placeholder="Repeat password">
+        <div class="pw-input-wrap">
+          <input id="confirmPassword" type="password" placeholder="Repeat password">
+          <button type="button" class="pw-toggle-btn" onclick="togglePw('confirmPassword', this)"><i class="fas fa-eye"></i></button>
+        </div>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
@@ -476,6 +496,14 @@ function getStore(key) {
   return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
 }
 
+/* ── SHOW / HIDE PASSWORD ── */
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isText = input.type === "text";
+  input.type = isText ? "password" : "text";
+  btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
+}
+
 /* ── NAVIGATION ── */
 function goBackToDashboard() {
   window.location.href = "index.html";
@@ -500,9 +528,7 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-/* ── FETCH THIS USER'S OWN WORK DEPARTMENTS ──
-   Used to scope admin's visible users/links/dropdowns.
-   Always called first on init. ── */
+/* ── FETCH THIS USER'S OWN WORK DEPARTMENTS ── */
 async function fetchMyWorkDepts() {
   const userData = getStore("user");
   const token    = getStore("token");
@@ -515,14 +541,10 @@ async function fetchMyWorkDepts() {
   return Array.isArray(depts) ? depts : [];
 }
 
-/* ── LOAD ACCESS DEPTS (for checkboxes) ──
-   Both admin and superadmin see ALL access depts in checkboxes
-   so they can assign any department access to a user.
-   Scoping of users/links list is handled separately. ── */
+/* ── LOAD ACCESS DEPTS (for checkboxes) ── */
 async function loadAccessDepts() {
   const res = await fetch(`${API}/api/access-dept`);
   allAccessDepts = await res.json();
-  // Deduplicate
   const seen = new Set();
   allAccessDepts = allAccessDepts.filter(d => {
     if (seen.has(d.name.toLowerCase())) return false;
@@ -543,9 +565,7 @@ function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
   });
 }
 
-/* ── SCOPED DEPARTMENT LIST FOR DROPDOWNS ──
-   admin: only their own work departments
-   superadmin: all departments ── */
+/* ── SCOPED DEPARTMENT LIST FOR DROPDOWNS ── */
 async function getScopedDepts() {
   if (window.userRole === "admin") {
     return await fetchMyWorkDepts();
@@ -587,7 +607,6 @@ async function loadUsers() {
   const tbody = document.querySelector("#userTable tbody");
   tbody.innerHTML = "";
 
-  // admin: only show users whose work department is in adminWorkDeptIds
   const visible = window.userRole === "admin"
     ? users.filter(u => u.departments?.some(d => adminWorkDeptIds.includes(d.id)))
     : users;
@@ -623,30 +642,62 @@ async function createUser() {
   const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirm  = document.getElementById("confirmPassword").value;
-  const roleEl   = document.getElementById("role");
-  const role     = roleEl.tagName === "SELECT" ? roleEl.value : "user";
+
+  /* Role: if the field was replaced with a disabled text input (admin view),
+     fall back to "user"; otherwise read the select value. */
+  const roleEl = document.getElementById("role");
+  const role   = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
+
   const workDept = document.getElementById("userDepartment").value;
   const deps     = [];
   document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
 
-  if (!name || !email || !password) { showToast("Please fill all fields", "error"); return; }
-  if (password !== confirm)          { showToast("Passwords do not match", "error"); return; }
-  if (password.length < 6)           { showToast("Password must be at least 6 characters", "error"); return; }
+  if (!name)     { showToast("Please enter a name", "error"); return; }
+  if (!email)    { showToast("Please enter an email", "error"); return; }
+  if (!password) { showToast("Please enter a password", "error"); return; }
+  if (password !== confirm) { showToast("Passwords do not match", "error"); return; }
+  if (password.length < 6)  { showToast("Password must be at least 6 characters", "error"); return; }
 
-  const res  = await fetch(`${API}/api/users`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-    body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
-  });
-  const data = await res.json();
-  if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
+  try {
+    const res  = await fetch(`${API}/api/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,
+        departments: workDept ? [workDept] : [],
+        link_access: deps
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
 
-  showToast("User created successfully!");
-  ["name","email","password","confirmPassword"].forEach(id => document.getElementById(id).value = "");
-  if (document.getElementById("role")?.tagName === "SELECT") document.getElementById("role").value = "user";
-  document.getElementById("userDepartment").value = "";
-  renderAccessDeptCheckboxes("departmentCheckboxes");
-  loadUsers();
+    showToast("User created successfully!");
+    document.getElementById("name").value            = "";
+    document.getElementById("email").value           = "";
+    document.getElementById("password").value        = "";
+    document.getElementById("confirmPassword").value = "";
+
+    /* Reset password toggle icons */
+    ["password","confirmPassword"].forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.type = "password";
+        const btn = input.closest(".pw-input-wrap")?.querySelector(".pw-toggle-btn i");
+        if (btn) btn.className = "fas fa-eye";
+      }
+    });
+
+    if (roleEl && roleEl.tagName === "SELECT") roleEl.value = "user";
+    document.getElementById("userDepartment").value = "";
+    renderAccessDeptCheckboxes("departmentCheckboxes");
+    loadUsers();
+  } catch (err) {
+    console.error("createUser error:", err);
+    showToast("Server error. Please try again.", "error");
+  }
 }
 
 /* ── LINKS ── */
@@ -656,7 +707,6 @@ async function loadLinks() {
   const tbody = document.querySelector("#linkTable tbody");
   tbody.innerHTML = "";
 
-  // admin: only show links in their own work departments
   const visible = window.userRole === "admin"
     ? links.filter(l => adminWorkDeptIds.includes(Number(l.department_id)))
     : links;
@@ -932,23 +982,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch(e) {}
 
   if (role === "admin") {
-    // Hide bookings tab
     document.getElementById("bookingsNavBtn").style.display = "none";
-    // Lock role field to User only
     const roleGroup = document.getElementById("roleGroup");
     if (roleGroup) {
       const roleInput    = document.createElement("input");
       roleInput.type     = "text";
       roleInput.value    = "User (Staff)";
       roleInput.disabled = true;
+      roleInput.id       = "role"; /* keep same id so createUser() can find it */
       document.getElementById("role").replaceWith(roleInput);
     }
   }
 
   try {
-    // Must run first — populates adminWorkDeptIds used for scoping
     await fetchMyWorkDepts();
-    // Load all access depts for checkboxes (both roles see all)
     await loadAccessDepts();
     renderAccessDeptCheckboxes("departmentCheckboxes");
     await loadDepartments();
