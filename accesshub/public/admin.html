@@ -87,7 +87,18 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .form-group input:focus, .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 .form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
 
-/* ── PASSWORD INPUT WRAP ── */
+/* ── EMAIL VALIDATION INDICATOR ── */
+.email-hint {
+  font-size: 11.5px;
+  margin-top: 4px;
+  display: none;
+  align-items: center;
+  gap: 5px;
+}
+.email-hint.invalid { display: flex; color: #ef4444; }
+.email-hint.valid   { display: flex; color: #16a34a; }
+input.email-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
+input.email-valid   { border-color: #16a34a !important; box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; }
 .pw-input-wrap { position: relative; display: flex; align-items: center; }
 .pw-input-wrap input { width: 100%; padding-right: 40px; }
 .pw-toggle-btn {
@@ -197,7 +208,8 @@ table a:hover { text-decoration: underline; }
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="editEmail" placeholder="Email">
+        <input type="email" id="editEmail" placeholder="Email" oninput="validateEmailField(this, 'editEmailHint')">
+        <div class="email-hint" id="editEmailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span></div>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
@@ -341,7 +353,8 @@ table a:hover { text-decoration: underline; }
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input id="email" type="email" placeholder="Enter email">
+        <input id="email" type="email" placeholder="Enter email" oninput="validateEmailField(this, 'emailHint')">
+        <div class="email-hint" id="emailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span></div>
       </div>
     </div>
     <div class="form-grid-2" style="margin-bottom:14px;">
@@ -494,6 +507,28 @@ let adminWorkDeptIds = [];
 /* ── HELPER: read from either storage ── */
 function getStore(key) {
   return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
+}
+
+/* ── REAL-TIME EMAIL VALIDATION ── */
+function validateEmailField(input, hintId) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const hint = document.getElementById(hintId);
+  if (!input.value) {
+    input.classList.remove("email-valid", "email-invalid");
+    hint.className = "email-hint";
+    return;
+  }
+  if (emailRegex.test(input.value)) {
+    input.classList.add("email-valid");
+    input.classList.remove("email-invalid");
+    hint.className = "email-hint valid";
+    hint.innerHTML = '<i class="fas fa-circle-check"></i> <span>Valid email</span>';
+  } else {
+    input.classList.add("email-invalid");
+    input.classList.remove("email-valid");
+    hint.className = "email-hint invalid";
+    hint.innerHTML = '<i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span>';
+  }
 }
 
 /* ── SHOW / HIDE PASSWORD ── */
@@ -652,11 +687,14 @@ async function createUser() {
   const deps     = [];
   document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
 
-  if (!name)     { showToast("Please enter a name", "error"); return; }
-  if (!email)    { showToast("Please enter an email", "error"); return; }
-  if (!password) { showToast("Please enter a password", "error"); return; }
-  if (password !== confirm) { showToast("Passwords do not match", "error"); return; }
-  if (password.length < 6)  { showToast("Password must be at least 6 characters", "error"); return; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!name)                  { showToast("Please enter a name", "error"); return; }
+  if (!email)                 { showToast("Please enter an email", "error"); return; }
+  if (!emailRegex.test(email)){ showToast("Please enter a valid email address", "error"); return; }
+  if (!password)              { showToast("Please enter a password", "error"); return; }
+  if (password !== confirm)   { showToast("Passwords do not match", "error"); return; }
+  if (password.length < 6)    { showToast("Password must be at least 6 characters", "error"); return; }
 
   try {
     const res  = await fetch(`${API}/api/users`, {
@@ -831,6 +869,12 @@ async function confirmEdit() {
   const email    = document.getElementById("editEmail").value.trim();
   const password = document.getElementById("editPassword").value;
   const workDept = document.getElementById("editWorkDept").value;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!name)                   { showToast("Please enter a name", "error"); return; }
+  if (!email)                  { showToast("Please enter an email", "error"); return; }
+  if (!emailRegex.test(email)) { showToast("Please enter a valid email address", "error"); return; }
+
   const linkDeps = [];
   document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
   const body = { name, email, departments: workDept ? [workDept] : [], link_access: linkDeps };
