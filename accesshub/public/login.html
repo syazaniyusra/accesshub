@@ -189,17 +189,17 @@
       box-shadow: var(--shadow-focus);
     }
 
-    /* Email validation states override focus-within */
+    /* ── FIX: Email valid state now uses pink instead of green ── */
     .input-wrap.email-invalid {
       border-color: #ef4444 !important;
       box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important;
     }
     .input-wrap.email-valid {
-      border-color: #16a34a !important;
-      box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+      border-color: var(--pink) !important;
+      box-shadow: var(--shadow-focus) !important;
     }
     .input-wrap.email-invalid .input-icon { color: #ef4444; }
-    .input-wrap.email-valid   .input-icon { color: #16a34a; }
+    .input-wrap.email-valid   .input-icon { color: var(--pink); }
 
     .input-wrap .input-icon {
       padding: 0 13px;
@@ -241,7 +241,7 @@
     }
     .toggle-pw:hover { color: var(--pink); }
 
-    /* ── EMAIL HINT ── */
+    /* ── FIX: Email hint valid state now uses pink instead of green ── */
     .email-hint {
       font-size: 11.5px;
       display: none;
@@ -250,7 +250,7 @@
       margin-top: 2px;
     }
     .email-hint.invalid { display: flex; color: #ef4444; }
-    .email-hint.valid   { display: flex; color: #16a34a; }
+    .email-hint.valid   { display: flex; color: var(--pink); }
 
     /* ── REMEMBER ROW ── */
     .remember-row {
@@ -416,7 +416,6 @@
     const hintText = document.getElementById("emailHintText");
     const val      = input.value.trim();
 
-    // Empty — reset to neutral
     if (!val) {
       wrap.classList.remove("email-valid", "email-invalid");
       hint.className = "email-hint";
@@ -509,11 +508,8 @@
       store.setItem("user",  JSON.stringify(data.user));
       store.setItem("role",  data.user.role);
 
-      if (data.user.role === "admin" || data.user.role === "superadmin") {
-        window.location.href = "admin.html";
-      } else {
-        window.location.href = "index.html";
-      }
+      // ── FIX: All users go to dashboard first — admins enter admin panel from there ──
+      window.location.href = "index.html";
 
     } catch(err) {
       console.error(err);
