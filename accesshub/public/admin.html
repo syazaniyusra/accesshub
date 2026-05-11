@@ -1,447 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>const API = window.location.origin;</script>
-<title>Bismi — Admin Panel</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>const API = window.location.origin;</script>
+  <title>Bismi — Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 
-/* ── Hide until auth passes to prevent flash ── */
-body { visibility: hidden; }
+  <style>
+    /* ── Hide until auth passes to prevent flash ── */
+    body { visibility: hidden; }
 
-:root {
-  --pink:         #D4186C;
-  --pink-hover:   #B5135C;
-  --pink-soft:    #FCE8F3;
-  --pink-pill:    #F9D5EA;
-  --ink:          #1C1C1E;
-  --ink-mid:      #5A5A6E;
-  --ink-light:    #9999AA;
-  --ink-faint:    #D0D0DA;
-  --surface:      #FDFCFB;
-  --surface-2:    #FAF9F6;
-  --border:       #E2DDD7;
-  --r-sm:  8px;
-  --r-md:  12px;
-  --r-lg:  18px;
-  --shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
-  --shadow-focus: 0 0 0 3px rgba(212,24,108,0.18);
-  --font:         'Plus Jakarta Sans', sans-serif;
-  --font-display: 'DM Serif Display', serif;
-  --t: 160ms;
-  --sidebar-w: 235px;
-}
+    /* ══════════════════════════════════════
+       VARIABLES
+    ══════════════════════════════════════ */
+    :root {
+      --pink:         #D4186C;
+      --pink-hover:   #B5135C;
+      --pink-soft:    #FCE8F3;
+      --pink-pill:    #F9D5EA;
+      --ink:          #1C1C1E;
+      --ink-mid:      #5A5A6E;
+      --ink-light:    #9999AA;
+      --ink-faint:    #D0D0DA;
+      --surface:      #FDFCFB;
+      --surface-2:    #FAF9F6;
+      --border:       #E2DDD7;
+      --r-sm:         8px;
+      --r-md:         12px;
+      --r-lg:         18px;
+      --shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+      --shadow-focus: 0 0 0 3px rgba(212,24,108,0.18);
+      --font:         'Plus Jakarta Sans', sans-serif;
+      --font-display: 'DM Serif Display', serif;
+      --t:            160ms;
+      --sidebar-w:    235px;
+    }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: var(--font);
-  background: var(--surface-2);
-  color: var(--ink);
-  display: flex;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+    body {
+      font-family: var(--font);
+      background: var(--surface-2);
+      color: var(--ink);
+      display: flex;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
 
-/* ══════════════════════════════════════
-   MOBILE HAMBURGER + OVERLAY
-══════════════════════════════════════ */
-.hamburger {
-  display: none;
-  position: fixed;
-  top: 14px; left: 14px;
-  z-index: 1001;
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  color: var(--pink);
-  font-size: 16px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background var(--t);
-}
-.hamburger:hover { background: var(--pink-soft); }
+    /* ══════════════════════════════════════
+       HAMBURGER + OVERLAY (mobile)
+    ══════════════════════════════════════ */
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 14px; left: 14px;
+      z-index: 1001;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--pink);
+      font-size: 16px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background var(--t);
+    }
+    .hamburger:hover { background: var(--pink-soft); }
 
-.sidebar-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  z-index: 899;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(3px);
-}
-.sidebar-overlay.open { display: block; }
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 899;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(3px);
+    }
+    .sidebar-overlay.open { display: block; }
 
-/* ══════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════ */
-.sidebar {
-  width: var(--sidebar-w);
-  background: #EDE8E1;
-  height: 100vh;
-  position: fixed;
-  top: 0; left: 0;
-  display: flex;
-  flex-direction: column;
-  z-index: 900;
-  overflow: hidden;
-  border-right: 1px solid #D9D3CB;
-  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
-}
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #EDE8E1;
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 900;
+      overflow: hidden;
+      border-right: 1px solid #D9D3CB;
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    }
 
-.sidebar-brand {
-  padding: 24px 20px 16px;
-  display: flex; align-items: center; gap: 12px;
-  border-bottom: 1px solid #D9D3CB;
-  flex-shrink: 0;
-}
-.sidebar-logo-wrap {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: #fff; display: flex; align-items: center; justify-content: center;
-  overflow: hidden; flex-shrink: 0; border: 1px solid #D9D3CB;
-}
-.sidebar-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
-.sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
-.sidebar-brand-name { font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1; }
-.sidebar-brand-sub { font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pink); }
+    /* Logo — horizontal row, 44px, matches styles.css */
+    .sidebar-brand {
+      padding: 24px 20px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #D9D3CB;
+      flex-shrink: 0;
+    }
+    .sidebar-logo-wrap {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: none;
+    }
+    .sidebar-logo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; }
+    .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
+    .sidebar-brand-name { font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1; }
+    .sidebar-brand-sub  { font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pink); }
 
-.back-btn {
-  margin: 14px 12px 8px;
-  padding: 10px 14px;
-  background: rgba(0,0,0,0.05);
-  border: 1px solid #D9D3CB;
-  border-radius: 10px;
-  color: var(--ink-mid);
-  font-size: 13px; font-weight: 600;
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer;
-  transition: background var(--t);
-  font-family: var(--font);
-  width: calc(100% - 24px);
-  text-align: left;
-  flex-shrink: 0;
-}
-.back-btn:hover { background: rgba(0,0,0,0.09); }
-.back-btn i { color: var(--ink-light); font-size: 12px; }
+    .back-btn {
+      margin: 14px 12px 8px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid #D9D3CB;
+      border-radius: 10px;
+      color: var(--ink-mid);
+      font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: background var(--t);
+      font-family: var(--font);
+      width: calc(100% - 24px);
+      text-align: left;
+      flex-shrink: 0;
+    }
+    .back-btn:hover { background: rgba(0,0,0,0.09); }
+    .back-btn i { color: var(--ink-light); font-size: 12px; }
 
-.sidebar-nav {
-  flex: 1;
-  padding: 0 0 10px;
-  display: flex; flex-direction: column; gap: 0;
-  overflow-y: auto;
-}
-.sidebar-nav::-webkit-scrollbar { width: 0; }
-.sidebar-section-label {
-  font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px;
-  text-transform: uppercase; color: #B0A89E;
-  padding: 12px 20px 5px; user-select: none;
-}
-.sidebar-nav button {
-  width: calc(100% - 20px);
-  padding: 9px 12px; border: none; background: transparent;
-  color: var(--ink-mid); cursor: pointer; text-align: left;
-  font-family: var(--font); font-size: 13px; font-weight: 500;
-  display: flex; align-items: center; gap: 11px;
-  transition: background var(--t), color var(--t);
-  margin: 1px 10px; border-radius: 8px;
-}
-.sidebar-nav button i {
-  width: 17px; text-align: center; font-size: 13px;
-  color: #B0A89E; transition: color var(--t); flex-shrink: 0;
-}
-.sidebar-nav button:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
-.sidebar-nav button:hover i { color: var(--ink-mid); }
-.sidebar-nav button.active { background: var(--pink); color: #fff; font-weight: 700; }
-.sidebar-nav button.active i { color: #fff; }
+    .sidebar-nav {
+      flex: 1;
+      padding: 0 0 10px;
+      display: flex; flex-direction: column; gap: 0;
+      overflow-y: auto;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 0; }
 
-.sidebar-footer {
-  padding: 12px;
-  border-top: 1px solid #D9D3CB;
-  flex-shrink: 0;
-}
-.sidebar-footer .user-info {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: 10px;
-  background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB;
-}
-.user-avatar-sm {
-  width: 32px; height: 32px; background: var(--pink); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
-}
-.user-meta { flex: 1; min-width: 0; }
-.user-meta-name { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-meta-role { font-size: 10px; color: var(--ink-light); text-transform: capitalize; margin-top: 1px; }
+    .sidebar-section-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px;
+      text-transform: uppercase; color: #B0A89E;
+      padding: 12px 20px 5px;
+      user-select: none;
+    }
 
-/* ══════════════════════════════════════
-   MAIN
-══════════════════════════════════════ */
-.main {
-  margin-left: var(--sidebar-w);
-  padding: 36px 40px;
-  width: calc(100% - var(--sidebar-w));
-  min-height: 100vh;
-  transition: margin-left 0.28s cubic-bezier(.4,0,.2,1);
-}
+    .sidebar-nav button {
+      width: calc(100% - 20px);
+      padding: 9px 12px;
+      border: none; background: transparent;
+      color: var(--ink-mid); cursor: pointer;
+      text-align: left; font-family: var(--font);
+      font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 11px;
+      transition: background var(--t), color var(--t);
+      margin: 1px 10px;
+      border-radius: 8px;
+    }
+    .sidebar-nav button i {
+      width: 17px; text-align: center; font-size: 13px;
+      color: #B0A89E; transition: color var(--t); flex-shrink: 0;
+    }
+    .sidebar-nav button:hover         { background: rgba(0,0,0,0.06); color: var(--ink); }
+    .sidebar-nav button:hover i       { color: var(--ink-mid); }
+    .sidebar-nav button.active        { background: var(--pink); color: #fff; font-weight: 700; }
+    .sidebar-nav button.active i      { color: #fff; }
 
-.page-header { margin-bottom: 24px; }
-.page-title {
-  font-family: var(--font-display); font-size: 28px; color: var(--ink);
-  display: flex; align-items: center; gap: 10px;
-}
-.page-title-icon {
-  width: 36px; height: 36px; background: var(--pink-soft); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 15px;
-  flex-shrink: 0;
-}
-.page-title .accent { color: var(--pink); }
-.page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid #D9D3CB;
+      flex-shrink: 0;
+    }
+    .sidebar-footer .user-info {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 10px;
+      background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB;
+    }
+    .user-avatar-sm {
+      width: 32px; height: 32px;
+      background: var(--pink); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .user-meta { flex: 1; min-width: 0; }
+    .user-meta-name { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-meta-role { font-size: 10px; color: var(--ink-light); text-transform: capitalize; margin-top: 1px; }
 
-/* ── CARD ── */
-.card {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: var(--r-lg); padding: 28px; margin-bottom: 20px;
-  box-shadow: var(--shadow-card);
-}
-.card-title {
-  font-size: 15px; font-weight: 700; color: var(--ink);
-  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-}
-.card-title i { color: var(--pink); font-size: 14px; }
+    /* ══════════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════════ */
+    .main {
+      margin-left: var(--sidebar-w);
+      padding: 36px 40px;
+      width: calc(100% - var(--sidebar-w));
+      min-height: 100vh;
+      transition: margin-left 0.28s cubic-bezier(.4,0,.2,1);
+    }
 
-/* ── FORM ── */
-.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); }
-.form-label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
+    .page-header { margin-bottom: 24px; }
 
-.form-group input, .form-group select {
-  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
-  border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font);
-  color: var(--ink); background: var(--surface); outline: none;
-  transition: border-color var(--t), box-shadow var(--t); margin: 0;
-  -webkit-appearance: none; appearance: none;
-}
-.form-group input:focus, .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
-.form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 28px; color: var(--ink);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-title-icon {
+      width: 36px; height: 36px;
+      background: var(--pink-soft); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--pink); font-size: 15px; flex-shrink: 0;
+    }
+    .page-title .accent { color: var(--pink); }
+    .page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
 
-/* email validation */
-.email-hint { font-size: 11.5px; margin-top: 4px; display: none; align-items: center; gap: 5px; }
-.email-hint.invalid { display: flex; color: #ef4444; }
-.email-hint.valid   { display: flex; color: #16a34a; }
-input.email-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
-input.email-valid   { border-color: #16a34a !important; box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; }
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .card-title {
+      font-size: 15px; font-weight: 700; color: var(--ink);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title i { color: var(--pink); font-size: 14px; }
 
-/* password toggle */
-.pw-input-wrap { position: relative; display: flex; align-items: center; }
-.pw-input-wrap input { width: 100%; padding-right: 40px; }
-.pw-toggle-btn {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer; color: var(--ink-light);
-  font-size: 14px; padding: 0; width: auto; margin: 0; line-height: 1;
-  transition: color var(--t);
-}
-.pw-toggle-btn:hover { color: var(--pink); }
+    /* ── FORM ── */
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group  { display: flex; flex-direction: column; gap: 6px; }
 
-/* ── CHECKBOXES ── */
-.checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.checkbox-label {
-  display: flex; align-items: center; gap: 9px; padding: 10px 14px;
-  border: 1.5px solid var(--border); border-radius: var(--r-sm);
-  font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer;
-  transition: border-color var(--t), background var(--t);
-}
-.checkbox-label:hover { border-color: var(--pink-pill); background: var(--pink-soft); color: var(--pink); }
-.checkbox-label input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
+    .form-label {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--ink-light);
+    }
+    .form-label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
 
-/* ── BUTTONS ── */
-.btn-primary { background: var(--pink); color: #fff; border: none; border-radius: var(--r-sm); padding: 11px 22px; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background var(--t), transform var(--t); width: auto; margin: 0; }
-.btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
-.btn-secondary { background: var(--surface); color: var(--ink-mid); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--t); width: auto; margin: 0; }
-.btn-secondary:hover { background: var(--surface-2); }
-.btn-danger { background: #fee2e2; color: #b91c1c; border: 1.5px solid #fecaca; border-radius: var(--r-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--t); width: auto; margin: 0; }
-.btn-danger:hover { background: #fecaca; }
-.btn-success { background: #dcfce7; color: #166534; border: 1.5px solid #bbf7d0; border-radius: var(--r-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--t); width: auto; margin: 0; }
-.btn-success:hover { background: #bbf7d0; }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 13.5px; font-family: var(--font);
+      color: var(--ink); background: var(--surface);
+      outline: none;
+      transition: border-color var(--t), box-shadow var(--t);
+      margin: 0;
+      -webkit-appearance: none; appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
+    .form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
 
-/* ── TABLE ── */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; }
-thead tr { background: var(--surface-2); border-bottom: 1.5px solid var(--border); }
-th { padding: 11px 14px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--ink-light); text-align: left; white-space: nowrap; }
-td { padding: 13px 14px; color: var(--ink-mid); border-bottom: 1px solid var(--border); vertical-align: middle; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: var(--surface-2); }
+    /* Email validation indicator */
+    .email-hint { font-size: 11.5px; margin-top: 4px; display: none; align-items: center; gap: 5px; }
+    .email-hint.invalid { display: flex; color: #ef4444; }
+    .email-hint.valid   { display: flex; color: #16a34a; }
+    input.email-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
+    input.email-valid   { border-color: #16a34a !important; box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; }
 
-/* ── BADGES ── */
-.badge { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap; }
-.badge-access { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap; }
-.badge-role { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
-.badge-role.user       { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
-.badge-role.admin      { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); }
-.badge-role.superadmin { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
-.status-badge { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; white-space: nowrap; }
-.status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-.status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-table a { color: var(--pink); text-decoration: none; font-weight: 600; }
-table a:hover { text-decoration: underline; }
+    /* Password toggle */
+    .pw-input-wrap { position: relative; display: flex; align-items: center; }
+    .pw-input-wrap input { width: 100%; padding-right: 40px; }
+    .pw-toggle-btn {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-light); font-size: 14px;
+      padding: 0; width: auto; margin: 0; line-height: 1;
+      transition: color var(--t);
+    }
+    .pw-toggle-btn:hover { color: var(--pink); }
 
-/* ── ACTION BUTTONS ── */
-.action-buttons { display: flex; gap: 6px; }
-.action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t); font-size: 12px; flex-shrink: 0; }
-.action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
-.action-buttons button:active { transform: scale(0.95); }
-.edit-btn    { background: #fef9c3; color: #854d0e; }
-.delete-btn  { background: #fee2e2; color: #b91c1c; }
-.cancel-btn  { background: #ffedd5; color: #c2410c; }
-.restore-btn { background: #dcfce7; color: #166534; }
+    /* ── CHECKBOXES ── */
+    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .checkbox-label {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 500; color: var(--ink-mid);
+      cursor: pointer;
+      transition: border-color var(--t), background var(--t);
+    }
+    .checkbox-label:hover { border-color: var(--pink-pill); background: var(--pink-soft); color: var(--pink); }
+    .checkbox-label input[type="checkbox"] {
+      width: 15px; height: 15px; margin: 0;
+      accent-color: var(--pink); cursor: pointer; flex-shrink: 0;
+    }
 
-/* ── FILTER BAR ── */
-.filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
-.filter-bar select, .filter-bar input {
-  padding: 9px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm);
-  font-size: 13px; font-family: var(--font); color: var(--ink);
-  background: var(--surface); outline: none; margin: 0; width: auto;
-  -webkit-appearance: none; appearance: none;
-}
-.filter-bar select:focus, .filter-bar input:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--pink); color: #fff;
+      border: none; border-radius: var(--r-sm);
+      padding: 11px 22px;
+      font-size: 13.5px; font-weight: 700; font-family: var(--font);
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background var(--t), transform var(--t);
+      width: auto; margin: 0;
+    }
+    .btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
 
-/* ── MODAL ── */
-.modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 16px; }
-.modal-box {
-  background: var(--surface); border-radius: var(--r-lg); padding: 28px;
-  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
-  animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both;
-}
-.modal-box.wide { max-width: 500px; }
-@keyframes modalPop { from { transform: scale(0.90); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-.modal-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--pink-soft); display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 15px; flex-shrink: 0; }
-.modal-title { font-family: var(--font-display); font-size: 18px; color: var(--ink); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; }
-.modal-sub { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); margin-bottom: 8px; margin-top: 16px; }
-.modal-hint { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; }
-.modal-detail-row { display: flex; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
-.modal-detail-row:last-child { border-bottom: none; }
-.modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; flex-shrink: 0; }
-.modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; word-break: break-word; }
+    .btn-secondary {
+      background: var(--surface); color: var(--ink-mid);
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      padding: 10px 18px;
+      font-size: 13px; font-weight: 600; font-family: var(--font);
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: background var(--t);
+      width: auto; margin: 0;
+    }
+    .btn-secondary:hover { background: var(--surface-2); }
 
-/* ── TOAST ── */
-.toast { position: fixed; top: 22px; right: 22px; background: var(--surface); color: var(--ink); padding: 13px 18px; border-radius: var(--r-md); font-size: 13.5px; font-weight: 500; font-family: var(--font); box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 300px; opacity: 0; transform: translateY(-16px); transition: opacity 0.25s, transform 0.25s; z-index: 1100; border-left: 4px solid var(--border); }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.success { border-left-color: #22c55e; }
-.toast.error   { border-left-color: #ef4444; }
+    .btn-danger {
+      background: #fee2e2; color: #b91c1c;
+      border: 1.5px solid #fecaca; border-radius: var(--r-sm);
+      padding: 10px 18px;
+      font-size: 13px; font-weight: 600; font-family: var(--font);
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: background var(--t);
+      width: auto; margin: 0;
+    }
+    .btn-danger:hover { background: #fecaca; }
 
-.booking-detail-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
-.tbl-empty { text-align: center; padding: 40px 20px; color: var(--ink-light); font-size: 13.5px; }
-.tbl-empty i { font-size: 28px; color: var(--pink-pill); display: block; margin-bottom: 10px; }
+    .btn-success {
+      background: #dcfce7; color: #166534;
+      border: 1.5px solid #bbf7d0; border-radius: var(--r-sm);
+      padding: 10px 18px;
+      font-size: 13px; font-weight: 600; font-family: var(--font);
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: background var(--t);
+      width: auto; margin: 0;
+    }
+    .btn-success:hover { background: #bbf7d0; }
 
-/* ══════════════════════════════════════
-   RESPONSIVE — TABLET (≤ 900px)
-══════════════════════════════════════ */
-@media (max-width: 900px) {
-  .hamburger { display: flex; }
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; }
+    thead tr { background: var(--surface-2); border-bottom: 1.5px solid var(--border); }
+    th {
+      padding: 11px 14px;
+      font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.7px;
+      color: var(--ink-light); text-align: left; white-space: nowrap;
+    }
+    td {
+      padding: 13px 14px;
+      color: var(--ink-mid);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
 
-  .sidebar {
-    transform: translateX(-100%);
-    z-index: 900;
-    width: 260px;
-  }
-  .sidebar.open { transform: translateX(0); }
+    /* ── BADGES ── */
+    .badge {
+      background: var(--pink-soft); color: var(--pink);
+      border: 1px solid var(--pink-pill);
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap;
+    }
+    .badge-access {
+      background: #eff6ff; color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap;
+    }
+    .badge-role { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
+    .badge-role.user       { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-role.admin      { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); }
+    .badge-role.superadmin { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
 
-  .main {
-    margin-left: 0;
-    width: 100%;
-    padding: 70px 20px 24px; /* top pad for hamburger */
-  }
+    .status-badge { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; white-space: nowrap; }
+    .status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
-  .page-title { font-size: 22px; }
-  .page-title-icon { width: 30px; height: 30px; font-size: 13px; }
+    table a { color: var(--pink); text-decoration: none; font-weight: 600; }
+    table a:hover { text-decoration: underline; }
 
-  .card { padding: 20px 16px; }
+    /* ── ACTION BUTTONS ── */
+    .action-buttons { display: flex; gap: 6px; }
+    .action-buttons button {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+      border: none; border-radius: var(--r-sm);
+      cursor: pointer; font-size: 12px; flex-shrink: 0;
+      transition: transform var(--t), opacity var(--t);
+    }
+    .action-buttons button:hover  { transform: translateY(-1px); opacity: 0.85; }
+    .action-buttons button:active { transform: scale(0.95); }
+    .edit-btn    { background: #fef9c3; color: #854d0e; }
+    .delete-btn  { background: #fee2e2; color: #b91c1c; }
+    .cancel-btn  { background: #ffedd5; color: #c2410c; }
+    .restore-btn { background: #dcfce7; color: #166534; }
 
-  .form-grid-2 { grid-template-columns: 1fr; }
+    /* ── FILTER BAR ── */
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+    .filter-bar select,
+    .filter-bar input {
+      padding: 9px 13px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 13px; font-family: var(--font);
+      color: var(--ink); background: var(--surface);
+      outline: none; margin: 0; width: auto;
+      -webkit-appearance: none; appearance: none;
+    }
+    .filter-bar select:focus,
+    .filter-bar input:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 
-  .checkbox-grid { grid-template-columns: 1fr; }
+    /* ── MODAL ── */
+    .modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+      justify-content: center; align-items: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: var(--surface); border-radius: var(--r-lg);
+      padding: 28px;
+      width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+      animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .modal-box.wide { max-width: 500px; }
+    @keyframes modalPop {
+      from { transform: scale(0.90); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .modal-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--pink-soft);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--pink); font-size: 15px; flex-shrink: 0;
+    }
+    .modal-title { font-family: var(--font-display); font-size: 18px; color: var(--ink); }
+    .modal-actions {
+      display: flex; justify-content: flex-end; gap: 10px;
+      margin-top: 22px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .modal-sub {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--ink-light);
+      margin-bottom: 8px; margin-top: 16px;
+    }
+    .modal-hint  { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; }
 
-  .modal-box { padding: 20px 16px; }
-  .modal-actions { justify-content: stretch; }
-  .modal-actions button { flex: 1; justify-content: center; }
+    .modal-detail-row {
+      display: flex; padding: 9px 0;
+      border-bottom: 1px solid var(--border); font-size: 13.5px;
+    }
+    .modal-detail-row:last-child { border-bottom: none; }
+    .modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; flex-shrink: 0; }
+    .modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; word-break: break-word; }
 
-  .filter-bar { gap: 8px; }
-  .filter-bar select, .filter-bar input { width: 100%; }
-  .filter-bar .btn-secondary { width: 100%; justify-content: center; }
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; top: 22px; right: 22px;
+      background: var(--surface); color: var(--ink);
+      padding: 13px 18px; border-radius: var(--r-md);
+      font-size: 13.5px; font-weight: 500; font-family: var(--font);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 300px;
+      opacity: 0; transform: translateY(-16px);
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 1100; border-left: 4px solid var(--border);
+    }
+    .toast.show    { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left-color: #22c55e; }
+    .toast.error   { border-left-color: #ef4444; }
 
-  .toast { right: 12px; top: 12px; max-width: calc(100vw - 24px); }
-}
+    /* ── MISC ── */
+    .booking-detail-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+    .tbl-empty          { text-align: center; padding: 40px 20px; color: var(--ink-light); font-size: 13.5px; }
+    .tbl-empty i        { font-size: 28px; color: var(--pink-pill); display: block; margin-bottom: 10px; }
 
-/* ══════════════════════════════════════
-   RESPONSIVE — MOBILE (≤ 600px)
-══════════════════════════════════════ */
-@media (max-width: 600px) {
-  .main { padding: 64px 14px 20px; }
+    /* ══════════════════════════════════════
+       RESPONSIVE — TABLET (≤ 900px)
+    ══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
 
-  .page-title { font-size: 20px; gap: 8px; }
-  .page-subtitle { font-size: 12px; }
+      .sidebar {
+        transform: translateX(-100%);
+        width: 260px;
+      }
+      .sidebar.open { transform: translateX(0); }
 
-  .card { padding: 16px 14px; border-radius: var(--r-md); margin-bottom: 14px; }
-  .card-title { font-size: 14px; margin-bottom: 16px; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 70px 20px 24px;
+      }
 
-  .form-group input,
-  .form-group select { font-size: 16px; /* prevents iOS zoom on focus */ padding: 12px 14px; }
+      .page-title { font-size: 22px; }
+      .card       { padding: 20px 16px; }
 
-  .btn-primary { width: 100%; justify-content: center; padding: 13px; font-size: 14px; }
-  .btn-secondary, .btn-danger, .btn-success { font-size: 12px; padding: 9px 14px; }
+      .form-grid-2   { grid-template-columns: 1fr; }
+      .checkbox-grid { grid-template-columns: 1fr; }
 
-  th { font-size: 9.5px; padding: 9px 10px; }
-  td { font-size: 12.5px; padding: 10px 10px; }
+      .modal-actions { justify-content: stretch; }
+      .modal-actions button { flex: 1; justify-content: center; }
 
-  .badge, .badge-access { font-size: 10px; padding: 2px 7px; }
-  .badge-role { font-size: 10px; padding: 2px 7px; }
+      .filter-bar select,
+      .filter-bar input,
+      .filter-bar .btn-secondary { width: 100%; }
 
-  .action-buttons { gap: 4px; }
-  .action-buttons button { width: 28px; height: 28px; font-size: 11px; }
+      .toast { right: 12px; top: 12px; max-width: calc(100vw - 24px); }
+    }
 
-  .modal-box { padding: 18px 14px; border-radius: var(--r-md); }
-  .modal-title { font-size: 16px; }
-  .modal-actions { flex-direction: column; }
-  .modal-actions button { width: 100%; justify-content: center; }
+    /* ══════════════════════════════════════
+       RESPONSIVE — MOBILE (≤ 600px)
+    ══════════════════════════════════════ */
+    @media (max-width: 600px) {
+      .main { padding: 64px 14px 20px; }
 
-  .modal-detail-label { width: 42%; font-size: 12px; }
-  .modal-detail-value { font-size: 12.5px; }
+      .page-title    { font-size: 20px; gap: 8px; }
+      .page-subtitle { font-size: 12px; }
 
-  .checkbox-label { padding: 10px 12px; font-size: 12.5px; }
-}
+      .card       { padding: 16px 14px; border-radius: var(--r-md); margin-bottom: 14px; }
+      .card-title { font-size: 14px; margin-bottom: 16px; }
 
-/* ══════════════════════════════════════
-   RESPONSIVE — SMALL MOBILE (≤ 380px)
-══════════════════════════════════════ */
-@media (max-width: 380px) {
-  .main { padding: 60px 10px 16px; }
-  .card { padding: 14px 12px; }
-  .page-title { font-size: 18px; }
-  .page-title-icon { display: none; }
-}
+      /* 16px prevents iOS auto-zoom on focus */
+      .form-group input,
+      .form-group select { font-size: 16px; padding: 12px 14px; }
 
-</style>
+      .btn-primary { width: 100%; justify-content: center; }
+
+      th { font-size: 9.5px; padding: 9px 10px; }
+      td { font-size: 12.5px; padding: 10px 10px; }
+
+      .action-buttons button { width: 28px; height: 28px; font-size: 11px; }
+
+      .modal-box    { padding: 18px 14px; border-radius: var(--r-md); }
+      .modal-title  { font-size: 16px; }
+      .modal-actions { flex-direction: column; }
+      .modal-actions button { width: 100%; justify-content: center; }
+
+      .checkbox-label { padding: 10px 12px; font-size: 12.5px; }
+    }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE — SMALL MOBILE (≤ 380px)
+    ══════════════════════════════════════ */
+    @media (max-width: 380px) {
+      .main { padding: 60px 10px 16px; }
+      .page-title-icon { display: none; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ── HAMBURGER ── -->
+<!-- ══════════════════════════════════════
+     HAMBURGER (mobile)
+══════════════════════════════════════ -->
 <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
   <i class="fas fa-bars"></i>
 </button>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ── MODALS ── -->
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
 
-<!-- EDIT USER -->
+<!-- Edit User -->
 <div id="editModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -456,14 +600,18 @@ table a:hover { text-decoration: underline; }
       <div class="form-group">
         <label class="form-label">Email</label>
         <input type="email" id="editEmail" placeholder="Email" oninput="validateEmailField(this,'editEmailHint')">
-        <div class="email-hint" id="editEmailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email</span></div>
+        <div class="email-hint" id="editEmailHint">
+          <i class="fas fa-circle-xmark"></i> <span>Enter a valid email</span>
+        </div>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">New Password <span>(leave blank to keep current)</span></label>
       <div class="pw-input-wrap">
         <input type="password" id="editPassword" placeholder="New password (optional)">
-        <button type="button" class="pw-toggle-btn" onclick="togglePw('editPassword',this)"><i class="fas fa-eye"></i></button>
+        <button type="button" class="pw-toggle-btn" onclick="togglePw('editPassword',this)">
+          <i class="fas fa-eye"></i>
+        </button>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
@@ -475,12 +623,12 @@ table a:hover { text-decoration: underline; }
     <div class="checkbox-grid" id="editDepartments" style="max-height:200px;overflow-y:auto;"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-      <button class="btn-primary" onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
+      <button class="btn-primary"   onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
     </div>
   </div>
 </div>
 
-<!-- DELETE -->
+<!-- Delete Confirmation -->
 <div id="deleteModal" class="modal">
   <div class="modal-box" style="max-width:380px;">
     <div class="modal-header">
@@ -490,12 +638,12 @@ table a:hover { text-decoration: underline; }
     <p id="deleteMessage" style="font-size:13.5px;color:var(--ink-mid);line-height:1.6;"></p>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-danger" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
+      <button class="btn-danger"    onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
     </div>
   </div>
 </div>
 
-<!-- EDIT LINK -->
+<!-- Edit Link -->
 <div id="editLinkModal" class="modal">
   <div class="modal-box">
     <div class="modal-header">
@@ -516,12 +664,12 @@ table a:hover { text-decoration: underline; }
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeEditLinkModal()">Cancel</button>
-      <button class="btn-primary" onclick="updateLink()"><i class="fas fa-save"></i> Update</button>
+      <button class="btn-primary"   onclick="updateLink()"><i class="fas fa-save"></i> Update</button>
     </div>
   </div>
 </div>
 
-<!-- BOOKING DETAIL -->
+<!-- Booking Detail -->
 <div id="bookingDetailModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -531,14 +679,17 @@ table a:hover { text-decoration: underline; }
     <div id="bookingDetailRows"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-danger"  id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel</button>
-      <button class="btn-success" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
+      <button class="btn-danger"    id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel</button>
+      <button class="btn-success"   id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
     </div>
   </div>
 </div>
 
-<!-- ── SIDEBAR ── -->
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
 <div class="sidebar" id="sidebar">
+
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
       <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
@@ -555,13 +706,13 @@ table a:hover { text-decoration: underline; }
 
   <nav class="sidebar-nav">
     <span class="sidebar-section-label">Manage</span>
-    <button onclick="showSection('usersSection',this);closeSidebar();" class="active">
+    <button onclick="showSection('usersSection', this); closeSidebar();" class="active">
       <i class="fas fa-users"></i> Users
     </button>
-    <button onclick="showSection('linksSection',this);closeSidebar();">
+    <button onclick="showSection('linksSection', this); closeSidebar();">
       <i class="fas fa-link"></i> Links
     </button>
-    <button id="bookingsNavBtn" onclick="showSection('bookingsSection',this);closeSidebar();">
+    <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this); closeSidebar();">
       <i class="fas fa-calendar-days"></i> Bookings
     </button>
   </nav>
@@ -575,762 +726,879 @@ table a:hover { text-decoration: underline; }
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- ── MAIN ── -->
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
 <div class="main">
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
-<!-- USERS SECTION -->
-<div id="usersSection">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-users"></i></div>
-      Manage <span class="accent">Users</span>
-    </h2>
-    <p class="page-subtitle">Create and manage user accounts and their access</p>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><i class="fas fa-user-plus"></i> Create User</div>
-    <div class="form-grid-2">
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input id="name" placeholder="Enter full name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input id="email" type="email" placeholder="Enter email" oninput="validateEmailField(this,'emailHint')">
-        <div class="email-hint" id="emailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span></div>
-      </div>
+  <!-- ── USERS SECTION ── -->
+  <div id="usersSection">
+    <div class="page-header">
+      <h2 class="page-title">
+        <div class="page-title-icon"><i class="fas fa-users"></i></div>
+        Manage <span class="accent">Users</span>
+      </h2>
+      <p class="page-subtitle">Create and manage user accounts and their access</p>
     </div>
-    <div class="form-grid-2" style="margin-bottom:14px;">
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <div class="pw-input-wrap">
-          <input id="password" type="password" placeholder="Create password">
-          <button type="button" class="pw-toggle-btn" onclick="togglePw('password',this)"><i class="fas fa-eye"></i></button>
+
+    <!-- Create User Form -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-user-plus"></i> Create User</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input id="name" placeholder="Enter full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input id="email" type="email" placeholder="Enter email" oninput="validateEmailField(this,'emailHint')">
+          <div class="email-hint" id="emailHint">
+            <i class="fas fa-circle-xmark"></i> <span>Enter a valid email</span>
+          </div>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Confirm Password</label>
-        <div class="pw-input-wrap">
-          <input id="confirmPassword" type="password" placeholder="Repeat password">
-          <button type="button" class="pw-toggle-btn" onclick="togglePw('confirmPassword',this)"><i class="fas fa-eye"></i></button>
+      <div class="form-grid-2" style="margin-bottom:14px;">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="pw-input-wrap">
+            <input id="password" type="password" placeholder="Create password">
+            <button type="button" class="pw-toggle-btn" onclick="togglePw('password', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <div class="pw-input-wrap">
+            <input id="confirmPassword" type="password" placeholder="Repeat password">
+            <button type="button" class="pw-toggle-btn" onclick="togglePw('confirmPassword', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="form-group" style="margin-bottom:14px;">
-      <label class="form-label">Department <span>(where they work)</span></label>
-      <select id="userDepartment"></select>
-    </div>
-    <div class="form-group" style="margin-bottom:14px;" id="roleGroup">
-      <label class="form-label">Role</label>
-      <select id="role">
-        <option value="user">User (Staff)</option>
-        <option value="admin">Admin (Department Admin)</option>
-      </select>
-    </div>
-    <div style="margin-bottom:20px;">
-      <div class="form-label" style="margin-bottom:4px;">
-        Access Departments
-        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(which access group they belong to)</span>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label">Department <span>(where they work)</span></label>
+        <select id="userDepartment"></select>
       </div>
-      <div class="modal-hint">Check all access departments for this user.</div>
-      <div class="checkbox-grid" id="departmentCheckboxes"></div>
-    </div>
-    <button class="btn-primary" onclick="createUser()">
-      <i class="fas fa-user-plus"></i> Create User
-    </button>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><i class="fas fa-list"></i> Users List</div>
-    <div class="table-wrap">
-      <table id="userTable">
-        <thead>
-          <tr>
-            <th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Access Dept</th><th>Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- LINKS SECTION -->
-<div id="linksSection" style="display:none;">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-link"></i></div>
-      Manage <span class="accent">Links</span>
-    </h2>
-    <p class="page-subtitle">Add and manage links for each department</p>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><i class="fas fa-plus"></i> Add Link</div>
-    <div class="form-grid-2" style="margin-bottom:14px;">
-      <div class="form-group">
-        <label class="form-label">Link Name</label>
-        <input id="linkName" placeholder="e.g. Leave System">
+      <div class="form-group" style="margin-bottom:14px;" id="roleGroup">
+        <label class="form-label">Role</label>
+        <select id="role">
+          <option value="user">User (Staff)</option>
+          <option value="admin">Admin (Department Admin)</option>
+        </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">URL</label>
-        <input id="linkURL" placeholder="https://...">
+      <div style="margin-bottom:20px;">
+        <div class="form-label" style="margin-bottom:4px;">
+          Access Departments
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">
+            (which access group they belong to)
+          </span>
+        </div>
+        <div class="modal-hint">Check all access departments for this user.</div>
+        <div class="checkbox-grid" id="departmentCheckboxes"></div>
+      </div>
+      <button class="btn-primary" onclick="createUser()">
+        <i class="fas fa-user-plus"></i> Create User
+      </button>
+    </div>
+
+    <!-- Users List -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-list"></i> Users List</div>
+      <div class="table-wrap">
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Access Dept</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
-    <div class="form-group" style="margin-bottom:20px;">
-      <label class="form-label">Department</label>
-      <select id="linkDepartment"></select>
-    </div>
-    <button class="btn-primary" onclick="createLink()">
-      <i class="fas fa-plus"></i> Add Link
-    </button>
   </div>
 
-  <div class="card">
-    <div class="card-title"><i class="fas fa-list"></i> Links List</div>
-    <div class="table-wrap">
-      <table id="linkTable">
-        <thead>
-          <tr><th>Link Name</th><th>URL</th><th>Department</th><th>Action</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <!-- ── LINKS SECTION ── -->
+  <div id="linksSection" style="display:none;">
+    <div class="page-header">
+      <h2 class="page-title">
+        <div class="page-title-icon"><i class="fas fa-link"></i></div>
+        Manage <span class="accent">Links</span>
+      </h2>
+      <p class="page-subtitle">Add and manage links for each department</p>
     </div>
-  </div>
-</div>
 
-<!-- BOOKINGS SECTION -->
-<div id="bookingsSection" style="display:none;">
-  <div class="page-header">
-    <h2 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-calendar"></i></div>
-      Room <span class="accent">Bookings</span>
-    </h2>
-    <p class="page-subtitle">View and manage all room bookings</p>
+    <!-- Add Link Form -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-plus"></i> Add Link</div>
+      <div class="form-grid-2" style="margin-bottom:14px;">
+        <div class="form-group">
+          <label class="form-label">Link Name</label>
+          <input id="linkName" placeholder="e.g. Leave System">
+        </div>
+        <div class="form-group">
+          <label class="form-label">URL</label>
+          <input id="linkURL" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label class="form-label">Department</label>
+        <select id="linkDepartment"></select>
+      </div>
+      <button class="btn-primary" onclick="createLink()">
+        <i class="fas fa-plus"></i> Add Link
+      </button>
+    </div>
+
+    <!-- Links List -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-list"></i> Links List</div>
+      <div class="table-wrap">
+        <table id="linkTable">
+          <thead>
+            <tr>
+              <th>Link Name</th>
+              <th>URL</th>
+              <th>Department</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="card-title"><i class="fas fa-filter"></i> Filter Bookings</div>
-    <div class="filter-bar">
-      <select id="filterStatus" onchange="filterBookings()">
-        <option value="">All Status</option>
-        <option value="confirmed">Confirmed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-      <select id="filterRoom" onchange="filterBookings()">
-        <option value="">All Rooms</option>
-      </select>
-      <input type="date" id="filterDate" onchange="filterBookings()">
-      <button class="btn-secondary" onclick="clearBookingFilters()"><i class="fas fa-xmark"></i> Clear</button>
+  <!-- ── BOOKINGS SECTION ── -->
+  <div id="bookingsSection" style="display:none;">
+    <div class="page-header">
+      <h2 class="page-title">
+        <div class="page-title-icon"><i class="fas fa-calendar"></i></div>
+        Room <span class="accent">Bookings</span>
+      </h2>
+      <p class="page-subtitle">View and manage all room bookings</p>
     </div>
-    <div class="table-wrap">
-      <table id="bookingsTable">
-        <thead>
-          <tr><th>Room</th><th>Event</th><th>Date</th><th>Time</th><th>Booked By</th><th>Contact</th><th>Status</th><th>Action</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-filter"></i> Filter Bookings</div>
+      <div class="filter-bar">
+        <select id="filterStatus" onchange="filterBookings()">
+          <option value="">All Status</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select id="filterRoom" onchange="filterBookings()">
+          <option value="">All Rooms</option>
+        </select>
+        <input type="date" id="filterDate" onchange="filterBookings()">
+        <button class="btn-secondary" onclick="clearBookingFilters()">
+          <i class="fas fa-xmark"></i> Clear
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table id="bookingsTable">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Booked By</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
 </div><!-- end .main -->
 
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
 <script>
 
-let editingUserId    = null;
-let editingLinkId    = null;
-let deleteType       = null;
-let deleteId         = null;
-let allBookings      = [];
-let viewingBookingId = null;
-let allAccessDepts   = [];
-let adminWorkDeptIds = [];
+  /* ── STATE ── */
+  let editingUserId    = null;
+  let editingLinkId    = null;
+  let deleteType       = null;
+  let deleteId         = null;
+  let allBookings      = [];
+  let viewingBookingId = null;
+  let allAccessDepts   = [];
+  let adminWorkDeptIds = [];
 
-function getStore(key) {
-  return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
-}
-
-/* ── MOBILE SIDEBAR ── */
-function toggleSidebar() {
-  const sidebar  = document.getElementById("sidebar");
-  const overlay  = document.getElementById("sidebarOverlay");
-  const btn      = document.getElementById("hamburgerBtn");
-  const isOpen   = sidebar.classList.contains("open");
-  sidebar.classList.toggle("open", !isOpen);
-  overlay.classList.toggle("open", !isOpen);
-  btn.innerHTML  = isOpen ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
-}
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("sidebarOverlay").classList.remove("open");
-  document.getElementById("hamburgerBtn").innerHTML = '<i class="fas fa-bars"></i>';
-}
-window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
-
-/* ── EMAIL VALIDATION ── */
-function validateEmailField(input, hintId) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const hint = document.getElementById(hintId);
-  if (!input.value) {
-    input.classList.remove("email-valid","email-invalid");
-    hint.className = "email-hint"; return;
+  /* ── HELPER: read from localStorage OR sessionStorage ── */
+  function getStore(key) {
+    return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
   }
-  if (emailRegex.test(input.value)) {
-    input.classList.add("email-valid"); input.classList.remove("email-invalid");
-    hint.className = "email-hint valid";
-    hint.innerHTML = '<i class="fas fa-circle-check"></i> <span>Valid email</span>';
-  } else {
-    input.classList.add("email-invalid"); input.classList.remove("email-valid");
-    hint.className = "email-hint invalid";
-    hint.innerHTML = '<i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span>';
+
+  /* ══════════════════════════════════════
+     MOBILE SIDEBAR
+  ══════════════════════════════════════ */
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const btn     = document.getElementById("hamburgerBtn");
+    const isOpen  = sidebar.classList.contains("open");
+    sidebar.classList.toggle("open", !isOpen);
+    overlay.classList.toggle("open", !isOpen);
+    btn.innerHTML = isOpen
+      ? '<i class="fas fa-bars"></i>'
+      : '<i class="fas fa-times"></i>';
   }
-}
 
-/* ── PASSWORD TOGGLE ── */
-function togglePw(inputId, btn) {
-  const input = document.getElementById(inputId);
-  const isText = input.type === "text";
-  input.type = isText ? "password" : "text";
-  btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
-}
-
-/* ── NAVIGATION ── */
-function goBackToDashboard() { window.location.href = "index.html"; }
-
-function showSection(id, btn) {
-  ["usersSection","linksSection","bookingsSection"].forEach(s => {
-    document.getElementById(s).style.display = "none";
-  });
-  document.getElementById(id).style.display = "block";
-  document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-  // scroll to top on mobile section switch
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-/* ── TOAST ── */
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toast");
-  toast.classList.remove("show","success","error");
-  void toast.offsetWidth;
-  toast.textContent = message;
-  toast.classList.add("show", type);
-  setTimeout(() => toast.classList.remove("show"), 2800);
-}
-
-/* ── FETCH MY WORK DEPTS ── */
-async function fetchMyWorkDepts() {
-  const userData = getStore("user");
-  const token    = getStore("token");
-  const user     = JSON.parse(userData);
-  const res      = await fetch(`${API}/api/users/${user.id}/departments`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  const depts    = await res.json();
-  adminWorkDeptIds = Array.isArray(depts) ? depts.map(d => d.id) : [];
-  return Array.isArray(depts) ? depts : [];
-}
-
-/* ── LOAD ACCESS DEPTS ── */
-async function loadAccessDepts() {
-  const res = await fetch(`${API}/api/access-dept`);
-  allAccessDepts = await res.json();
-  const seen = new Set();
-  allAccessDepts = allAccessDepts.filter(d => {
-    if (seen.has(d.name.toLowerCase())) return false;
-    seen.add(d.name.toLowerCase()); return true;
-  });
-}
-
-/* ── CHECKBOX RENDERER ── */
-function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-  allAccessDepts.forEach(dep => {
-    const checked = checkedIds.includes(String(dep.id)) ? "checked" : "";
-    const label   = document.createElement("label");
-    label.className = "checkbox-label";
-    label.innerHTML = `<input type="checkbox" value="${dep.id}" ${checked}> ${dep.name}`;
-    container.appendChild(label);
-  });
-}
-
-/* ── SCOPED DEPTS FOR DROPDOWNS ── */
-async function getScopedDepts() {
-  if (window.userRole === "admin") return await fetchMyWorkDepts();
-  const res  = await fetch(`${API}/api/departments`);
-  return await res.json();
-}
-
-function dedupe(depts) {
-  const seen = new Set();
-  return depts.filter(d => {
-    if (seen.has(d.name.toLowerCase())) return false;
-    seen.add(d.name.toLowerCase()); return true;
-  });
-}
-
-async function loadDepartments() {
-  const data = dedupe(await getScopedDepts());
-  const sel  = document.getElementById("userDepartment");
-  if (sel) {
-    sel.innerHTML = "<option value=''>Select department...</option>";
-    data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("open");
+    document.getElementById("hamburgerBtn").innerHTML = '<i class="fas fa-bars"></i>';
   }
-}
 
-async function loadLinkDepartments() {
-  const data = dedupe(await getScopedDepts());
-  const sel  = document.getElementById("linkDepartment");
-  sel.innerHTML = "<option value=''>Select Department</option>";
-  data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
-}
-
-/* ── USERS ── */
-async function loadUsers() {
-  const token = getStore("token");
-  const res   = await fetch(`${API}/api/users`, { headers: { "Authorization": `Bearer ${token}` } });
-  const users = await res.json();
-  const tbody = document.querySelector("#userTable tbody");
-  tbody.innerHTML = "";
-
-  const visible = window.userRole === "admin"
-    ? users.filter(u => u.departments?.some(d => adminWorkDeptIds.includes(d.id)))
-    : users;
-
-  if (!visible.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="tbl-empty"><i class="fas fa-users"></i>No users found</td></tr>`;
-    return;
-  }
-  visible.forEach(user => {
-    const roleBadge   = `<span class="badge-role ${user.role}">${user.role}</span>`;
-    const depts       = user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "—";
-    const accessDepts = (user.link_access || []).map(d => `<span class="badge-access">${d.name}</span>`).join("") || "—";
-    tbody.innerHTML += `
-      <tr>
-        <td style="font-weight:600;color:var(--ink);">${user.name || "—"}</td>
-        <td style="word-break:break-all;">${user.email}</td>
-        <td>${roleBadge}</td>
-        <td>${depts}</td>
-        <td>${accessDepts}</td>
-        <td>
-          <div class="action-buttons">
-            <button class="edit-btn" title="Edit" onclick="editUser(${user.id})"><i class="fas fa-pen"></i></button>
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('user',${user.id})"><i class="fas fa-trash"></i></button>
-          </div>
-        </td>
-      </tr>`;
-  });
-}
-
-async function createUser() {
-  const token    = getStore("token");
-  const name     = document.getElementById("name").value.trim();
-  const email    = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const confirm  = document.getElementById("confirmPassword").value;
-  const roleEl   = document.getElementById("role");
-  const role     = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
-  const workDept = document.getElementById("userDepartment").value;
-  const deps     = [];
-  document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!name)                   { showToast("Please enter a name","error"); return; }
-  if (!email)                  { showToast("Please enter an email","error"); return; }
-  if (!emailRegex.test(email)) { showToast("Please enter a valid email address","error"); return; }
-  if (!password)               { showToast("Please enter a password","error"); return; }
-  if (password !== confirm)    { showToast("Passwords do not match","error"); return; }
-  if (password.length < 6)     { showToast("Password must be at least 6 characters","error"); return; }
-
-  try {
-    const res  = await fetch(`${API}/api/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
-    });
-    const data = await res.json();
-    if (!res.ok) { showToast(data.message || "Failed to create user","error"); return; }
-
-    showToast("User created successfully!");
-    ["name","email","password","confirmPassword"].forEach(id => { document.getElementById(id).value = ""; });
-    ["password","confirmPassword"].forEach(id => {
-      const input = document.getElementById(id);
-      if (input) input.type = "password";
-      const btn = input?.closest(".pw-input-wrap")?.querySelector(".pw-toggle-btn i");
-      if (btn) btn.className = "fas fa-eye";
-    });
-    if (roleEl?.tagName === "SELECT") roleEl.value = "user";
-    document.getElementById("userDepartment").value = "";
-    // reset email validation
-    const emailEl = document.getElementById("email");
-    emailEl.classList.remove("email-valid","email-invalid");
-    document.getElementById("emailHint").className = "email-hint";
-    renderAccessDeptCheckboxes("departmentCheckboxes");
-    loadUsers();
-  } catch (err) {
-    console.error(err);
-    showToast("Server error. Please try again.","error");
-  }
-}
-
-/* ── LINKS ── */
-async function loadLinks() {
-  const res   = await fetch(`${API}/api/links`);
-  const links = await res.json();
-  const tbody = document.querySelector("#linkTable tbody");
-  tbody.innerHTML = "";
-
-  const visible = window.userRole === "admin"
-    ? links.filter(l => adminWorkDeptIds.includes(Number(l.department_id)))
-    : links;
-
-  if (!visible.length) {
-    tbody.innerHTML = `<tr><td colspan="4" class="tbl-empty"><i class="fas fa-link"></i>No links found</td></tr>`;
-    return;
-  }
-  visible.forEach(link => {
-    tbody.innerHTML += `
-      <tr>
-        <td style="font-weight:600;color:var(--ink);">${link.name}</td>
-        <td><a href="${link.url}" target="_blank">Open <i class="fas fa-arrow-up-right-from-square" style="font-size:10px;"></i></a></td>
-        <td><span class="badge">${link.department_name}</span></td>
-        <td>
-          <div class="action-buttons">
-            <button class="edit-btn" title="Edit" onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fas fa-pen"></i></button>
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('link',${link.id})"><i class="fas fa-trash"></i></button>
-          </div>
-        </td>
-      </tr>`;
-  });
-}
-
-async function createLink() {
-  const name = document.getElementById("linkName").value.trim();
-  const url  = document.getElementById("linkURL").value.trim();
-  const dept = document.getElementById("linkDepartment").value;
-  if (!name || !url || !dept) { showToast("Please fill all fields","error"); return; }
-  const res = await fetch(`${API}/api/links`, {
-    method: "POST", headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name, url, department_id: dept })
-  });
-  if (!res.ok) { showToast("Failed to add link","error"); return; }
-  showToast("Link added successfully!");
-  document.getElementById("linkName").value = "";
-  document.getElementById("linkURL").value  = "";
-  document.getElementById("linkDepartment").value = "";
-  loadLinks();
-}
-
-async function editLink(id, name, url, department_id) {
-  editingLinkId = id;
-  document.getElementById("editLinkName").value = name;
-  document.getElementById("editLinkURL").value  = url;
-  const deps = dedupe(await getScopedDepts());
-  const sel  = document.getElementById("editLinkDepartment");
-  sel.innerHTML = "";
-  deps.forEach(d => sel.innerHTML += `<option value="${d.id}" ${d.id == department_id ? "selected" : ""}>${d.name}</option>`);
-  document.getElementById("editLinkModal").style.display = "flex";
-}
-function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
-
-async function updateLink() {
-  const name = document.getElementById("editLinkName").value.trim();
-  const url  = document.getElementById("editLinkURL").value.trim();
-  const dept = document.getElementById("editLinkDepartment").value;
-  if (!name || !url) { showToast("Please fill all fields","error"); return; }
-  await fetch(`${API}/api/links/${editingLinkId}`, {
-    method: "PUT", headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name, url, department_id: dept })
-  });
-  showToast("Link updated!");
-  closeEditLinkModal();
-  loadLinks();
-}
-
-/* ── DELETE ── */
-function openDeleteModal(type, id) {
-  deleteType = type; deleteId = id;
-  document.getElementById("deleteMessage").textContent =
-    `Are you sure you want to delete this ${type}? This action cannot be undone.`;
-  document.getElementById("deleteModal").style.display = "flex";
-}
-function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; }
-
-async function confirmDelete() {
-  const token = getStore("token");
-  const url   = deleteType === "link"    ? `${API}/api/links/${deleteId}`
-              : deleteType === "booking" ? `${API}/api/bookings/${deleteId}`
-              : `${API}/api/users/${deleteId}`;
-  await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
-  showToast("Deleted successfully!");
-  closeDeleteModal();
-  if (deleteType === "link")         loadLinks();
-  else if (deleteType === "booking") loadBookings();
-  else                               loadUsers();
-}
-
-/* ── EDIT USER ── */
-async function editUser(id) {
-  const token   = getStore("token");
-  const resUser = await fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${token}` } });
-  const user    = await resUser.json();
-  const deps    = dedupe(await getScopedDepts());
-
-  editingUserId = id;
-  document.getElementById("editName").value     = user.name  || "";
-  document.getElementById("editEmail").value    = user.email || "";
-  document.getElementById("editPassword").value = "";
-  // reset email hint
-  const editEmailEl = document.getElementById("editEmail");
-  editEmailEl.classList.remove("email-valid","email-invalid");
-  document.getElementById("editEmailHint").className = "email-hint";
-
-  const workSel = document.getElementById("editWorkDept");
-  workSel.innerHTML = "<option value=''>Select department...</option>";
-  deps.forEach(d => {
-    const sel = user.departments?.some(ud => ud.id === d.id) ? "selected" : "";
-    workSel.innerHTML += `<option value="${d.id}" ${sel}>${d.name}</option>`;
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) closeSidebar();
   });
 
-  const checkedIds = (user.link_access || []).map(d => String(d.id));
-  renderAccessDeptCheckboxes("editDepartments", checkedIds);
-  document.getElementById("editModal").style.display = "flex";
-}
-function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
-
-async function confirmEdit() {
-  const token    = getStore("token");
-  const name     = document.getElementById("editName").value.trim();
-  const email    = document.getElementById("editEmail").value.trim();
-  const password = document.getElementById("editPassword").value;
-  const workDept = document.getElementById("editWorkDept").value;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!name)                   { showToast("Please enter a name","error"); return; }
-  if (!email)                  { showToast("Please enter an email","error"); return; }
-  if (!emailRegex.test(email)) { showToast("Please enter a valid email address","error"); return; }
-  const linkDeps = [];
-  document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
-  const body = { name, email, departments: workDept ? [workDept] : [], link_access: linkDeps };
-  if (password) body.password = password;
-  await fetch(`${API}/api/users/${editingUserId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-    body: JSON.stringify(body)
-  });
-  showToast("User updated successfully!");
-  closeEditModal();
-  loadUsers();
-}
-
-/* ── BOOKINGS ── */
-async function loadBookings() {
-  const res   = await fetch(`${API}/api/bookings`);
-  allBookings = await res.json();
-  renderBookings(allBookings);
-  loadBookingRoomFilter();
-}
-
-async function loadBookingRoomFilter() {
-  const res   = await fetch(`${API}/api/bookings/rooms`);
-  const rooms = await res.json();
-  const sel   = document.getElementById("filterRoom");
-  sel.innerHTML = `<option value="">All Rooms</option>`;
-  rooms.forEach(r => sel.innerHTML += `<option value="${r.id}">${r.name}</option>`);
-}
-
-function renderBookings(bookings) {
-  const tbody = document.querySelector("#bookingsTable tbody");
-  tbody.innerHTML = "";
-  if (!Array.isArray(bookings) || !bookings.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="tbl-empty"><i class="fas fa-calendar-times"></i>No bookings found</td></tr>`;
-    return;
-  }
-  bookings.forEach(b => {
-    const isConfirmed = b.status === "confirmed";
-    tbody.innerHTML += `
-      <tr>
-        <td style="font-weight:600;color:var(--ink);">${b.room_name}</td>
-        <td>${b.event_name}</td>
-        <td style="white-space:nowrap;">${formatBookingDate(b.date)}</td>
-        <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
-        <td>${b.name}<div class="booking-detail-sub">${b.department}</div></td>
-        <td>${b.phone}</td>
-        <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
-        <td>
-          <div class="action-buttons">
-            <button class="edit-btn" title="View" onclick="viewBookingDetail(${b.id})"><i class="fas fa-eye"></i></button>
-            ${isConfirmed
-              ? `<button class="cancel-btn" title="Cancel" onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fas fa-ban"></i></button>`
-              : `<button class="restore-btn" title="Restore" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fas fa-rotate-left"></i></button>`
-            }
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('booking',${b.id})"><i class="fas fa-trash"></i></button>
-          </div>
-        </td>
-      </tr>`;
-  });
-}
-
-function filterBookings() {
-  const status = document.getElementById("filterStatus").value;
-  const roomId = document.getElementById("filterRoom").value;
-  const date   = document.getElementById("filterDate").value;
-  renderBookings(allBookings.filter(b =>
-    (!status || b.status === status) &&
-    (!roomId || String(b.room_id) === roomId) &&
-    (!date   || b.date.slice(0,10) === date)
-  ));
-}
-
-function clearBookingFilters() {
-  ["filterStatus","filterRoom","filterDate"].forEach(id => document.getElementById(id).value = "");
-  renderBookings(allBookings);
-}
-
-async function updateBookingStatus(id, status) {
-  const res = await fetch(`${API}/api/bookings/${id}/status`, {
-    method: "PUT", headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ status })
-  });
-  if (res.ok) { showToast(status === "cancelled" ? "Booking cancelled" : "Booking restored"); loadBookings(); }
-  else { showToast("Failed to update status","error"); }
-}
-
-function viewBookingDetail(id) {
-  const b = allBookings.find(x => x.id === id);
-  if (!b) return;
-  viewingBookingId = id;
-  const rows = [
-    ["Room",      b.room_name],
-    ["Event",     b.event_name],
-    ["Date",      formatBookingDate(b.date)],
-    ["Time",      `${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}`],
-    ["Duration",  (b.duration_hours > 0 ? b.duration_hours + " hr " : "") + (b.duration_minutes > 0 ? b.duration_minutes + " min" : "")],
-    ["Name",      b.name],
-    ["Dept",      b.department],
-    ["Phone",     b.phone],
-    ["Status",    `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`],
-    ["Submitted", new Date(b.created_at).toLocaleString("en-MY")],
-  ];
-  document.getElementById("bookingDetailRows").innerHTML = rows.map(([label, val]) => `
-    <div class="modal-detail-row">
-      <div class="modal-detail-label">${label}</div>
-      <div class="modal-detail-value">${val}</div>
-    </div>`).join("");
-  document.getElementById("detailCancelBtn").style.display  = b.status === "confirmed" ? "inline-flex" : "none";
-  document.getElementById("detailRestoreBtn").style.display = b.status === "cancelled"  ? "inline-flex" : "none";
-  document.getElementById("bookingDetailModal").style.display = "flex";
-}
-function closeBookingDetailModal() { document.getElementById("bookingDetailModal").style.display = "none"; }
-async function cancelFromDetail()  { await updateBookingStatus(viewingBookingId, "cancelled"); closeBookingDetailModal(); }
-async function restoreFromDetail() { await updateBookingStatus(viewingBookingId, "confirmed"); closeBookingDetailModal(); }
-
-/* ── HELPERS ── */
-function formatBookingDate(d) {
-  return new Date(d).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
-}
-function formatBookingTime(t) {
-  if (!t) return "";
-  const [h, m] = t.slice(0,5).split(":").map(Number);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour  = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2,"0")} ${ampm}`;
-}
-function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
-
-function applyAutoCapitalize(input) {
-  input.addEventListener("input", () => {
-    if (input.value.length === 1) input.value = input.value.toUpperCase();
-  });
-  input.addEventListener("keyup", e => {
-    if (e.key !== " ") return;
-    input.value = input.value.replace(/(^\s*|\s+)(\S)/g, (m, space, char) => space + char.toUpperCase());
-  });
-}
-
-function applyEnterToNext(inputs) {
-  inputs.forEach((input, i) => {
-    input?.addEventListener("keydown", e => {
-      if (e.key !== "Enter") return;
-      e.preventDefault();
-      inputs[i + 1]?.focus();
-    });
-  });
-}
-
-/* ── INIT ── */
-document.addEventListener("DOMContentLoaded", async () => {
-  const token    = getStore("token");
-  const role     = getStore("role");
-  const userData = getStore("user");
-
-  // Auth guard
-  if (!token) { window.location.href = "login.html"; return; }
-  if (role !== "admin" && role !== "superadmin") { window.location.href = "index.html"; return; }
-
-  // Auth passed — show page
-  document.body.style.visibility = "visible";
-
-  window.authToken = token;
-  window.userRole  = role;
-
-  try {
-    const user     = JSON.parse(userData);
-    const initials = (user.name || "A").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
-    document.getElementById("sidebarAvatar").textContent = initials;
-    document.getElementById("sidebarName").textContent   = user.name || user.email || "Admin";
-    document.getElementById("sidebarRole").textContent   = role;
-  } catch(e) {}
-
-  if (role === "admin") {
-    document.getElementById("bookingsNavBtn").style.display = "none";
-    const roleGroup = document.getElementById("roleGroup");
-    if (roleGroup) {
-      const roleInput = document.createElement("input");
-      roleInput.type = "text"; roleInput.value = "User (Staff)";
-      roleInput.disabled = true; roleInput.id = "role";
-      document.getElementById("role").replaceWith(roleInput);
+  /* ══════════════════════════════════════
+     UI HELPERS
+  ══════════════════════════════════════ */
+  function validateEmailField(input, hintId) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hint = document.getElementById(hintId);
+    if (!input.value) {
+      input.classList.remove("email-valid", "email-invalid");
+      hint.className = "email-hint";
+      return;
+    }
+    if (emailRegex.test(input.value)) {
+      input.classList.add("email-valid");
+      input.classList.remove("email-invalid");
+      hint.className = "email-hint valid";
+      hint.innerHTML = '<i class="fas fa-circle-check"></i> <span>Valid email</span>';
+    } else {
+      input.classList.add("email-invalid");
+      input.classList.remove("email-valid");
+      hint.className = "email-hint invalid";
+      hint.innerHTML = '<i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span>';
     }
   }
 
-  try {
-    await fetchMyWorkDepts();
-    await loadAccessDepts();
-    renderAccessDeptCheckboxes("departmentCheckboxes");
-    await loadDepartments();
-    await loadLinkDepartments();
-    await loadUsers();
-    await loadLinks();
-    if (role === "superadmin") await loadBookings();
-  } catch (err) {
-    console.error("INIT ERROR:", err);
-    showToast("Failed to load data","error");
+  function togglePw(inputId, btn) {
+    const input  = document.getElementById(inputId);
+    const isText = input.type === "text";
+    input.type = isText ? "password" : "text";
+    btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
   }
 
-  // Auto-capitalize name fields
-  ["name","linkName","editName","editLinkName"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) applyAutoCapitalize(el);
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.classList.remove("show", "success", "error");
+    void toast.offsetWidth;
+    toast.textContent = message;
+    toast.classList.add("show", type);
+    setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  /* ══════════════════════════════════════
+     NAVIGATION
+  ══════════════════════════════════════ */
+  function goBackToDashboard() {
+    window.location.href = "index.html";
+  }
+
+  function showSection(id, btn) {
+    ["usersSection", "linksSection", "bookingsSection"].forEach(s => {
+      document.getElementById(s).style.display = "none";
+    });
+    document.getElementById(id).style.display = "block";
+    document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ══════════════════════════════════════
+     DEPARTMENT HELPERS
+  ══════════════════════════════════════ */
+
+  /* Fetch the logged-in admin's own work departments.
+     Populates adminWorkDeptIds used for scoping users/links. */
+  async function fetchMyWorkDepts() {
+    const user  = JSON.parse(getStore("user"));
+    const token = getStore("token");
+    const res   = await fetch(`${API}/api/users/${user.id}/departments`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const depts      = await res.json();
+    adminWorkDeptIds = Array.isArray(depts) ? depts.map(d => d.id) : [];
+    return Array.isArray(depts) ? depts : [];
+  }
+
+  /* Load all access departments for the checkbox lists.
+     Both admin and superadmin see the full list. */
+  async function loadAccessDepts() {
+    const res    = await fetch(`${API}/api/access-dept`);
+    allAccessDepts = await res.json();
+    const seen   = new Set();
+    allAccessDepts = allAccessDepts.filter(d => {
+      if (seen.has(d.name.toLowerCase())) return false;
+      seen.add(d.name.toLowerCase()); return true;
+    });
+  }
+
+  function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+    allAccessDepts.forEach(dep => {
+      const checked = checkedIds.includes(String(dep.id)) ? "checked" : "";
+      const label   = document.createElement("label");
+      label.className = "checkbox-label";
+      label.innerHTML = `<input type="checkbox" value="${dep.id}" ${checked}> ${dep.name}`;
+      container.appendChild(label);
+    });
+  }
+
+  /* Scoped departments for dropdowns:
+     admin → only their own work departments
+     superadmin → all departments */
+  async function getScopedDepts() {
+    if (window.userRole === "admin") return await fetchMyWorkDepts();
+    const res = await fetch(`${API}/api/departments`);
+    return await res.json();
+  }
+
+  function dedupe(depts) {
+    const seen = new Set();
+    return depts.filter(d => {
+      if (seen.has(d.name.toLowerCase())) return false;
+      seen.add(d.name.toLowerCase()); return true;
+    });
+  }
+
+  async function loadDepartments() {
+    const data = dedupe(await getScopedDepts());
+    const sel  = document.getElementById("userDepartment");
+    if (sel) {
+      sel.innerHTML = "<option value=''>Select department...</option>";
+      data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+    }
+  }
+
+  async function loadLinkDepartments() {
+    const data = dedupe(await getScopedDepts());
+    const sel  = document.getElementById("linkDepartment");
+    sel.innerHTML = "<option value=''>Select Department</option>";
+    data.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+  }
+
+  /* ══════════════════════════════════════
+     USERS
+  ══════════════════════════════════════ */
+  async function loadUsers() {
+    const token = getStore("token");
+    const res   = await fetch(`${API}/api/users`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const users = await res.json();
+    const tbody = document.querySelector("#userTable tbody");
+    tbody.innerHTML = "";
+
+    // admin: only show users in their own work departments
+    const visible = window.userRole === "admin"
+      ? users.filter(u => u.departments?.some(d => adminWorkDeptIds.includes(d.id)))
+      : users;
+
+    if (!visible.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="tbl-empty"><i class="fas fa-users"></i>No users found</td></tr>`;
+      return;
+    }
+
+    visible.forEach(user => {
+      const roleBadge   = `<span class="badge-role ${user.role}">${user.role}</span>`;
+      const depts       = user.departments?.map(d => `<span class="badge">${d.name}</span>`).join("") || "—";
+      const accessDepts = (user.link_access || []).map(d => `<span class="badge-access">${d.name}</span>`).join("") || "—";
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-weight:600;color:var(--ink);">${user.name || "—"}</td>
+          <td style="word-break:break-all;">${user.email}</td>
+          <td>${roleBadge}</td>
+          <td>${depts}</td>
+          <td>${accessDepts}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="edit-btn"   title="Edit"   onclick="editUser(${user.id})"><i class="fas fa-pen"></i></button>
+              <button class="delete-btn" title="Delete" onclick="openDeleteModal('user', ${user.id})"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  async function createUser() {
+    const token    = getStore("token");
+    const name     = document.getElementById("name").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirm  = document.getElementById("confirmPassword").value;
+    const roleEl   = document.getElementById("role");
+    const role     = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
+    const workDept = document.getElementById("userDepartment").value;
+    const deps     = [];
+    document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name)                   { showToast("Please enter a name", "error"); return; }
+    if (!email)                  { showToast("Please enter an email", "error"); return; }
+    if (!emailRegex.test(email)) { showToast("Please enter a valid email address", "error"); return; }
+    if (!password)               { showToast("Please enter a password", "error"); return; }
+    if (password !== confirm)    { showToast("Passwords do not match", "error"); return; }
+    if (password.length < 6)     { showToast("Password must be at least 6 characters", "error"); return; }
+
+    try {
+      const res  = await fetch(`${API}/api/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
+
+      showToast("User created successfully!");
+
+      // Reset form fields
+      ["name", "email", "password", "confirmPassword"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      ["password", "confirmPassword"].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.type = "password";
+        const icon = input?.closest(".pw-input-wrap")?.querySelector(".pw-toggle-btn i");
+        if (icon) icon.className = "fas fa-eye";
+      });
+      if (roleEl?.tagName === "SELECT") roleEl.value = "user";
+      document.getElementById("userDepartment").value = "";
+
+      // Reset email validation state
+      const emailEl = document.getElementById("email");
+      emailEl.classList.remove("email-valid", "email-invalid");
+      document.getElementById("emailHint").className = "email-hint";
+
+      renderAccessDeptCheckboxes("departmentCheckboxes");
+      loadUsers();
+    } catch (err) {
+      console.error("createUser error:", err);
+      showToast("Server error. Please try again.", "error");
+    }
+  }
+
+  async function editUser(id) {
+    const token   = getStore("token");
+    const resUser = await fetch(`${API}/api/users/${id}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const user = await resUser.json();
+    const deps = dedupe(await getScopedDepts());
+
+    editingUserId = id;
+    document.getElementById("editName").value     = user.name  || "";
+    document.getElementById("editEmail").value    = user.email || "";
+    document.getElementById("editPassword").value = "";
+
+    // Reset email validation state
+    const emailEl = document.getElementById("editEmail");
+    emailEl.classList.remove("email-valid", "email-invalid");
+    document.getElementById("editEmailHint").className = "email-hint";
+
+    // Populate work dept dropdown
+    const workSel = document.getElementById("editWorkDept");
+    workSel.innerHTML = "<option value=''>Select department...</option>";
+    deps.forEach(d => {
+      const selected = user.departments?.some(ud => ud.id === d.id) ? "selected" : "";
+      workSel.innerHTML += `<option value="${d.id}" ${selected}>${d.name}</option>`;
+    });
+
+    // Render access dept checkboxes with user's current access pre-checked
+    const checkedIds = (user.link_access || []).map(d => String(d.id));
+    renderAccessDeptCheckboxes("editDepartments", checkedIds);
+
+    document.getElementById("editModal").style.display = "flex";
+  }
+
+  function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+  }
+
+  async function confirmEdit() {
+    const token    = getStore("token");
+    const name     = document.getElementById("editName").value.trim();
+    const email    = document.getElementById("editEmail").value.trim();
+    const password = document.getElementById("editPassword").value;
+    const workDept = document.getElementById("editWorkDept").value;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name)                   { showToast("Please enter a name", "error"); return; }
+    if (!email)                  { showToast("Please enter an email", "error"); return; }
+    if (!emailRegex.test(email)) { showToast("Please enter a valid email address", "error"); return; }
+
+    const linkDeps = [];
+    document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
+
+    const body = { name, email, departments: workDept ? [workDept] : [], link_access: linkDeps };
+    if (password) body.password = password;
+
+    await fetch(`${API}/api/users/${editingUserId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(body)
+    });
+
+    showToast("User updated successfully!");
+    closeEditModal();
+    loadUsers();
+  }
+
+  /* ══════════════════════════════════════
+     LINKS
+  ══════════════════════════════════════ */
+  async function loadLinks() {
+    const res   = await fetch(`${API}/api/links`);
+    const links = await res.json();
+    const tbody = document.querySelector("#linkTable tbody");
+    tbody.innerHTML = "";
+
+    // admin: only show links in their own work departments
+    const visible = window.userRole === "admin"
+      ? links.filter(l => adminWorkDeptIds.includes(Number(l.department_id)))
+      : links;
+
+    if (!visible.length) {
+      tbody.innerHTML = `<tr><td colspan="4" class="tbl-empty"><i class="fas fa-link"></i>No links found</td></tr>`;
+      return;
+    }
+
+    visible.forEach(link => {
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-weight:600;color:var(--ink);">${link.name}</td>
+          <td>
+            <a href="${link.url}" target="_blank">
+              Open <i class="fas fa-arrow-up-right-from-square" style="font-size:10px;"></i>
+            </a>
+          </td>
+          <td><span class="badge">${link.department_name}</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="edit-btn"   title="Edit"   onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fas fa-pen"></i></button>
+              <button class="delete-btn" title="Delete" onclick="openDeleteModal('link', ${link.id})"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  async function createLink() {
+    const name = document.getElementById("linkName").value.trim();
+    const url  = document.getElementById("linkURL").value.trim();
+    const dept = document.getElementById("linkDepartment").value;
+    if (!name || !url || !dept) { showToast("Please fill all fields", "error"); return; }
+
+    const res = await fetch(`${API}/api/links`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, url, department_id: dept })
+    });
+    if (!res.ok) { showToast("Failed to add link", "error"); return; }
+
+    showToast("Link added successfully!");
+    document.getElementById("linkName").value       = "";
+    document.getElementById("linkURL").value        = "";
+    document.getElementById("linkDepartment").value = "";
+    loadLinks();
+  }
+
+  async function editLink(id, name, url, department_id) {
+    editingLinkId = id;
+    document.getElementById("editLinkName").value = name;
+    document.getElementById("editLinkURL").value  = url;
+
+    const deps = dedupe(await getScopedDepts());
+    const sel  = document.getElementById("editLinkDepartment");
+    sel.innerHTML = "";
+    deps.forEach(d => {
+      sel.innerHTML += `<option value="${d.id}" ${d.id == department_id ? "selected" : ""}>${d.name}</option>`;
+    });
+
+    document.getElementById("editLinkModal").style.display = "flex";
+  }
+
+  function closeEditLinkModal() {
+    document.getElementById("editLinkModal").style.display = "none";
+  }
+
+  async function updateLink() {
+    const name = document.getElementById("editLinkName").value.trim();
+    const url  = document.getElementById("editLinkURL").value.trim();
+    const dept = document.getElementById("editLinkDepartment").value;
+    if (!name || !url) { showToast("Please fill all fields", "error"); return; }
+
+    await fetch(`${API}/api/links/${editingLinkId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, url, department_id: dept })
+    });
+
+    showToast("Link updated!");
+    closeEditLinkModal();
+    loadLinks();
+  }
+
+  /* ══════════════════════════════════════
+     DELETE
+  ══════════════════════════════════════ */
+  function openDeleteModal(type, id) {
+    deleteType = type;
+    deleteId   = id;
+    document.getElementById("deleteMessage").textContent =
+      `Are you sure you want to delete this ${type}? This action cannot be undone.`;
+    document.getElementById("deleteModal").style.display = "flex";
+  }
+
+  function closeDeleteModal() {
+    document.getElementById("deleteModal").style.display = "none";
+  }
+
+  async function confirmDelete() {
+    const token = getStore("token");
+    const url   = deleteType === "link"    ? `${API}/api/links/${deleteId}`
+                : deleteType === "booking" ? `${API}/api/bookings/${deleteId}`
+                :                           `${API}/api/users/${deleteId}`;
+
+    await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+
+    showToast("Deleted successfully!");
+    closeDeleteModal();
+
+    if      (deleteType === "link")    loadLinks();
+    else if (deleteType === "booking") loadBookings();
+    else                               loadUsers();
+  }
+
+  /* ══════════════════════════════════════
+     BOOKINGS
+  ══════════════════════════════════════ */
+  async function loadBookings() {
+    const res   = await fetch(`${API}/api/bookings`);
+    allBookings = await res.json();
+    renderBookings(allBookings);
+    loadBookingRoomFilter();
+  }
+
+  async function loadBookingRoomFilter() {
+    const res   = await fetch(`${API}/api/bookings/rooms`);
+    const rooms = await res.json();
+    const sel   = document.getElementById("filterRoom");
+    sel.innerHTML = `<option value="">All Rooms</option>`;
+    rooms.forEach(r => sel.innerHTML += `<option value="${r.id}">${r.name}</option>`);
+  }
+
+  function renderBookings(bookings) {
+    const tbody = document.querySelector("#bookingsTable tbody");
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(bookings) || !bookings.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="tbl-empty"><i class="fas fa-calendar-times"></i>No bookings found</td></tr>`;
+      return;
+    }
+
+    bookings.forEach(b => {
+      const isConfirmed = b.status === "confirmed";
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-weight:600;color:var(--ink);">${b.room_name}</td>
+          <td>${b.event_name}</td>
+          <td style="white-space:nowrap;">${formatBookingDate(b.date)}</td>
+          <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
+          <td>${b.name}<div class="booking-detail-sub">${b.department}</div></td>
+          <td>${b.phone}</td>
+          <td><span class="status-badge status-${b.status}">${capitalize(b.status)}</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="edit-btn" title="View" onclick="viewBookingDetail(${b.id})"><i class="fas fa-eye"></i></button>
+              ${isConfirmed
+                ? `<button class="cancel-btn"  title="Cancel"  onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fas fa-ban"></i></button>`
+                : `<button class="restore-btn" title="Restore" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fas fa-rotate-left"></i></button>`
+              }
+              <button class="delete-btn" title="Delete" onclick="openDeleteModal('booking', ${b.id})"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function filterBookings() {
+    const status = document.getElementById("filterStatus").value;
+    const roomId = document.getElementById("filterRoom").value;
+    const date   = document.getElementById("filterDate").value;
+    renderBookings(allBookings.filter(b =>
+      (!status || b.status === status) &&
+      (!roomId || String(b.room_id) === roomId) &&
+      (!date   || b.date.slice(0, 10) === date)
+    ));
+  }
+
+  function clearBookingFilters() {
+    ["filterStatus", "filterRoom", "filterDate"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+    renderBookings(allBookings);
+  }
+
+  async function updateBookingStatus(id, status) {
+    const res = await fetch(`${API}/api/bookings/${id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    if (res.ok) {
+      showToast(status === "cancelled" ? "Booking cancelled" : "Booking restored");
+      loadBookings();
+    } else {
+      showToast("Failed to update status", "error");
+    }
+  }
+
+  function viewBookingDetail(id) {
+    const b = allBookings.find(x => x.id === id);
+    if (!b) return;
+    viewingBookingId = id;
+
+    const rows = [
+      ["Room",      b.room_name],
+      ["Event",     b.event_name],
+      ["Date",      formatBookingDate(b.date)],
+      ["Time",      `${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}`],
+      ["Duration",  (b.duration_hours  > 0 ? b.duration_hours  + " hr "  : "") +
+                    (b.duration_minutes > 0 ? b.duration_minutes + " min" : "")],
+      ["Name",      b.name],
+      ["Dept",      b.department],
+      ["Phone",     b.phone],
+      ["Status",    `<span class="status-badge status-${b.status}">${capitalize(b.status)}</span>`],
+      ["Submitted", new Date(b.created_at).toLocaleString("en-MY")],
+    ];
+
+    document.getElementById("bookingDetailRows").innerHTML = rows
+      .map(([label, val]) => `
+        <div class="modal-detail-row">
+          <div class="modal-detail-label">${label}</div>
+          <div class="modal-detail-value">${val}</div>
+        </div>`)
+      .join("");
+
+    document.getElementById("detailCancelBtn").style.display  = b.status === "confirmed" ? "inline-flex" : "none";
+    document.getElementById("detailRestoreBtn").style.display = b.status === "cancelled"  ? "inline-flex" : "none";
+    document.getElementById("bookingDetailModal").style.display = "flex";
+  }
+
+  function closeBookingDetailModal() {
+    document.getElementById("bookingDetailModal").style.display = "none";
+  }
+
+  async function cancelFromDetail() {
+    await updateBookingStatus(viewingBookingId, "cancelled");
+    closeBookingDetailModal();
+  }
+
+  async function restoreFromDetail() {
+    await updateBookingStatus(viewingBookingId, "confirmed");
+    closeBookingDetailModal();
+  }
+
+  /* ══════════════════════════════════════
+     FORMAT HELPERS
+  ══════════════════════════════════════ */
+  function formatBookingDate(d) {
+    return new Date(d).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function formatBookingTime(t) {
+    if (!t) return "";
+    const [h, m] = t.slice(0, 5).split(":").map(Number);
+    const ampm   = h >= 12 ? "PM" : "AM";
+    const hour   = h % 12 || 12;
+    return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+  }
+
+  function capitalize(s) {
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+  }
+
+  /* ══════════════════════════════════════
+     INIT
+  ══════════════════════════════════════ */
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token    = getStore("token");
+    const role     = getStore("role");
+    const userData = getStore("user");
+
+    // Auth guard — redirect if not logged in or wrong role
+    if (!token) { window.location.href = "login.html"; return; }
+    if (role !== "admin" && role !== "superadmin") { window.location.href = "index.html"; return; }
+
+    // Auth passed — reveal page
+    document.body.style.visibility = "visible";
+    window.authToken = token;
+    window.userRole  = role;
+
+    // Populate sidebar user info
+    try {
+      const user     = JSON.parse(userData);
+      const initials = (user.name || "A").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+      document.getElementById("sidebarAvatar").textContent = initials;
+      document.getElementById("sidebarName").textContent   = user.name || user.email || "Admin";
+      document.getElementById("sidebarRole").textContent   = role;
+    } catch (e) {}
+
+    // admin role: hide bookings tab, lock role field to User only
+    if (role === "admin") {
+      document.getElementById("bookingsNavBtn").style.display = "none";
+      const roleGroup = document.getElementById("roleGroup");
+      if (roleGroup) {
+        const roleInput    = document.createElement("input");
+        roleInput.type     = "text";
+        roleInput.value    = "User (Staff)";
+        roleInput.disabled = true;
+        roleInput.id       = "role";
+        document.getElementById("role").replaceWith(roleInput);
+      }
+    }
+
+    // Load all data
+    try {
+      await fetchMyWorkDepts();           // must run first — populates adminWorkDeptIds
+      await loadAccessDepts();
+      renderAccessDeptCheckboxes("departmentCheckboxes");
+      await loadDepartments();
+      await loadLinkDepartments();
+      await loadUsers();
+      await loadLinks();
+      if (role === "superadmin") await loadBookings();
+    } catch (err) {
+      console.error("INIT ERROR:", err);
+      showToast("Failed to load data", "error");
+    }
   });
-
-  // Enter key navigation
-  applyEnterToNext([
-    document.getElementById("name"),
-    document.getElementById("email"),
-    document.getElementById("password"),
-    document.getElementById("confirmPassword"),
-  ].filter(Boolean));
-
-  applyEnterToNext([
-    document.getElementById("linkName"),
-    document.getElementById("linkURL"),
-  ].filter(Boolean));
-});
 
 </script>
 </body>
