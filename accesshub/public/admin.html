@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 
-/* ── FIX: Hide page until auth check passes to prevent admin flash ── */
+/* ── Hide until auth passes to prevent flash ── */
 body { visibility: hidden; }
 
 :root {
@@ -36,49 +36,182 @@ body { visibility: hidden; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font); background: var(--surface-2); color: var(--ink); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-/* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); background: #EDE8E1; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 100; overflow: hidden; border-right: 1px solid #D9D3CB; }
-.sidebar-brand { padding: 24px 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #D9D3CB; }
-.sidebar-logo-wrap { width: 40px; height: 40px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid #D9D3CB; }
+body {
+  font-family: var(--font);
+  background: var(--surface-2);
+  color: var(--ink);
+  display: flex;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ══════════════════════════════════════
+   MOBILE HAMBURGER + OVERLAY
+══════════════════════════════════════ */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 1001;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--pink);
+  font-size: 16px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background var(--t);
+}
+.hamburger:hover { background: var(--pink-soft); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 899;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+}
+.sidebar-overlay.open { display: block; }
+
+/* ══════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: #EDE8E1;
+  height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 900;
+  overflow: hidden;
+  border-right: 1px solid #D9D3CB;
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+.sidebar-brand {
+  padding: 24px 20px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid #D9D3CB;
+  flex-shrink: 0;
+}
+.sidebar-logo-wrap {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0; border: 1px solid #D9D3CB;
+}
 .sidebar-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
 .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
 .sidebar-brand-name { font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1; }
 .sidebar-brand-sub { font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pink); }
 
-.back-btn { margin: 14px 12px 8px; padding: 10px 14px; background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB; border-radius: 10px; color: var(--ink-mid); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t); font-family: var(--font); width: calc(100% - 24px); text-align: left; }
+.back-btn {
+  margin: 14px 12px 8px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid #D9D3CB;
+  border-radius: 10px;
+  color: var(--ink-mid);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  transition: background var(--t);
+  font-family: var(--font);
+  width: calc(100% - 24px);
+  text-align: left;
+  flex-shrink: 0;
+}
 .back-btn:hover { background: rgba(0,0,0,0.09); }
 .back-btn i { color: var(--ink-light); font-size: 12px; }
 
-.sidebar-nav { flex: 1; padding: 0 0 10px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; }
+.sidebar-nav {
+  flex: 1;
+  padding: 0 0 10px;
+  display: flex; flex-direction: column; gap: 0;
+  overflow-y: auto;
+}
 .sidebar-nav::-webkit-scrollbar { width: 0; }
-.sidebar-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #B0A89E; padding: 12px 20px 5px; user-select: none; }
-.sidebar-nav button { width: calc(100% - 20px); padding: 9px 12px; border: none; background: transparent; color: var(--ink-mid); cursor: pointer; text-align: left; font-family: var(--font); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 11px; transition: background var(--t), color var(--t); margin: 1px 10px; border-radius: 8px; }
-.sidebar-nav button i { width: 17px; text-align: center; font-size: 13px; color: #B0A89E; transition: color var(--t); flex-shrink: 0; }
+.sidebar-section-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px;
+  text-transform: uppercase; color: #B0A89E;
+  padding: 12px 20px 5px; user-select: none;
+}
+.sidebar-nav button {
+  width: calc(100% - 20px);
+  padding: 9px 12px; border: none; background: transparent;
+  color: var(--ink-mid); cursor: pointer; text-align: left;
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 11px;
+  transition: background var(--t), color var(--t);
+  margin: 1px 10px; border-radius: 8px;
+}
+.sidebar-nav button i {
+  width: 17px; text-align: center; font-size: 13px;
+  color: #B0A89E; transition: color var(--t); flex-shrink: 0;
+}
 .sidebar-nav button:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
 .sidebar-nav button:hover i { color: var(--ink-mid); }
 .sidebar-nav button.active { background: var(--pink); color: #fff; font-weight: 700; }
 .sidebar-nav button.active i { color: #fff; }
 
-.sidebar-footer { padding: 12px; border-top: 1px solid #D9D3CB; }
-.sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB; }
-.user-avatar-sm { width: 32px; height: 32px; background: var(--pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #D9D3CB;
+  flex-shrink: 0;
+}
+.sidebar-footer .user-info {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 10px;
+  background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB;
+}
+.user-avatar-sm {
+  width: 32px; height: 32px; background: var(--pink); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
 .user-meta { flex: 1; min-width: 0; }
 .user-meta-name { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-meta-role { font-size: 10px; color: var(--ink-light); text-transform: capitalize; margin-top: 1px; }
 
-/* ── MAIN ── */
-.main { margin-left: var(--sidebar-w); padding: 36px 40px; width: calc(100% - var(--sidebar-w)); min-height: 100vh; }
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
+.main {
+  margin-left: var(--sidebar-w);
+  padding: 36px 40px;
+  width: calc(100% - var(--sidebar-w));
+  min-height: 100vh;
+  transition: margin-left 0.28s cubic-bezier(.4,0,.2,1);
+}
+
 .page-header { margin-bottom: 24px; }
-.page-title { font-family: var(--font-display); font-size: 28px; color: var(--ink); display: flex; align-items: center; gap: 10px; }
-.page-title-icon { width: 36px; height: 36px; background: var(--pink-soft); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 15px; }
+.page-title {
+  font-family: var(--font-display); font-size: 28px; color: var(--ink);
+  display: flex; align-items: center; gap: 10px;
+}
+.page-title-icon {
+  width: 36px; height: 36px; background: var(--pink-soft); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 15px;
+  flex-shrink: 0;
+}
 .page-title .accent { color: var(--pink); }
 .page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
 
 /* ── CARD ── */
-.card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-lg); padding: 28px; margin-bottom: 20px; box-shadow: var(--shadow-card); }
-.card-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); padding: 28px; margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+.card-title {
+  font-size: 15px; font-weight: 700; color: var(--ink);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
 .card-title i { color: var(--pink); font-size: 14px; }
 
 /* ── FORM ── */
@@ -86,36 +219,43 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); }
 .form-label span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
-.form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); color: var(--ink); background: var(--surface); outline: none; transition: border-color var(--t), box-shadow var(--t); margin: 0; }
+
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font);
+  color: var(--ink); background: var(--surface); outline: none;
+  transition: border-color var(--t), box-shadow var(--t); margin: 0;
+  -webkit-appearance: none; appearance: none;
+}
 .form-group input:focus, .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 .form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
 
-/* ── EMAIL VALIDATION INDICATOR ── */
-.email-hint {
-  font-size: 11.5px;
-  margin-top: 4px;
-  display: none;
-  align-items: center;
-  gap: 5px;
-}
+/* email validation */
+.email-hint { font-size: 11.5px; margin-top: 4px; display: none; align-items: center; gap: 5px; }
 .email-hint.invalid { display: flex; color: #ef4444; }
 .email-hint.valid   { display: flex; color: #16a34a; }
 input.email-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important; }
 input.email-valid   { border-color: #16a34a !important; box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; }
+
+/* password toggle */
 .pw-input-wrap { position: relative; display: flex; align-items: center; }
 .pw-input-wrap input { width: 100%; padding-right: 40px; }
 .pw-toggle-btn {
   position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer;
-  color: var(--ink-light); font-size: 14px; padding: 0;
-  width: auto; margin: 0; line-height: 1;
+  background: none; border: none; cursor: pointer; color: var(--ink-light);
+  font-size: 14px; padding: 0; width: auto; margin: 0; line-height: 1;
   transition: color var(--t);
 }
 .pw-toggle-btn:hover { color: var(--pink); }
 
 /* ── CHECKBOXES ── */
 .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.checkbox-label { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer; transition: border-color var(--t), background var(--t); }
+.checkbox-label {
+  display: flex; align-items: center; gap: 9px; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer;
+  transition: border-color var(--t), background var(--t);
+}
 .checkbox-label:hover { border-color: var(--pink-pill); background: var(--pink-soft); color: var(--pink); }
 .checkbox-label input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
 
@@ -130,8 +270,8 @@ input.email-valid   { border-color: #16a34a !important; box-shadow: 0 0 0 3px rg
 .btn-success:hover { background: #bbf7d0; }
 
 /* ── TABLE ── */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; }
 thead tr { background: var(--surface-2); border-bottom: 1.5px solid var(--border); }
 th { padding: 11px 14px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--ink-light); text-align: left; white-space: nowrap; }
 td { padding: 13px 14px; color: var(--ink-mid); border-bottom: 1px solid var(--border); vertical-align: middle; }
@@ -139,14 +279,13 @@ tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--surface-2); }
 
 /* ── BADGES ── */
-.badge { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; }
-.badge-access { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; }
-.badge-role { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+.badge { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap; }
+.badge-access { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; white-space: nowrap; }
+.badge-role { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
 .badge-role.user       { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
 .badge-role.admin      { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); }
 .badge-role.superadmin { background: #fdf4ff; color: #7e22ce; border: 1px solid #e9d5ff; }
-
-.status-badge { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+.status-badge { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; white-space: nowrap; }
 .status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 .status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 table a { color: var(--pink); text-decoration: none; font-weight: 600; }
@@ -154,7 +293,7 @@ table a:hover { text-decoration: underline; }
 
 /* ── ACTION BUTTONS ── */
 .action-buttons { display: flex; gap: 6px; }
-.action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t)); font-size: 12px; }
+.action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t); font-size: 12px; flex-shrink: 0; }
 .action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
 .action-buttons button:active { transform: scale(0.95); }
 .edit-btn    { background: #fef9c3; color: #854d0e; }
@@ -164,27 +303,37 @@ table a:hover { text-decoration: underline; }
 
 /* ── FILTER BAR ── */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
-.filter-bar select, .filter-bar input { padding: 9px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-family: var(--font); color: var(--ink); background: var(--surface); outline: none; margin: 0; width: auto; }
+.filter-bar select, .filter-bar input {
+  padding: 9px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  font-size: 13px; font-family: var(--font); color: var(--ink);
+  background: var(--surface); outline: none; margin: 0; width: auto;
+  -webkit-appearance: none; appearance: none;
+}
 .filter-bar select:focus, .filter-bar input:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 
 /* ── MODAL ── */
-.modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-.modal-box { background: var(--surface); border-radius: var(--r-lg); padding: 28px; width: 440px; max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.15); animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both; }
-.modal-box.wide { width: 500px; }
+.modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 16px; }
+.modal-box {
+  background: var(--surface); border-radius: var(--r-lg); padding: 28px;
+  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+  animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both;
+}
+.modal-box.wide { max-width: 500px; }
 @keyframes modalPop { from { transform: scale(0.90); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
 .modal-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--pink-soft); display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 15px; flex-shrink: 0; }
 .modal-title { font-family: var(--font-display); font-size: 18px; color: var(--ink); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; }
 .modal-sub { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); margin-bottom: 8px; margin-top: 16px; }
 .modal-hint { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; }
 .modal-detail-row { display: flex; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
 .modal-detail-row:last-child { border-bottom: none; }
-.modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; }
-.modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; }
+.modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; flex-shrink: 0; }
+.modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; word-break: break-word; }
 
 /* ── TOAST ── */
-.toast { position: fixed; top: 22px; right: 22px; background: var(--surface); color: var(--ink); padding: 13px 18px; border-radius: var(--r-md); font-size: 13.5px; font-weight: 500; font-family: var(--font); box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 320px; opacity: 0; transform: translateY(-16px); transition: opacity 0.25s, transform 0.25s; z-index: 1000; border-left: 4px solid var(--border); }
+.toast { position: fixed; top: 22px; right: 22px; background: var(--surface); color: var(--ink); padding: 13px 18px; border-radius: var(--r-md); font-size: 13.5px; font-weight: 500; font-family: var(--font); box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 300px; opacity: 0; transform: translateY(-16px); transition: opacity 0.25s, transform 0.25s; z-index: 1100; border-left: 4px solid var(--border); }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { border-left-color: #22c55e; }
 .toast.error   { border-left-color: #ef4444; }
@@ -193,11 +342,106 @@ table a:hover { text-decoration: underline; }
 .tbl-empty { text-align: center; padding: 40px 20px; color: var(--ink-light); font-size: 13.5px; }
 .tbl-empty i { font-size: 28px; color: var(--pink-pill); display: block; margin-bottom: 10px; }
 
+/* ══════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 900px)
+══════════════════════════════════════ */
+@media (max-width: 900px) {
+  .hamburger { display: flex; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 900;
+    width: 260px;
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+    padding: 70px 20px 24px; /* top pad for hamburger */
+  }
+
+  .page-title { font-size: 22px; }
+  .page-title-icon { width: 30px; height: 30px; font-size: 13px; }
+
+  .card { padding: 20px 16px; }
+
+  .form-grid-2 { grid-template-columns: 1fr; }
+
+  .checkbox-grid { grid-template-columns: 1fr; }
+
+  .modal-box { padding: 20px 16px; }
+  .modal-actions { justify-content: stretch; }
+  .modal-actions button { flex: 1; justify-content: center; }
+
+  .filter-bar { gap: 8px; }
+  .filter-bar select, .filter-bar input { width: 100%; }
+  .filter-bar .btn-secondary { width: 100%; justify-content: center; }
+
+  .toast { right: 12px; top: 12px; max-width: calc(100vw - 24px); }
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 600px)
+══════════════════════════════════════ */
+@media (max-width: 600px) {
+  .main { padding: 64px 14px 20px; }
+
+  .page-title { font-size: 20px; gap: 8px; }
+  .page-subtitle { font-size: 12px; }
+
+  .card { padding: 16px 14px; border-radius: var(--r-md); margin-bottom: 14px; }
+  .card-title { font-size: 14px; margin-bottom: 16px; }
+
+  .form-group input,
+  .form-group select { font-size: 16px; /* prevents iOS zoom on focus */ padding: 12px 14px; }
+
+  .btn-primary { width: 100%; justify-content: center; padding: 13px; font-size: 14px; }
+  .btn-secondary, .btn-danger, .btn-success { font-size: 12px; padding: 9px 14px; }
+
+  th { font-size: 9.5px; padding: 9px 10px; }
+  td { font-size: 12.5px; padding: 10px 10px; }
+
+  .badge, .badge-access { font-size: 10px; padding: 2px 7px; }
+  .badge-role { font-size: 10px; padding: 2px 7px; }
+
+  .action-buttons { gap: 4px; }
+  .action-buttons button { width: 28px; height: 28px; font-size: 11px; }
+
+  .modal-box { padding: 18px 14px; border-radius: var(--r-md); }
+  .modal-title { font-size: 16px; }
+  .modal-actions { flex-direction: column; }
+  .modal-actions button { width: 100%; justify-content: center; }
+
+  .modal-detail-label { width: 42%; font-size: 12px; }
+  .modal-detail-value { font-size: 12.5px; }
+
+  .checkbox-label { padding: 10px 12px; font-size: 12.5px; }
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (≤ 380px)
+══════════════════════════════════════ */
+@media (max-width: 380px) {
+  .main { padding: 60px 10px 16px; }
+  .card { padding: 14px 12px; }
+  .page-title { font-size: 18px; }
+  .page-title-icon { display: none; }
+}
+
 </style>
 </head>
 <body>
 
-<!-- ── EDIT USER MODAL ── -->
+<!-- ── HAMBURGER ── -->
+<button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
+  <i class="fas fa-bars"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ── MODALS ── -->
+
+<!-- EDIT USER -->
 <div id="editModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -211,15 +455,15 @@ table a:hover { text-decoration: underline; }
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" id="editEmail" placeholder="Email" oninput="validateEmailField(this, 'editEmailHint')">
-        <div class="email-hint" id="editEmailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span></div>
+        <input type="email" id="editEmail" placeholder="Email" oninput="validateEmailField(this,'editEmailHint')">
+        <div class="email-hint" id="editEmailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email</span></div>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
       <label class="form-label">New Password <span>(leave blank to keep current)</span></label>
       <div class="pw-input-wrap">
         <input type="password" id="editPassword" placeholder="New password (optional)">
-        <button type="button" class="pw-toggle-btn" onclick="togglePw('editPassword', this)"><i class="fas fa-eye"></i></button>
+        <button type="button" class="pw-toggle-btn" onclick="togglePw('editPassword',this)"><i class="fas fa-eye"></i></button>
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
@@ -228,7 +472,7 @@ table a:hover { text-decoration: underline; }
     </div>
     <div class="modal-sub">Access Departments</div>
     <div class="modal-hint">Check all access departments for this user.</div>
-    <div class="checkbox-grid" id="editDepartments" style="max-height:220px;overflow-y:auto;"></div>
+    <div class="checkbox-grid" id="editDepartments" style="max-height:200px;overflow-y:auto;"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
       <button class="btn-primary" onclick="confirmEdit()"><i class="fas fa-save"></i> Update</button>
@@ -236,14 +480,14 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- ── DELETE MODAL ── -->
+<!-- DELETE -->
 <div id="deleteModal" class="modal">
-  <div class="modal-box" style="width:380px;">
+  <div class="modal-box" style="max-width:380px;">
     <div class="modal-header">
       <div class="modal-icon" style="background:#fee2e2;color:#b91c1c;"><i class="fas fa-trash"></i></div>
       <h3 class="modal-title">Confirm Delete</h3>
     </div>
-    <p id="deleteMessage" style="font-size:13.5px;color:var(--ink-mid);line-height:1.6;">Are you sure you want to delete this?</p>
+    <p id="deleteMessage" style="font-size:13.5px;color:var(--ink-mid);line-height:1.6;"></p>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
       <button class="btn-danger" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete</button>
@@ -251,7 +495,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- ── EDIT LINK MODAL ── -->
+<!-- EDIT LINK -->
 <div id="editLinkModal" class="modal">
   <div class="modal-box">
     <div class="modal-header">
@@ -277,7 +521,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- ── BOOKING DETAIL MODAL ── -->
+<!-- BOOKING DETAIL -->
 <div id="bookingDetailModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -287,14 +531,14 @@ table a:hover { text-decoration: underline; }
     <div id="bookingDetailRows"></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeBookingDetailModal()">Close</button>
-      <button class="btn-danger"  id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel Booking</button>
+      <button class="btn-danger"  id="detailCancelBtn"  onclick="cancelFromDetail()"><i class="fas fa-ban"></i> Cancel</button>
       <button class="btn-success" id="detailRestoreBtn" onclick="restoreFromDetail()" style="display:none;"><i class="fas fa-rotate-left"></i> Restore</button>
     </div>
   </div>
 </div>
 
 <!-- ── SIDEBAR ── -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
       <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
@@ -311,13 +555,13 @@ table a:hover { text-decoration: underline; }
 
   <nav class="sidebar-nav">
     <span class="sidebar-section-label">Manage</span>
-    <button onclick="showSection('usersSection', this)" class="active">
+    <button onclick="showSection('usersSection',this);closeSidebar();" class="active">
       <i class="fas fa-users"></i> Users
     </button>
-    <button onclick="showSection('linksSection', this)">
+    <button onclick="showSection('linksSection',this);closeSidebar();">
       <i class="fas fa-link"></i> Links
     </button>
-    <button id="bookingsNavBtn" onclick="showSection('bookingsSection', this)">
+    <button id="bookingsNavBtn" onclick="showSection('bookingsSection',this);closeSidebar();">
       <i class="fas fa-calendar-days"></i> Bookings
     </button>
   </nav>
@@ -356,7 +600,7 @@ table a:hover { text-decoration: underline; }
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input id="email" type="email" placeholder="Enter email" oninput="validateEmailField(this, 'emailHint')">
+        <input id="email" type="email" placeholder="Enter email" oninput="validateEmailField(this,'emailHint')">
         <div class="email-hint" id="emailHint"><i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span></div>
       </div>
     </div>
@@ -365,14 +609,14 @@ table a:hover { text-decoration: underline; }
         <label class="form-label">Password</label>
         <div class="pw-input-wrap">
           <input id="password" type="password" placeholder="Create password">
-          <button type="button" class="pw-toggle-btn" onclick="togglePw('password', this)"><i class="fas fa-eye"></i></button>
+          <button type="button" class="pw-toggle-btn" onclick="togglePw('password',this)"><i class="fas fa-eye"></i></button>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
         <div class="pw-input-wrap">
           <input id="confirmPassword" type="password" placeholder="Repeat password">
-          <button type="button" class="pw-toggle-btn" onclick="togglePw('confirmPassword', this)"><i class="fas fa-eye"></i></button>
+          <button type="button" class="pw-toggle-btn" onclick="togglePw('confirmPassword',this)"><i class="fas fa-eye"></i></button>
         </div>
       </div>
     </div>
@@ -406,7 +650,7 @@ table a:hover { text-decoration: underline; }
       <table id="userTable">
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Access Department</th><th>Action</th>
+            <th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Access Dept</th><th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -507,34 +751,47 @@ let viewingBookingId = null;
 let allAccessDepts   = [];
 let adminWorkDeptIds = [];
 
-/* ── HELPER: read from either storage ── */
 function getStore(key) {
   return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
 }
 
-/* ── REAL-TIME EMAIL VALIDATION ── */
+/* ── MOBILE SIDEBAR ── */
+function toggleSidebar() {
+  const sidebar  = document.getElementById("sidebar");
+  const overlay  = document.getElementById("sidebarOverlay");
+  const btn      = document.getElementById("hamburgerBtn");
+  const isOpen   = sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", !isOpen);
+  overlay.classList.toggle("open", !isOpen);
+  btn.innerHTML  = isOpen ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("open");
+  document.getElementById("hamburgerBtn").innerHTML = '<i class="fas fa-bars"></i>';
+}
+window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
+
+/* ── EMAIL VALIDATION ── */
 function validateEmailField(input, hintId) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const hint = document.getElementById(hintId);
   if (!input.value) {
-    input.classList.remove("email-valid", "email-invalid");
-    hint.className = "email-hint";
-    return;
+    input.classList.remove("email-valid","email-invalid");
+    hint.className = "email-hint"; return;
   }
   if (emailRegex.test(input.value)) {
-    input.classList.add("email-valid");
-    input.classList.remove("email-invalid");
+    input.classList.add("email-valid"); input.classList.remove("email-invalid");
     hint.className = "email-hint valid";
     hint.innerHTML = '<i class="fas fa-circle-check"></i> <span>Valid email</span>';
   } else {
-    input.classList.add("email-invalid");
-    input.classList.remove("email-valid");
+    input.classList.add("email-invalid"); input.classList.remove("email-valid");
     hint.className = "email-hint invalid";
     hint.innerHTML = '<i class="fas fa-circle-xmark"></i> <span>Enter a valid email (e.g. name@domain.com)</span>';
   }
 }
 
-/* ── SHOW / HIDE PASSWORD ── */
+/* ── PASSWORD TOGGLE ── */
 function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   const isText = input.type === "text";
@@ -543,9 +800,7 @@ function togglePw(inputId, btn) {
 }
 
 /* ── NAVIGATION ── */
-function goBackToDashboard() {
-  window.location.href = "index.html";
-}
+function goBackToDashboard() { window.location.href = "index.html"; }
 
 function showSection(id, btn) {
   ["usersSection","linksSection","bookingsSection"].forEach(s => {
@@ -554,6 +809,8 @@ function showSection(id, btn) {
   document.getElementById(id).style.display = "block";
   document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
+  // scroll to top on mobile section switch
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ── TOAST ── */
@@ -566,7 +823,7 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-/* ── FETCH THIS USER'S OWN WORK DEPARTMENTS ── */
+/* ── FETCH MY WORK DEPTS ── */
 async function fetchMyWorkDepts() {
   const userData = getStore("user");
   const token    = getStore("token");
@@ -579,7 +836,7 @@ async function fetchMyWorkDepts() {
   return Array.isArray(depts) ? depts : [];
 }
 
-/* ── LOAD ACCESS DEPTS (for checkboxes) ── */
+/* ── LOAD ACCESS DEPTS ── */
 async function loadAccessDepts() {
   const res = await fetch(`${API}/api/access-dept`);
   allAccessDepts = await res.json();
@@ -603,14 +860,11 @@ function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
   });
 }
 
-/* ── SCOPED DEPARTMENT LIST FOR DROPDOWNS ── */
+/* ── SCOPED DEPTS FOR DROPDOWNS ── */
 async function getScopedDepts() {
-  if (window.userRole === "admin") {
-    return await fetchMyWorkDepts();
-  }
+  if (window.userRole === "admin") return await fetchMyWorkDepts();
   const res  = await fetch(`${API}/api/departments`);
-  const data = await res.json();
-  return data;
+  return await res.json();
 }
 
 function dedupe(depts) {
@@ -660,14 +914,14 @@ async function loadUsers() {
     tbody.innerHTML += `
       <tr>
         <td style="font-weight:600;color:var(--ink);">${user.name || "—"}</td>
-        <td>${user.email}</td>
+        <td style="word-break:break-all;">${user.email}</td>
         <td>${roleBadge}</td>
         <td>${depts}</td>
         <td>${accessDepts}</td>
         <td>
           <div class="action-buttons">
             <button class="edit-btn" title="Edit" onclick="editUser(${user.id})"><i class="fas fa-pen"></i></button>
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('user', ${user.id})"><i class="fas fa-trash"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('user',${user.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -680,58 +934,48 @@ async function createUser() {
   const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirm  = document.getElementById("confirmPassword").value;
-
-  const roleEl = document.getElementById("role");
-  const role   = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
-
+  const roleEl   = document.getElementById("role");
+  const role     = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
   const workDept = document.getElementById("userDepartment").value;
   const deps     = [];
   document.querySelectorAll("#departmentCheckboxes input:checked").forEach(cb => deps.push(cb.value));
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!name)                  { showToast("Please enter a name", "error"); return; }
-  if (!email)                 { showToast("Please enter an email", "error"); return; }
-  if (!emailRegex.test(email)){ showToast("Please enter a valid email address", "error"); return; }
-  if (!password)              { showToast("Please enter a password", "error"); return; }
-  if (password !== confirm)   { showToast("Passwords do not match", "error"); return; }
-  if (password.length < 6)    { showToast("Password must be at least 6 characters", "error"); return; }
+  if (!name)                   { showToast("Please enter a name","error"); return; }
+  if (!email)                  { showToast("Please enter an email","error"); return; }
+  if (!emailRegex.test(email)) { showToast("Please enter a valid email address","error"); return; }
+  if (!password)               { showToast("Please enter a password","error"); return; }
+  if (password !== confirm)    { showToast("Passwords do not match","error"); return; }
+  if (password.length < 6)     { showToast("Password must be at least 6 characters","error"); return; }
 
   try {
     const res  = await fetch(`${API}/api/users`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      body: JSON.stringify({
-        name, email, password, role,
-        departments: workDept ? [workDept] : [],
-        link_access: deps
-      })
+      body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
     });
     const data = await res.json();
-    if (!res.ok) { showToast(data.message || "Failed to create user", "error"); return; }
+    if (!res.ok) { showToast(data.message || "Failed to create user","error"); return; }
 
     showToast("User created successfully!");
-    document.getElementById("name").value            = "";
-    document.getElementById("email").value           = "";
-    document.getElementById("password").value        = "";
-    document.getElementById("confirmPassword").value = "";
-
+    ["name","email","password","confirmPassword"].forEach(id => { document.getElementById(id).value = ""; });
     ["password","confirmPassword"].forEach(id => {
       const input = document.getElementById(id);
-      if (input) {
-        input.type = "password";
-        const btn = input.closest(".pw-input-wrap")?.querySelector(".pw-toggle-btn i");
-        if (btn) btn.className = "fas fa-eye";
-      }
+      if (input) input.type = "password";
+      const btn = input?.closest(".pw-input-wrap")?.querySelector(".pw-toggle-btn i");
+      if (btn) btn.className = "fas fa-eye";
     });
-
-    if (roleEl && roleEl.tagName === "SELECT") roleEl.value = "user";
+    if (roleEl?.tagName === "SELECT") roleEl.value = "user";
     document.getElementById("userDepartment").value = "";
+    // reset email validation
+    const emailEl = document.getElementById("email");
+    emailEl.classList.remove("email-valid","email-invalid");
+    document.getElementById("emailHint").className = "email-hint";
     renderAccessDeptCheckboxes("departmentCheckboxes");
     loadUsers();
   } catch (err) {
-    console.error("createUser error:", err);
-    showToast("Server error. Please try again.", "error");
+    console.error(err);
+    showToast("Server error. Please try again.","error");
   }
 }
 
@@ -759,7 +1003,7 @@ async function loadLinks() {
         <td>
           <div class="action-buttons">
             <button class="edit-btn" title="Edit" onclick="editLink(${link.id},'${link.name}','${link.url}',${link.department_id})"><i class="fas fa-pen"></i></button>
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('link', ${link.id})"><i class="fas fa-trash"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('link',${link.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -767,18 +1011,15 @@ async function loadLinks() {
 }
 
 async function createLink() {
-  const name = document.getElementById("linkName").value;
-  const url  = document.getElementById("linkURL").value;
+  const name = document.getElementById("linkName").value.trim();
+  const url  = document.getElementById("linkURL").value.trim();
   const dept = document.getElementById("linkDepartment").value;
   if (!name || !url || !dept) { showToast("Please fill all fields","error"); return; }
-
   const res = await fetch(`${API}/api/links`, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
+    method: "POST", headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ name, url, department_id: dept })
   });
   if (!res.ok) { showToast("Failed to add link","error"); return; }
-
   showToast("Link added successfully!");
   document.getElementById("linkName").value = "";
   document.getElementById("linkURL").value  = "";
@@ -790,7 +1031,6 @@ async function editLink(id, name, url, department_id) {
   editingLinkId = id;
   document.getElementById("editLinkName").value = name;
   document.getElementById("editLinkURL").value  = url;
-
   const deps = dedupe(await getScopedDepts());
   const sel  = document.getElementById("editLinkDepartment");
   sel.innerHTML = "";
@@ -800,12 +1040,12 @@ async function editLink(id, name, url, department_id) {
 function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
 
 async function updateLink() {
-  const name = document.getElementById("editLinkName").value;
-  const url  = document.getElementById("editLinkURL").value;
+  const name = document.getElementById("editLinkName").value.trim();
+  const url  = document.getElementById("editLinkURL").value.trim();
   const dept = document.getElementById("editLinkDepartment").value;
+  if (!name || !url) { showToast("Please fill all fields","error"); return; }
   await fetch(`${API}/api/links/${editingLinkId}`, {
-    method: "PUT",
-    headers: {"Content-Type":"application/json"},
+    method: "PUT", headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ name, url, department_id: dept })
   });
   showToast("Link updated!");
@@ -846,6 +1086,10 @@ async function editUser(id) {
   document.getElementById("editName").value     = user.name  || "";
   document.getElementById("editEmail").value    = user.email || "";
   document.getElementById("editPassword").value = "";
+  // reset email hint
+  const editEmailEl = document.getElementById("editEmail");
+  editEmailEl.classList.remove("email-valid","email-invalid");
+  document.getElementById("editEmailHint").className = "email-hint";
 
   const workSel = document.getElementById("editWorkDept");
   workSel.innerHTML = "<option value=''>Select department...</option>";
@@ -866,12 +1110,10 @@ async function confirmEdit() {
   const email    = document.getElementById("editEmail").value.trim();
   const password = document.getElementById("editPassword").value;
   const workDept = document.getElementById("editWorkDept").value;
-
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!name)                   { showToast("Please enter a name", "error"); return; }
-  if (!email)                  { showToast("Please enter an email", "error"); return; }
-  if (!emailRegex.test(email)) { showToast("Please enter a valid email address", "error"); return; }
-
+  if (!name)                   { showToast("Please enter a name","error"); return; }
+  if (!email)                  { showToast("Please enter an email","error"); return; }
+  if (!emailRegex.test(email)) { showToast("Please enter a valid email address","error"); return; }
   const linkDeps = [];
   document.querySelectorAll("#editDepartments input:checked").forEach(cb => linkDeps.push(cb.value));
   const body = { name, email, departments: workDept ? [workDept] : [], link_access: linkDeps };
@@ -915,7 +1157,7 @@ function renderBookings(bookings) {
       <tr>
         <td style="font-weight:600;color:var(--ink);">${b.room_name}</td>
         <td>${b.event_name}</td>
-        <td>${formatBookingDate(b.date)}</td>
+        <td style="white-space:nowrap;">${formatBookingDate(b.date)}</td>
         <td style="white-space:nowrap;">${formatBookingTime(b.start_time)} – ${formatBookingTime(b.end_time)}</td>
         <td>${b.name}<div class="booking-detail-sub">${b.department}</div></td>
         <td>${b.phone}</td>
@@ -927,7 +1169,7 @@ function renderBookings(bookings) {
               ? `<button class="cancel-btn" title="Cancel" onclick="updateBookingStatus(${b.id},'cancelled')"><i class="fas fa-ban"></i></button>`
               : `<button class="restore-btn" title="Restore" onclick="updateBookingStatus(${b.id},'confirmed')"><i class="fas fa-rotate-left"></i></button>`
             }
-            <button class="delete-btn" title="Delete" onclick="openDeleteModal('booking', ${b.id})"><i class="fas fa-trash"></i></button>
+            <button class="delete-btn" title="Delete" onclick="openDeleteModal('booking',${b.id})"><i class="fas fa-trash"></i></button>
           </div>
         </td>
       </tr>`;
@@ -1002,25 +1244,21 @@ function formatBookingTime(t) {
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
 function applyAutoCapitalize(input) {
+  input.addEventListener("input", () => {
+    if (input.value.length === 1) input.value = input.value.toUpperCase();
+  });
   input.addEventListener("keyup", e => {
     if (e.key !== " ") return;
-    const val = input.value;
-    input.value = val.replace(/(^\s*|\s+)(\S)/g, (match, space, char) => space + char.toUpperCase());
-  });
-  input.addEventListener("input", () => {
-    if (input.value.length === 1) {
-      input.value = input.value.toUpperCase();
-    }
+    input.value = input.value.replace(/(^\s*|\s+)(\S)/g, (m, space, char) => space + char.toUpperCase());
   });
 }
 
 function applyEnterToNext(inputs) {
   inputs.forEach((input, i) => {
-    input.addEventListener("keydown", e => {
+    input?.addEventListener("keydown", e => {
       if (e.key !== "Enter") return;
       e.preventDefault();
-      const next = inputs[i + 1];
-      if (next) next.focus();
+      inputs[i + 1]?.focus();
     });
   });
 }
@@ -1031,17 +1269,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const role     = getStore("role");
   const userData = getStore("user");
 
-  // ── AUTH GUARD ──
-  if (!token) {
-    window.location.href = "login.html";
-    return;
-  }
-  if (role !== "admin" && role !== "superadmin") {
-    window.location.href = "index.html";
-    return;
-  }
+  // Auth guard
+  if (!token) { window.location.href = "login.html"; return; }
+  if (role !== "admin" && role !== "superadmin") { window.location.href = "index.html"; return; }
 
-  // ── Auth passed — reveal the page ──
+  // Auth passed — show page
   document.body.style.visibility = "visible";
 
   window.authToken = token;
@@ -1059,11 +1291,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("bookingsNavBtn").style.display = "none";
     const roleGroup = document.getElementById("roleGroup");
     if (roleGroup) {
-      const roleInput    = document.createElement("input");
-      roleInput.type     = "text";
-      roleInput.value    = "User (Staff)";
-      roleInput.disabled = true;
-      roleInput.id       = "role";
+      const roleInput = document.createElement("input");
+      roleInput.type = "text"; roleInput.value = "User (Staff)";
+      roleInput.disabled = true; roleInput.id = "role";
       document.getElementById("role").replaceWith(roleInput);
     }
   }
@@ -1079,52 +1309,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (role === "superadmin") await loadBookings();
   } catch (err) {
     console.error("INIT ERROR:", err);
-    showToast("Failed to load data", "error");
+    showToast("Failed to load data","error");
   }
 
-  const autoCapFields = ["name", "linkName"];
-  autoCapFields.forEach(id => {
+  // Auto-capitalize name fields
+  ["name","linkName","editName","editLinkName"].forEach(id => {
     const el = document.getElementById(id);
     if (el) applyAutoCapitalize(el);
   });
 
-  const createUserFields = [
+  // Enter key navigation
+  applyEnterToNext([
     document.getElementById("name"),
     document.getElementById("email"),
     document.getElementById("password"),
     document.getElementById("confirmPassword"),
-    document.getElementById("userDepartment"),
-    document.getElementById("role"),
-  ].filter(Boolean);
-  applyEnterToNext(createUserFields);
+  ].filter(Boolean));
 
-  const addLinkFields = [
+  applyEnterToNext([
     document.getElementById("linkName"),
     document.getElementById("linkURL"),
-    document.getElementById("linkDepartment"),
-  ].filter(Boolean);
-  applyEnterToNext(addLinkFields);
-
-  const editUserFields = [
-    document.getElementById("editName"),
-    document.getElementById("editEmail"),
-    document.getElementById("editPassword"),
-    document.getElementById("editWorkDept"),
-  ].filter(Boolean);
-  applyEnterToNext(editUserFields);
-
-  const editNameEl = document.getElementById("editName");
-  if (editNameEl) applyAutoCapitalize(editNameEl);
-
-  const editLinkFields = [
-    document.getElementById("editLinkName"),
-    document.getElementById("editLinkURL"),
-    document.getElementById("editLinkDepartment"),
-  ].filter(Boolean);
-  applyEnterToNext(editLinkFields);
-
-  const editLinkNameEl = document.getElementById("editLinkName");
-  if (editLinkNameEl) applyAutoCapitalize(editLinkNameEl);
+  ].filter(Boolean));
 });
 
 </script>
