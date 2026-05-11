@@ -12,10 +12,6 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-
-    /* ════════════════════════════════════════
-       HAMBURGER BUTTON (mobile only)
-    ════════════════════════════════════════ */
     .hamburger {
       display: none;
       position: fixed;
@@ -48,9 +44,6 @@
       .hamburger { display: flex; }
     }
 
-    /* ════════════════════════════════════════
-       RE-AUTH MODAL
-    ════════════════════════════════════════ */
     .reauth-overlay {
       display: none;
       position: fixed; inset: 0;
@@ -134,9 +127,6 @@
       .reauth-cancel, .reauth-confirm { flex: unset; width: 100%; justify-content: center; }
     }
 
-    /* ════════════════════════════════════════
-       ADMIN BUTTON
-    ════════════════════════════════════════ */
     .admin-panel-btn {
       background: linear-gradient(135deg, #D4186C, #b8155d) !important;
       color: #fff !important;
@@ -145,39 +135,29 @@
       background: linear-gradient(135deg, #b8155d, #961149) !important;
     }
     .admin-panel-btn i { color: #fff !important; }
-
   </style>
 </head>
 <body>
 
-<!-- Hamburger (mobile only) -->
 <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
   <i class="fas fa-bars"></i>
 </button>
 
-<!-- Sidebar overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ══════════════════════════════════════
-     LOGOUT CONFIRM MODAL
-══════════════════════════════════════ -->
+<!-- LOGOUT MODAL -->
 <div class="reauth-overlay" id="logoutOverlay">
   <div class="reauth-box" style="max-width:340px;">
-    <div class="reauth-icon" style="background:#fff0f5;display:none;"></div>
     <h3>Log Out?</h3>
     <p>Are you sure you want to log out of your account?</p>
     <div class="reauth-actions">
       <button class="reauth-cancel" onclick="closeLogoutModal()">Cancel</button>
-      <button class="reauth-confirm" onclick="confirmLogout()" style="background:var(--pink);">
-        Log Out
-      </button>
+      <button class="reauth-confirm" onclick="confirmLogout()">Log Out</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     RE-AUTH MODAL
-══════════════════════════════════════ -->
+<!-- RE-AUTH MODAL -->
 <div class="reauth-overlay" id="reauthOverlay">
   <div class="reauth-box">
     <div class="reauth-icon"><i class="fas fa-shield-alt"></i></div>
@@ -197,11 +177,8 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     SIDEBAR
-══════════════════════════════════════ -->
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
       <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
@@ -215,7 +192,6 @@
   <nav class="sidebar-nav" id="sidebarNav">
     <span class="sidebar-section-label">Link Management</span>
     <!-- Department buttons injected by JS -->
-
     <span class="sidebar-section-label" id="othersLabel">Others</span>
     <button class="booking-btn" onclick="loadBookingPage(this)">
       <i class="fas fa-door-open"></i> Room Booking
@@ -223,12 +199,10 @@
     <button class="booking-btn" onclick="loadTrainingPage(this)">
       <i class="fas fa-graduation-cap"></i> Training Module
     </button>
-
     <span class="sidebar-section-label" id="adminSectionLabel" style="display:none;">Admin</span>
     <button class="booking-btn admin-panel-btn" id="adminPanelBtn" style="display:none;" onclick="openReauth()">
       <i class="fas fa-user-shield"></i> Admin Panel
     </button>
-
     <span class="sidebar-section-label">General</span>
     <button class="booking-btn" onclick="loadProfilePage(this)">
       <i class="fas fa-user-circle"></i> Profile
@@ -240,12 +214,9 @@
       <i class="fas fa-sign-out-alt"></i> Logout
     </button>
   </div>
-
 </div>
 
-<!-- ══════════════════════════════════════
-     MAIN
-══════════════════════════════════════ -->
+<!-- MAIN -->
 <div class="main">
 
   <!-- Dashboard -->
@@ -280,10 +251,7 @@
       </h2>
       <p class="page-subtitle">View your account details and manage your password</p>
     </div>
-
     <div class="profile-grid">
-
-      <!-- LEFT CARD: avatar header + info fields -->
       <div class="profile-card">
         <div class="profile-card-header">
           <div class="profile-avatar" id="profileAvatar"></div>
@@ -312,7 +280,6 @@
         </div>
       </div>
 
-      <!-- RIGHT CARD: change password -->
       <div class="profile-card">
         <div class="profile-card-body">
           <div class="profile-card-title"><i class="fas fa-lock"></i> Change Password</div>
@@ -343,20 +310,23 @@
           </button>
         </div>
       </div>
-
     </div>
   </div>
 
 </div>
 
-<!-- ══════════════════════════════════════
-     SCRIPTS
-══════════════════════════════════════ -->
 <script>
+
+/* ─────────────────────────────────────────
+   HELPERS — read token/user from EITHER store
+───────────────────────────────────────── */
+function getStore(key) {
+  return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
+}
 
 let allData = [];
 
-/* ════ MOBILE SIDEBAR ════ */
+/* ── MOBILE SIDEBAR ── */
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebarOverlay");
@@ -374,30 +344,33 @@ function closeSidebar() {
 function navClick() { if (window.innerWidth <= 900) closeSidebar(); }
 window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
 
-/* ════ DEPARTMENTS ════ */
+/* ── DEPARTMENTS ── */
 async function loadDepartments() {
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
-  const user     = JSON.parse(userData);
+  const token    = getStore("token");
+  const userData = getStore("user");
+  if (!userData) throw new Error("No user data in storage");
 
-  // Always fetch the user's own work department and their own link_access
-  // Never use all access-depts for admins — they should also be scoped to their own link_access
+  const user = JSON.parse(userData);
+
+  // Always fetch the user's own full profile — works for all roles
+  // This gives us their personal link_access (never the full dept list)
   const [resWork, resUser] = await Promise.all([
-    fetch(`${API}/api/users/${user.id}/departments`),
+    fetch(`${API}/api/users/${user.id}/departments`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    }),
     fetch(`${API}/api/users/${user.id}`, {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}` }
+      headers: { "Authorization": `Bearer ${token}` }
     })
   ]);
 
-  if (!resWork.ok || !resUser.ok) throw new Error("Dept fetch failed");
+  if (!resWork.ok) throw new Error(`Work dept fetch failed: ${resWork.status}`);
+  if (!resUser.ok) throw new Error(`User fetch failed: ${resUser.status}`);
 
   const workDepts = await resWork.json();
   const userFull  = await resUser.json();
 
-  // link_access = departments the user can see links for (scoped per user, even for admin)
-  const linkDepts = userFull.link_access || [];
-
-  if (!Array.isArray(linkDepts)) throw new Error("Invalid dept data");
+  // link_access = the departments whose links this user can see
+  const linkDepts = Array.isArray(userFull.link_access) ? userFull.link_access : [];
 
   window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
   window.userDepartmentIds = linkDepts.map(d => d.id);
@@ -406,26 +379,28 @@ async function loadDepartments() {
   generateSidebar(linkDepts);
 }
 
-/* ════ LINKS ════ */
+/* ── LINKS ── */
 async function loadLinks() {
   try {
-    const res  = await fetch(`${API}/api/links`);
+    const token = getStore("token");
+    const res   = await fetch(`${API}/api/links`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Links fetch failed: ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
-    // Filter links to only those in the user's access departments
-    const filtered = data.filter(link =>
-      window.userDepartmentIds?.length
-        ? window.userDepartmentIds.includes(Number(link.department_id))
-        : false // if no access depts assigned, show nothing
-    );
+    // Only show links belonging to this user's access departments
+    const filtered = (window.userDepartmentIds?.length)
+      ? data.filter(link => window.userDepartmentIds.includes(Number(link.department_id)))
+      : [];
 
     allData = filtered;
     renderDashboard(filtered);
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error("loadLinks error:", e); }
 }
 
-/* ════ DASHBOARD ════ */
+/* ── DASHBOARD ── */
 function renderDashboard(data, keyword = "") {
   const container = document.getElementById("dashboard");
   container.innerHTML = "";
@@ -443,7 +418,7 @@ function renderDashboard(data, keyword = "") {
   });
 }
 
-/* ════ SIDEBAR GENERATION ════ */
+/* ── SIDEBAR GENERATION ── */
 function generateSidebar(departments) {
   const nav = document.getElementById("sidebarNav");
   nav.querySelectorAll(".dyn-btn").forEach(b => b.remove());
@@ -485,7 +460,7 @@ function showDashboard() {
   document.getElementById("profilePage").style.display   = "none";
 }
 
-/* ════ TRAINING ════ */
+/* ── TRAINING ── */
 function loadTrainingPage(button) {
   setActive(button); navClick();
   document.getElementById("dashboardPage").style.display = "none";
@@ -496,17 +471,16 @@ function loadTrainingPage(button) {
   bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
 }
 
-/* ════ PROFILE ════ */
+/* ── PROFILE ── */
 function loadProfilePage(button) {
   setActive(button); navClick();
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("bookingPage").style.display   = "none";
   document.getElementById("profilePage").style.display   = "block";
 
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
-  const user     = JSON.parse(userData);
-
+  const userData  = getStore("user");
+  const role      = getStore("role");
+  const user      = JSON.parse(userData);
   const initials  = (user.name || user.username || "U").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
   const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
 
@@ -555,8 +529,8 @@ async function changePassword() {
   if (!current || !newPw || !confirm) return showMsg("Please fill in all fields.", "error");
   if (newPw.length < 6)              return showMsg("New password must be at least 6 characters.", "error");
   if (newPw !== confirm)             return showMsg("Passwords do not match.", "error");
-  const user  = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
-  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const user  = JSON.parse(getStore("user"));
+  const token = getStore("token");
   try {
     const res  = await fetch(`${API}/api/users/${user.id}/change-password`, {
       method: "POST",
@@ -571,7 +545,7 @@ async function changePassword() {
   } catch { showMsg("Server error. Please try again.", "error"); }
 }
 
-/* ════ BOOKING PAGE ════ */
+/* ── BOOKING PAGE ── */
 async function loadBookingPage(button) {
   setActive(button); navClick();
   document.getElementById("dashboardPage").style.display = "none";
@@ -597,7 +571,7 @@ async function loadBookingPage(button) {
   }
 }
 
-/* ════ SEARCH ════ */
+/* ── SEARCH ── */
 function doSearch() {
   const kw = document.getElementById("searchInput").value.toLowerCase();
   renderDashboard(allData.filter(i => i.name.toLowerCase().includes(kw)), kw);
@@ -606,13 +580,9 @@ document.getElementById("searchInput").addEventListener("keyup",    doSearch);
 document.getElementById("searchBtn").addEventListener("click",      doSearch);
 document.getElementById("searchInput").addEventListener("keypress", e => { if (e.key === "Enter") doSearch(); });
 
-/* ════ LOGOUT ════ */
-function logout() {
-  document.getElementById("logoutOverlay").classList.add("open");
-}
-function closeLogoutModal() {
-  document.getElementById("logoutOverlay").classList.remove("open");
-}
+/* ── LOGOUT ── */
+function logout() { document.getElementById("logoutOverlay").classList.add("open"); }
+function closeLogoutModal() { document.getElementById("logoutOverlay").classList.remove("open"); }
 function confirmLogout() {
   localStorage.clear(); sessionStorage.clear();
   window.location.href = "login.html";
@@ -621,7 +591,7 @@ document.getElementById("logoutOverlay").addEventListener("click", e => {
   if (e.target === document.getElementById("logoutOverlay")) closeLogoutModal();
 });
 
-/* ════ RE-AUTH ════ */
+/* ── RE-AUTH ── */
 function openReauth() {
   document.getElementById("reauthPassword").value = "";
   document.getElementById("reauthError").style.display = "none";
@@ -647,7 +617,7 @@ async function verifyAndGoAdmin() {
   const errorEl    = document.getElementById("reauthError");
   const confirmBtn = document.getElementById("reauthConfirmBtn");
   if (!password) { errorEl.textContent = "Please enter your password."; errorEl.style.display = "block"; return; }
-  const user = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
+  const user = JSON.parse(getStore("user"));
   confirmBtn.disabled = true;
   confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
   errorEl.style.display = "none";
@@ -676,14 +646,32 @@ async function verifyAndGoAdmin() {
 document.getElementById("reauthPassword").addEventListener("keypress", e => { if (e.key === "Enter") verifyAndGoAdmin(); });
 document.getElementById("reauthOverlay").addEventListener("click", e => { if (e.target === document.getElementById("reauthOverlay")) closeReauth(); });
 
-/* ════ INIT ════ */
+/* ─────────────────────────────────────────
+   INIT — runs on every page load
+   Checks auth FIRST before doing anything else
+───────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", async () => {
-  const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
-  const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
-  const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
+  const token    = getStore("token");
+  const role     = getStore("role");
+  const userData = getStore("user");
 
-  if (!token || !userData) { window.location.href = "login.html"; return; }
+  // ── AUTH GUARD ──
+  // If no token or no user data → not logged in → go to login
+  if (!token || !userData) {
+    window.location.href = "login.html";
+    return;
+  }
 
+  // ── ROLE REDIRECT ──
+  // Admin/superadmin should be on admin.html, not index.html
+  // If they land here by typing the URL directly, send them to the right place
+  if (role === "admin" || role === "superadmin") {
+    window.location.href = "admin.html";
+    return;
+  }
+
+  // ── SHOW ADMIN PANEL BUTTON if needed ──
+  // (kept for completeness but role check above means only 'user' reaches here)
   if (role === "admin" || role === "superadmin") {
     document.getElementById("adminSectionLabel").style.display = "block";
     document.getElementById("adminPanelBtn").style.display     = "block";
@@ -691,15 +679,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   window.currentUserId = JSON.parse(userData).id;
 
+  // ── LOAD DATA with retry ──
   let deptLoaded = false;
   for (let attempt = 1; attempt <= 3; attempt++) {
-    try { await loadDepartments(); deptLoaded = true; break; }
-    catch (e) {
+    try {
+      await loadDepartments();
+      deptLoaded = true;
+      break;
+    } catch (e) {
       console.warn(`loadDepartments attempt ${attempt} failed:`, e.message);
       if (attempt < 3) await new Promise(r => setTimeout(r, 800));
     }
   }
-  if (!deptLoaded) console.error("Could not load departments after 3 attempts.");
+
+  if (!deptLoaded) {
+    // Could not load departments — token may be expired → force re-login
+    console.error("Could not load departments after 3 attempts — clearing session");
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "login.html";
+    return;
+  }
+
   await loadLinks();
 });
 
