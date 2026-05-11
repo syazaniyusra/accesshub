@@ -352,8 +352,6 @@ async function loadDepartments() {
 
   const user = JSON.parse(userData);
 
-  // Always fetch the user's own full profile — works for all roles
-  // This gives us their personal link_access (never the full dept list)
   const [resWork, resUser] = await Promise.all([
     fetch(`${API}/api/users/${user.id}/departments`, {
       headers: { "Authorization": `Bearer ${token}` }
@@ -369,7 +367,6 @@ async function loadDepartments() {
   const workDepts = await resWork.json();
   const userFull  = await resUser.json();
 
-  // link_access = the departments whose links this user can see
   const linkDepts = Array.isArray(userFull.link_access) ? userFull.link_access : [];
 
   window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
@@ -390,7 +387,6 @@ async function loadLinks() {
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
-    // Only show links belonging to this user's access departments
     const filtered = (window.userDepartmentIds?.length)
       ? data.filter(link => window.userDepartmentIds.includes(Number(link.department_id)))
       : [];
@@ -647,8 +643,7 @@ document.getElementById("reauthPassword").addEventListener("keypress", e => { if
 document.getElementById("reauthOverlay").addEventListener("click", e => { if (e.target === document.getElementById("reauthOverlay")) closeReauth(); });
 
 /* ─────────────────────────────────────────
-   INIT — runs on every page load
-   Checks auth FIRST before doing anything else
+   INIT
 ───────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", async () => {
   const token    = getStore("token");
@@ -656,22 +651,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userData = getStore("user");
 
   // ── AUTH GUARD ──
-  // If no token or no user data → not logged in → go to login
   if (!token || !userData) {
     window.location.href = "login.html";
     return;
   }
 
-  // ── ROLE REDIRECT ──
-  // Admin/superadmin should be on admin.html, not index.html
-  // If they land here by typing the URL directly, send them to the right place
-  if (role === "admin" || role === "superadmin") {
-    window.location.href = "admin.html";
-    return;
-  }
-
-  // ── SHOW ADMIN PANEL BUTTON if needed ──
-  // (kept for completeness but role check above means only 'user' reaches here)
+  // ── SHOW ADMIN PANEL BUTTON for admin/superadmin ──
   if (role === "admin" || role === "superadmin") {
     document.getElementById("adminSectionLabel").style.display = "block";
     document.getElementById("adminPanelBtn").style.display     = "block";
@@ -693,7 +678,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (!deptLoaded) {
-    // Could not load departments — token may be expired → force re-login
     console.error("Could not load departments after 3 attempts — clearing session");
     localStorage.clear();
     sessionStorage.clear();
