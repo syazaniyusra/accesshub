@@ -97,28 +97,29 @@
       transition: transform 0.28s cubic-bezier(.4,0,.2,1);
     }
 
-    /* Logo — horizontal row, 44px, matches styles.css */
+    /* Logo — large centered, matches dashboard (index.html) style */
     .sidebar-brand {
-      padding: 24px 20px 16px;
+      padding: 24px 20px 20px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       border-bottom: 1px solid #D9D3CB;
       flex-shrink: 0;
     }
     .sidebar-logo-wrap {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      background: transparent;
+      width: 90px; height: 90px;
+      border-radius: 20px;
+      background: #fff;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
-      border: none;
+      border: 2px solid #D9D3CB;
     }
-    .sidebar-logo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; }
-    .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
-    .sidebar-brand-name { font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1; }
-    .sidebar-brand-sub  { font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pink); }
+    .sidebar-logo { width: 76px; height: 76px; object-fit: contain; border-radius: 12px; }
+    .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; text-align: center; }
+    .sidebar-brand-name { font-family: var(--font-display); font-size: 26px; color: var(--ink); line-height: 1; }
+    .sidebar-brand-sub  { font-size: 9.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--pink); }
 
     .back-btn {
       margin: 14px 12px 8px;
