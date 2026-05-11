@@ -374,51 +374,55 @@ function closeSidebar() {
 function navClick() { if (window.innerWidth <= 900) closeSidebar(); }
 window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
 
+/* ════ DEPARTMENTS ════ */
+async function loadDepartments() {
+  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
+  const user     = JSON.parse(userData);
+
+  // Always fetch the user's own work department and their own link_access
+  // Never use all access-depts for admins — they should also be scoped to their own link_access
+  const [resWork, resUser] = await Promise.all([
+    fetch(`${API}/api/users/${user.id}/departments`),
+    fetch(`${API}/api/users/${user.id}`, {
+      headers: { "Authorization": `Bearer ${localStorage.getItem("token") || sessionStorage.getItem("token")}` }
+    })
+  ]);
+
+  if (!resWork.ok || !resUser.ok) throw new Error("Dept fetch failed");
+
+  const workDepts = await resWork.json();
+  const userFull  = await resUser.json();
+
+  // link_access = departments the user can see links for (scoped per user, even for admin)
+  const linkDepts = userFull.link_access || [];
+
+  if (!Array.isArray(linkDepts)) throw new Error("Invalid dept data");
+
+  window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
+  window.userDepartmentIds = linkDepts.map(d => d.id);
+  window.userLinkDepts     = linkDepts;
+
+  generateSidebar(linkDepts);
+}
+
 /* ════ LINKS ════ */
 async function loadLinks() {
   try {
     const res  = await fetch(`${API}/api/links`);
     const data = await res.json();
     if (!Array.isArray(data)) return;
+
+    // Filter links to only those in the user's access departments
     const filtered = data.filter(link =>
-      !window.userDepartmentIds?.length ||
-      window.userDepartmentIds.includes(Number(link.department_id))
+      window.userDepartmentIds?.length
+        ? window.userDepartmentIds.includes(Number(link.department_id))
+        : false // if no access depts assigned, show nothing
     );
+
     allData = filtered;
     renderDashboard(filtered);
   } catch (e) { console.error(e); }
-}
-
-/* ════ DEPARTMENTS ════ */
-async function loadDepartments() {
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-  const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
-  const user     = JSON.parse(userData);
-  let workDepts, linkDepts;
-
-  if (role === "admin" || role === "superadmin") {
-    const [resWork, resAccess] = await Promise.all([
-      fetch(`${API}/api/users/${user.id}/departments`),
-      fetch(`${API}/api/access-dept`)
-    ]);
-    if (!resWork.ok || !resAccess.ok) throw new Error("Dept fetch failed");
-    workDepts = await resWork.json();
-    linkDepts = await resAccess.json();
-  } else {
-    const [resWork, resUser] = await Promise.all([
-      fetch(`${API}/api/users/${user.id}/departments`),
-      fetch(`${API}/api/users/${user.id}`)
-    ]);
-    if (!resWork.ok || !resUser.ok) throw new Error("Dept fetch failed");
-    workDepts      = await resWork.json();
-    const userFull = await resUser.json();
-    linkDepts      = userFull.link_access || [];
-  }
-  if (!Array.isArray(linkDepts)) throw new Error("Invalid dept data");
-  window.userDepartments   = Array.isArray(workDepts) ? workDepts : [];
-  window.userDepartmentIds = linkDepts.map(d => d.id);
-  window.userLinkDepts     = linkDepts;
-  generateSidebar(linkDepts);
 }
 
 /* ════ DASHBOARD ════ */
@@ -466,6 +470,7 @@ function generateSidebar(departments) {
     insertRef.insertAdjacentElement("afterend", btn);
     insertRef = btn;
   });
+
   setActive(allBtn);
 }
 
@@ -502,25 +507,31 @@ function loadProfilePage(button) {
   const role     = localStorage.getItem("role")  || sessionStorage.getItem("role");
   const user     = JSON.parse(userData);
 
-  const initials = (user.name || user.username || "U").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
+  const initials  = (user.name || user.username || "U").split(" ").map(w => w[0]).join("").toUpperCase().slice(0,2);
   const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "—";
 
-  document.getElementById("profileAvatar").textContent      = initials;
-  document.getElementById("profileName").textContent        = user.name  || user.username || "—";
-  document.getElementById("profileRoleHeader").textContent  = roleLabel;
-  document.getElementById("profileEmail").textContent       = user.email || "—";
-  document.getElementById("profileRole").textContent        = roleLabel;
+  document.getElementById("profileAvatar").textContent     = initials;
+  document.getElementById("profileName").textContent       = user.name  || user.username || "—";
+  document.getElementById("profileRoleHeader").textContent = roleLabel;
+  document.getElementById("profileEmail").textContent      = user.email || "—";
+  document.getElementById("profileRole").textContent       = roleLabel;
 
   const deptsEl = document.getElementById("profileDepts");
   deptsEl.innerHTML = "";
   if (window.userDepartments?.length) {
-    window.userDepartments.forEach(d => { const t = document.createElement("span"); t.className = "dept-tag"; t.textContent = d.name; deptsEl.appendChild(t); });
+    window.userDepartments.forEach(d => {
+      const t = document.createElement("span");
+      t.className = "dept-tag"; t.textContent = d.name; deptsEl.appendChild(t);
+    });
   } else { deptsEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>"; }
 
   const accessEl = document.getElementById("profileAccessDepts");
   accessEl.innerHTML = "";
   if (window.userLinkDepts?.length) {
-    window.userLinkDepts.forEach(d => { const t = document.createElement("span"); t.className = "dept-tag dept-tag--access"; t.textContent = d.name; accessEl.appendChild(t); });
+    window.userLinkDepts.forEach(d => {
+      const t = document.createElement("span");
+      t.className = "dept-tag dept-tag--access"; t.textContent = d.name; accessEl.appendChild(t);
+    });
   } else { accessEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>"; }
 }
 
