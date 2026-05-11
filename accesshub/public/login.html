@@ -47,7 +47,6 @@
       overflow: hidden;
     }
 
-    /* Decorative background blobs */
     body::before {
       content: '';
       position: fixed;
@@ -144,7 +143,6 @@
 
     /* ── ERROR ── */
     .error-box {
-      display: none;
       background: #FFF1F2;
       border: 1px solid #FECDD3;
       border-radius: var(--r-sm);
@@ -191,6 +189,18 @@
       box-shadow: var(--shadow-focus);
     }
 
+    /* Email validation states override focus-within */
+    .input-wrap.email-invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important;
+    }
+    .input-wrap.email-valid {
+      border-color: #16a34a !important;
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+    }
+    .input-wrap.email-invalid .input-icon { color: #ef4444; }
+    .input-wrap.email-valid   .input-icon { color: #16a34a; }
+
     .input-wrap .input-icon {
       padding: 0 13px;
       color: var(--ink-faint);
@@ -230,6 +240,17 @@
       transition: color var(--t);
     }
     .toggle-pw:hover { color: var(--pink); }
+
+    /* ── EMAIL HINT ── */
+    .email-hint {
+      font-size: 11.5px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .email-hint.invalid { display: flex; color: #ef4444; }
+    .email-hint.valid   { display: flex; color: #16a34a; }
 
     /* ── REMEMBER ROW ── */
     .remember-row {
@@ -343,9 +364,14 @@
   <!-- EMAIL -->
   <div class="form-group">
     <label class="form-label">Email Address</label>
-    <div class="input-wrap">
+    <div class="input-wrap" id="emailWrap">
       <span class="input-icon"><i class="fas fa-envelope"></i></span>
-      <input id="email" type="email" placeholder="Enter your email" autocomplete="email">
+      <input id="email" type="email" placeholder="Enter your email"
+             autocomplete="email" oninput="validateLoginEmail()">
+    </div>
+    <div class="email-hint" id="emailHint">
+      <i class="fas fa-circle-xmark"></i>
+      <span id="emailHintText">Enter a valid email (e.g. name@domain.com)</span>
     </div>
   </div>
 
@@ -380,6 +406,38 @@
 </div>
 
 <script>
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /* ── EMAIL VALIDATION ── */
+  function validateLoginEmail() {
+    const input    = document.getElementById("email");
+    const wrap     = document.getElementById("emailWrap");
+    const hint     = document.getElementById("emailHint");
+    const hintText = document.getElementById("emailHintText");
+    const val      = input.value.trim();
+
+    // Empty — reset to neutral
+    if (!val) {
+      wrap.classList.remove("email-valid", "email-invalid");
+      hint.className = "email-hint";
+      return;
+    }
+
+    if (emailRegex.test(val)) {
+      wrap.classList.add("email-valid");
+      wrap.classList.remove("email-invalid");
+      hint.className = "email-hint valid";
+      hint.querySelector("i").className = "fas fa-circle-check";
+      hintText.textContent = "Looks good!";
+    } else {
+      wrap.classList.add("email-invalid");
+      wrap.classList.remove("email-valid");
+      hint.className = "email-hint invalid";
+      hint.querySelector("i").className = "fas fa-circle-xmark";
+      hintText.textContent = "Enter a valid email (e.g. name@domain.com)";
+    }
+  }
+
   function showError(message) {
     const box = document.getElementById("errorBox");
     document.getElementById("errorMsg").textContent = message;
@@ -409,6 +467,11 @@
       document.getElementById("email").focus();
       return false;
     }
+    if (!emailRegex.test(email)) {
+      showError("Please enter a valid email address");
+      document.getElementById("email").focus();
+      return false;
+    }
     return true;
   }
 
@@ -419,8 +482,9 @@
     const remember = document.getElementById("rememberMe").checked;
     const btn      = document.getElementById("loginBtn");
 
-    if (!email)    { showError("Email is required"); return; }
-    if (!password) { showError("Password is required"); return; }
+    if (!email)                  { showError("Email is required"); return; }
+    if (!emailRegex.test(email)) { showError("Please enter a valid email address"); return; }
+    if (!password)               { showError("Password is required"); return; }
 
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
@@ -459,22 +523,20 @@
     }
   }
 
-  /* Keyboard navigation */
+  /* ── KEYBOARD NAVIGATION ── */
   document.getElementById("email").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (checkEmailFirst()) document.getElementById("password").focus();
-    }
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (checkEmailFirst()) document.getElementById("password").focus();
   });
 
   document.getElementById("password").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      login();
-    }
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    login();
   });
 
-  /* Hide error on typing */
+  /* ── HIDE ERROR ON TYPING ── */
   document.getElementById("email").addEventListener("input",    hideError);
   document.getElementById("password").addEventListener("input", hideError);
 </script>
