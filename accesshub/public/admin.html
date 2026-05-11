@@ -480,13 +480,10 @@ async function fetchMyWorkDepts() {
 // superadmin: sees all access depts
 // admin: can only assign within their own work departments
 async function loadAccessDepts() {
-  if (window.userRole === "superadmin") {
-    const res = await fetch(`${API}/api/access-dept`);
-    allAccessDepts = await res.json();
-  } else {
-    // admin: checkbox options limited to their own work departments
-    allAccessDepts = await fetchMyWorkDepts();
-  }
+  // Both admin and superadmin see the full access dept list in checkboxes
+  // Scoping (which users/links they can manage) is handled separately
+  const res = await fetch(`${API}/api/access-dept`);
+  allAccessDepts = await res.json();
   const seen = new Set();
   allAccessDepts = allAccessDepts.filter(d => {
     if (seen.has(d.name.toLowerCase())) return false;
