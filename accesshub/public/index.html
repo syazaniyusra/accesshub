@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
+    /* ── FIX: Hide page until auth check passes to prevent dashboard flash ── */
+    body { visibility: hidden; }
+
     .hamburger {
       display: none;
       position: fixed;
@@ -654,7 +657,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!token || !userData) {
     window.location.href = "login.html";
     return;
+    // NOTE: body stays visibility:hidden so nothing flashes before redirect
   }
+
+  // ── Auth passed — reveal the page ──
+  document.body.style.visibility = "visible";
 
   // ── SHOW ADMIN PANEL BUTTON for admin/superadmin ──
   if (role === "admin" || role === "superadmin") {
