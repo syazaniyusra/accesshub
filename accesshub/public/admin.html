@@ -35,6 +35,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font); background: var(--surface-2); color: var(--ink); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
+/* ── SIDEBAR ── */
 .sidebar { width: var(--sidebar-w); background: #EDE8E1; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; z-index: 100; overflow: hidden; border-right: 1px solid #D9D3CB; }
 .sidebar-brand { padding: 24px 20px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #D9D3CB; }
 .sidebar-logo-wrap { width: 40px; height: 40px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 1px solid #D9D3CB; }
@@ -42,9 +43,11 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
 .sidebar-brand-name { font-family: var(--font-display); font-size: 22px; color: var(--ink); line-height: 1; }
 .sidebar-brand-sub { font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pink); }
+
 .back-btn { margin: 14px 12px 8px; padding: 10px 14px; background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB; border-radius: 10px; color: var(--ink-mid); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background var(--t); font-family: var(--font); width: calc(100% - 24px); text-align: left; }
 .back-btn:hover { background: rgba(0,0,0,0.09); }
 .back-btn i { color: var(--ink-light); font-size: 12px; }
+
 .sidebar-nav { flex: 1; padding: 0 0 10px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; }
 .sidebar-nav::-webkit-scrollbar { width: 0; }
 .sidebar-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #B0A89E; padding: 12px 20px 5px; user-select: none; }
@@ -54,6 +57,7 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .sidebar-nav button:hover i { color: var(--ink-mid); }
 .sidebar-nav button.active { background: var(--pink); color: #fff; font-weight: 700; }
 .sidebar-nav button.active i { color: #fff; }
+
 .sidebar-footer { padding: 12px; border-top: 1px solid #D9D3CB; }
 .sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; background: rgba(0,0,0,0.05); border: 1px solid #D9D3CB; }
 .user-avatar-sm { width: 32px; height: 32px; background: var(--pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
@@ -61,6 +65,7 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .user-meta-name { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-meta-role { font-size: 10px; color: var(--ink-light); text-transform: capitalize; margin-top: 1px; }
 
+/* ── MAIN ── */
 .main { margin-left: var(--sidebar-w); padding: 36px 40px; width: calc(100% - var(--sidebar-w)); min-height: 100vh; }
 .page-header { margin-bottom: 24px; }
 .page-title { font-family: var(--font-display); font-size: 28px; color: var(--ink); display: flex; align-items: center; gap: 10px; }
@@ -68,10 +73,12 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .page-title .accent { color: var(--pink); }
 .page-subtitle { margin-top: 5px; font-size: 13px; color: var(--ink-light); }
 
+/* ── CARD ── */
 .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-lg); padding: 28px; margin-bottom: 20px; box-shadow: var(--shadow-card); }
 .card-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
 .card-title i { color: var(--pink); font-size: 14px; }
 
+/* ── FORM ── */
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); }
@@ -80,11 +87,13 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .form-group input:focus, .form-group select:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 .form-group input:disabled { background: var(--surface-2); color: var(--ink-light); cursor: not-allowed; }
 
+/* ── CHECKBOXES ── */
 .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .checkbox-label { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--ink-mid); cursor: pointer; transition: border-color var(--t), background var(--t); }
 .checkbox-label:hover { border-color: var(--pink-pill); background: var(--pink-soft); color: var(--pink); }
 .checkbox-label input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--pink); cursor: pointer; flex-shrink: 0; }
 
+/* ── BUTTONS ── */
 .btn-primary { background: var(--pink); color: #fff; border: none; border-radius: var(--r-sm); padding: 11px 22px; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background var(--t), transform var(--t); width: auto; margin: 0; }
 .btn-primary:hover { background: var(--pink-hover); transform: translateY(-1px); }
 .btn-secondary { background: var(--surface); color: var(--ink-mid); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--t); width: auto; margin: 0; }
@@ -94,6 +103,7 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 .btn-success { background: #dcfce7; color: #166534; border: 1.5px solid #bbf7d0; border-radius: var(--r-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--t); width: auto; margin: 0; }
 .btn-success:hover { background: #bbf7d0; }
 
+/* ── TABLE ── */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 thead tr { background: var(--surface-2); border-bottom: 1.5px solid var(--border); }
@@ -102,6 +112,7 @@ td { padding: 13px 14px; color: var(--ink-mid); border-bottom: 1px solid var(--b
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: var(--surface-2); }
 
+/* ── BADGES ── */
 .badge { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pill); padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; }
 .badge-access { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; display: inline-block; }
 .badge-role { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
@@ -115,19 +126,22 @@ tbody tr:hover { background: var(--surface-2); }
 table a { color: var(--pink); text-decoration: none; font-weight: 600; }
 table a:hover { text-decoration: underline; }
 
+/* ── ACTION BUTTONS ── */
 .action-buttons { display: flex; gap: 6px; }
 .action-buttons button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; border-radius: var(--r-sm); cursor: pointer; transition: transform var(--t), opacity var(--t); font-size: 12px; }
 .action-buttons button:hover { transform: translateY(-1px); opacity: 0.85; }
 .action-buttons button:active { transform: scale(0.95); }
-.edit-btn   { background: #fef9c3; color: #854d0e; }
-.delete-btn { background: #fee2e2; color: #b91c1c; }
-.cancel-btn { background: #ffedd5; color: #c2410c; }
+.edit-btn    { background: #fef9c3; color: #854d0e; }
+.delete-btn  { background: #fee2e2; color: #b91c1c; }
+.cancel-btn  { background: #ffedd5; color: #c2410c; }
 .restore-btn { background: #dcfce7; color: #166534; }
 
+/* ── FILTER BAR ── */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
 .filter-bar select, .filter-bar input { padding: 9px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-family: var(--font); color: var(--ink); background: var(--surface); outline: none; margin: 0; width: auto; }
 .filter-bar select:focus, .filter-bar input:focus { border-color: var(--pink); box-shadow: var(--shadow-focus); }
 
+/* ── MODAL ── */
 .modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
 .modal-box { background: var(--surface); border-radius: var(--r-lg); padding: 28px; width: 440px; max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.15); animation: modalPop 0.22s cubic-bezier(.34,1.56,.64,1) both; }
 .modal-box.wide { width: 500px; }
@@ -143,6 +157,7 @@ table a:hover { text-decoration: underline; }
 .modal-detail-label { width: 38%; color: var(--ink-light); font-size: 12.5px; }
 .modal-detail-value { flex: 1; color: var(--ink); font-weight: 500; }
 
+/* ── TOAST ── */
 .toast { position: fixed; top: 22px; right: 22px; background: var(--surface); color: var(--ink); padding: 13px 18px; border-radius: var(--r-md); font-size: 13.5px; font-weight: 500; font-family: var(--font); box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-width: 320px; opacity: 0; transform: translateY(-16px); transition: opacity 0.25s, transform 0.25s; z-index: 1000; border-left: 4px solid var(--border); }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { border-left-color: #22c55e; }
@@ -156,7 +171,7 @@ table a:hover { text-decoration: underline; }
 </head>
 <body>
 
-<!-- EDIT USER MODAL -->
+<!-- ── EDIT USER MODAL ── -->
 <div id="editModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -191,7 +206,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- ── DELETE MODAL ── -->
 <div id="deleteModal" class="modal">
   <div class="modal-box" style="width:380px;">
     <div class="modal-header">
@@ -206,7 +221,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- EDIT LINK MODAL -->
+<!-- ── EDIT LINK MODAL ── -->
 <div id="editLinkModal" class="modal">
   <div class="modal-box">
     <div class="modal-header">
@@ -232,7 +247,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- BOOKING DETAIL MODAL -->
+<!-- ── BOOKING DETAIL MODAL ── -->
 <div id="bookingDetailModal" class="modal">
   <div class="modal-box wide">
     <div class="modal-header">
@@ -248,7 +263,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- SIDEBAR -->
+<!-- ── SIDEBAR ── -->
 <div class="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
@@ -259,9 +274,12 @@ table a:hover { text-decoration: underline; }
       <span class="sidebar-brand-sub">Segar Halal Suci</span>
     </div>
   </div>
+
+  <!-- FIX: goes to index.html (dashboard), no role redirect blocks it now -->
   <button class="back-btn" onclick="goBackToDashboard()">
     <i class="fas fa-arrow-left"></i> Back to Dashboard
   </button>
+
   <nav class="sidebar-nav">
     <span class="sidebar-section-label">Manage</span>
     <button onclick="showSection('usersSection', this)" class="active">
@@ -274,6 +292,7 @@ table a:hover { text-decoration: underline; }
       <i class="fas fa-calendar-days"></i> Bookings
     </button>
   </nav>
+
   <div class="sidebar-footer">
     <div class="user-info">
       <div class="user-avatar-sm" id="sidebarAvatar">A</div>
@@ -285,7 +304,7 @@ table a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- ── MAIN ── -->
 <div class="main">
 <div id="toast" class="toast"></div>
 
@@ -298,6 +317,7 @@ table a:hover { text-decoration: underline; }
     </h2>
     <p class="page-subtitle">Create and manage user accounts and their access</p>
   </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-user-plus"></i> Create User</div>
     <div class="form-grid-2">
@@ -332,7 +352,10 @@ table a:hover { text-decoration: underline; }
       </select>
     </div>
     <div style="margin-bottom:20px;">
-      <div class="form-label" style="margin-bottom:4px;">Access Departments <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(which access group they belong to)</span></div>
+      <div class="form-label" style="margin-bottom:4px;">
+        Access Departments
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(which access group they belong to)</span>
+      </div>
       <div class="modal-hint">Check all access departments for this user.</div>
       <div class="checkbox-grid" id="departmentCheckboxes"></div>
     </div>
@@ -340,6 +363,7 @@ table a:hover { text-decoration: underline; }
       <i class="fas fa-user-plus"></i> Create User
     </button>
   </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-list"></i> Users List</div>
     <div class="table-wrap">
@@ -364,6 +388,7 @@ table a:hover { text-decoration: underline; }
     </h2>
     <p class="page-subtitle">Add and manage links for each department</p>
   </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-plus"></i> Add Link</div>
     <div class="form-grid-2" style="margin-bottom:14px;">
@@ -384,6 +409,7 @@ table a:hover { text-decoration: underline; }
       <i class="fas fa-plus"></i> Add Link
     </button>
   </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-list"></i> Links List</div>
     <div class="table-wrap">
@@ -406,6 +432,7 @@ table a:hover { text-decoration: underline; }
     </h2>
     <p class="page-subtitle">View and manage all room bookings</p>
   </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-filter"></i> Filter Bookings</div>
     <div class="filter-bar">
@@ -442,11 +469,18 @@ let deleteId         = null;
 let allBookings      = [];
 let viewingBookingId = null;
 let allAccessDepts   = [];
-let adminWorkDeptIds = []; // populated for all roles; for admin, limits scope
+let adminWorkDeptIds = [];
 
-function goBackToDashboard() { window.location.href = "index.html"; }
+/* ── HELPER: read from either storage ── */
+function getStore(key) {
+  return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
+}
 
-/* ── SECTION SWITCHING ── */
+/* ── NAVIGATION ── */
+function goBackToDashboard() {
+  window.location.href = "index.html";
+}
+
 function showSection(id, btn) {
   ["usersSection","linksSection","bookingsSection"].forEach(s => {
     document.getElementById(s).style.display = "none";
@@ -466,24 +500,29 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
-/* ── FETCH THIS ADMIN/SUPERADMIN'S OWN WORK DEPARTMENTS ── */
+/* ── FETCH THIS USER'S OWN WORK DEPARTMENTS ──
+   Used to scope admin's visible users/links/dropdowns.
+   Always called first on init. ── */
 async function fetchMyWorkDepts() {
-  const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+  const userData = getStore("user");
+  const token    = getStore("token");
   const user     = JSON.parse(userData);
-  const res      = await fetch(`${API}/api/users/${user.id}/departments`);
+  const res      = await fetch(`${API}/api/users/${user.id}/departments`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
   const depts    = await res.json();
   adminWorkDeptIds = Array.isArray(depts) ? depts.map(d => d.id) : [];
   return Array.isArray(depts) ? depts : [];
 }
 
-/* ── LOAD ACCESS DEPTS (for checkboxes when creating/editing users) ── */
-// superadmin: sees all access depts
-// admin: can only assign within their own work departments
+/* ── LOAD ACCESS DEPTS (for checkboxes) ──
+   Both admin and superadmin see ALL access depts in checkboxes
+   so they can assign any department access to a user.
+   Scoping of users/links list is handled separately. ── */
 async function loadAccessDepts() {
-  // Both admin and superadmin see the full access dept list in checkboxes
-  // Scoping (which users/links they can manage) is handled separately
   const res = await fetch(`${API}/api/access-dept`);
   allAccessDepts = await res.json();
+  // Deduplicate
   const seen = new Set();
   allAccessDepts = allAccessDepts.filter(d => {
     if (seen.has(d.name.toLowerCase())) return false;
@@ -504,8 +543,9 @@ function renderAccessDeptCheckboxes(containerId, checkedIds = []) {
   });
 }
 
-/* ── DEPARTMENT DROPDOWNS ── */
-// Returns scoped departments: admin gets only their own, superadmin gets all
+/* ── SCOPED DEPARTMENT LIST FOR DROPDOWNS ──
+   admin: only their own work departments
+   superadmin: all departments ── */
 async function getScopedDepts() {
   if (window.userRole === "admin") {
     return await fetchMyWorkDepts();
@@ -541,7 +581,8 @@ async function loadLinkDepartments() {
 
 /* ── USERS ── */
 async function loadUsers() {
-  const res   = await fetch(`${API}/api/users`, { headers: { "Authorization": `Bearer ${window.authToken}` } });
+  const token = getStore("token");
+  const res   = await fetch(`${API}/api/users`, { headers: { "Authorization": `Bearer ${token}` } });
   const users = await res.json();
   const tbody = document.querySelector("#userTable tbody");
   tbody.innerHTML = "";
@@ -577,6 +618,7 @@ async function loadUsers() {
 }
 
 async function createUser() {
+  const token    = getStore("token");
   const name     = document.getElementById("name").value.trim();
   const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
@@ -593,7 +635,7 @@ async function createUser() {
 
   const res  = await fetch(`${API}/api/users`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     body: JSON.stringify({ name, email, password, role, departments: workDept ? [workDept] : [], link_access: deps })
   });
   const data = await res.json();
@@ -601,7 +643,7 @@ async function createUser() {
 
   showToast("User created successfully!");
   ["name","email","password","confirmPassword"].forEach(id => document.getElementById(id).value = "");
-  if (document.getElementById("role").tagName === "SELECT") document.getElementById("role").value = "user";
+  if (document.getElementById("role")?.tagName === "SELECT") document.getElementById("role").value = "user";
   document.getElementById("userDepartment").value = "";
   renderAccessDeptCheckboxes("departmentCheckboxes");
   loadUsers();
@@ -668,7 +710,6 @@ async function editLink(id, name, url, department_id) {
   const sel  = document.getElementById("editLinkDepartment");
   sel.innerHTML = "";
   deps.forEach(d => sel.innerHTML += `<option value="${d.id}" ${d.id == department_id ? "selected" : ""}>${d.name}</option>`);
-
   document.getElementById("editLinkModal").style.display = "flex";
 }
 function closeEditLinkModal() { document.getElementById("editLinkModal").style.display = "none"; }
@@ -697,10 +738,11 @@ function openDeleteModal(type, id) {
 function closeDeleteModal() { document.getElementById("deleteModal").style.display = "none"; }
 
 async function confirmDelete() {
-  const url = deleteType === "link"    ? `${API}/api/links/${deleteId}`
-            : deleteType === "booking" ? `${API}/api/bookings/${deleteId}`
-            : `${API}/api/users/${deleteId}`;
-  await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${window.authToken}` } });
+  const token = getStore("token");
+  const url   = deleteType === "link"    ? `${API}/api/links/${deleteId}`
+              : deleteType === "booking" ? `${API}/api/bookings/${deleteId}`
+              : `${API}/api/users/${deleteId}`;
+  await fetch(url, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
   showToast("Deleted successfully!");
   closeDeleteModal();
   if (deleteType === "link")         loadLinks();
@@ -710,11 +752,10 @@ async function confirmDelete() {
 
 /* ── EDIT USER ── */
 async function editUser(id) {
-  const [resUser] = await Promise.all([
-    fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${window.authToken}` } })
-  ]);
-  const user = await resUser.json();
-  const deps = dedupe(await getScopedDepts());
+  const token   = getStore("token");
+  const resUser = await fetch(`${API}/api/users/${id}`, { headers: { "Authorization": `Bearer ${token}` } });
+  const user    = await resUser.json();
+  const deps    = dedupe(await getScopedDepts());
 
   editingUserId = id;
   document.getElementById("editName").value     = user.name  || "";
@@ -735,6 +776,7 @@ async function editUser(id) {
 function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
 
 async function confirmEdit() {
+  const token    = getStore("token");
   const name     = document.getElementById("editName").value.trim();
   const email    = document.getElementById("editEmail").value.trim();
   const password = document.getElementById("editPassword").value;
@@ -745,7 +787,7 @@ async function confirmEdit() {
   if (password) body.password = password;
   await fetch(`${API}/api/users/${editingUserId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${window.authToken}` },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
     body: JSON.stringify(body)
   });
   showToast("User updated successfully!");
@@ -870,9 +912,9 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 
 /* ── INIT ── */
 document.addEventListener("DOMContentLoaded", async () => {
-  const token    = localStorage.getItem("token")    || sessionStorage.getItem("token");
-  const role     = localStorage.getItem("role")     || sessionStorage.getItem("role");
-  const userData = localStorage.getItem("user")     || sessionStorage.getItem("user");
+  const token    = getStore("token");
+  const role     = getStore("role");
+  const userData = getStore("user");
 
   if (!token || (role !== "admin" && role !== "superadmin")) {
     window.location.href = "login.html"; return;
@@ -890,7 +932,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch(e) {}
 
   if (role === "admin") {
+    // Hide bookings tab
     document.getElementById("bookingsNavBtn").style.display = "none";
+    // Lock role field to User only
     const roleGroup = document.getElementById("roleGroup");
     if (roleGroup) {
       const roleInput    = document.createElement("input");
@@ -902,8 +946,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    // IMPORTANT: fetch admin's own work depts first — needed for scoping everywhere
+    // Must run first — populates adminWorkDeptIds used for scoping
     await fetchMyWorkDepts();
+    // Load all access depts for checkboxes (both roles see all)
     await loadAccessDepts();
     renderAccessDeptCheckboxes("departmentCheckboxes");
     await loadDepartments();
