@@ -9,6 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
 
+/* ── FIX: Hide page until auth check passes to prevent admin flash ── */
+body { visibility: hidden; }
+
 :root {
   --pink:         #D4186C;
   --pink-hover:   #B5135C;
@@ -678,8 +681,6 @@ async function createUser() {
   const password = document.getElementById("password").value;
   const confirm  = document.getElementById("confirmPassword").value;
 
-  /* Role: if the field was replaced with a disabled text input (admin view),
-     fall back to "user"; otherwise read the select value. */
   const roleEl = document.getElementById("role");
   const role   = (roleEl && roleEl.tagName === "SELECT") ? roleEl.value : "user";
 
@@ -701,10 +702,7 @@ async function createUser() {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({
-        name,
-        email,
-        password,
-        role,
+        name, email, password, role,
         departments: workDept ? [workDept] : [],
         link_access: deps
       })
@@ -718,7 +716,6 @@ async function createUser() {
     document.getElementById("password").value        = "";
     document.getElementById("confirmPassword").value = "";
 
-    /* Reset password toggle icons */
     ["password","confirmPassword"].forEach(id => {
       const input = document.getElementById(id);
       if (input) {
@@ -1004,17 +1001,12 @@ function formatBookingTime(t) {
 }
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
-/* ── AUTO-CAPITALIZE: capitalise first letter after every space ── */
 function applyAutoCapitalize(input) {
   input.addEventListener("keyup", e => {
-    // Only trigger on Space key
     if (e.key !== " ") return;
     const val = input.value;
-    // Find the word that just got a space after it and capitalise its first letter
     input.value = val.replace(/(^\s*|\s+)(\S)/g, (match, space, char) => space + char.toUpperCase());
   });
-
-  // Also capitalise the very first character as soon as anything is typed
   input.addEventListener("input", () => {
     if (input.value.length === 1) {
       input.value = input.value.toUpperCase();
@@ -1022,17 +1014,13 @@ function applyAutoCapitalize(input) {
   });
 }
 
-/* ── ENTER → NEXT FIELD ── */
 function applyEnterToNext(inputs) {
   inputs.forEach((input, i) => {
     input.addEventListener("keydown", e => {
       if (e.key !== "Enter") return;
       e.preventDefault();
-      // Find next focusable field in the list
       const next = inputs[i + 1];
-      if (next) {
-        next.focus();
-      }
+      if (next) next.focus();
     });
   });
 }
@@ -1043,9 +1031,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const role     = getStore("role");
   const userData = getStore("user");
 
-  if (!token || (role !== "admin" && role !== "superadmin")) {
-    window.location.href = "login.html"; return;
+  // ── AUTH GUARD ──
+  if (!token) {
+    window.location.href = "login.html";
+    return;
   }
+  if (role !== "admin" && role !== "superadmin") {
+    window.location.href = "index.html";
+    return;
+  }
+
+  // ── Auth passed — reveal the page ──
+  document.body.style.visibility = "visible";
 
   window.authToken = token;
   window.userRole  = role;
@@ -1066,7 +1063,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       roleInput.type     = "text";
       roleInput.value    = "User (Staff)";
       roleInput.disabled = true;
-      roleInput.id       = "role"; /* keep same id so createUser() can find it */
+      roleInput.id       = "role";
       document.getElementById("role").replaceWith(roleInput);
     }
   }
@@ -1085,25 +1082,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     showToast("Failed to load data", "error");
   }
 
-  /* ── APPLY AUTO-CAPITALIZE to text/email fields (not password) ── */
   const autoCapFields = ["name", "linkName"];
   autoCapFields.forEach(id => {
     const el = document.getElementById(id);
     if (el) applyAutoCapitalize(el);
   });
 
-  /* ── APPLY ENTER → NEXT FIELD for Create User form ── */
   const createUserFields = [
     document.getElementById("name"),
     document.getElementById("email"),
     document.getElementById("password"),
     document.getElementById("confirmPassword"),
     document.getElementById("userDepartment"),
-    document.getElementById("role"),         // may be input or select
+    document.getElementById("role"),
   ].filter(Boolean);
   applyEnterToNext(createUserFields);
 
-  /* ── APPLY ENTER → NEXT FIELD for Add Link form ── */
   const addLinkFields = [
     document.getElementById("linkName"),
     document.getElementById("linkURL"),
@@ -1111,7 +1105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   ].filter(Boolean);
   applyEnterToNext(addLinkFields);
 
-  /* ── APPLY ENTER → NEXT FIELD for Edit User modal ── */
   const editUserFields = [
     document.getElementById("editName"),
     document.getElementById("editEmail"),
@@ -1120,11 +1113,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   ].filter(Boolean);
   applyEnterToNext(editUserFields);
 
-  /* ── APPLY AUTO-CAPITALIZE to Edit User name field ── */
   const editNameEl = document.getElementById("editName");
   if (editNameEl) applyAutoCapitalize(editNameEl);
 
-  /* ── APPLY ENTER → NEXT for Edit Link modal ── */
   const editLinkFields = [
     document.getElementById("editLinkName"),
     document.getElementById("editLinkURL"),
