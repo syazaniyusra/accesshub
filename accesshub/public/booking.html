@@ -1158,4 +1158,63 @@ function toTitleCase(input) {
     .toLowerCase()
     .replace(/\b\w/g, c => c.toUpperCase());
 }
+
+/* ---- AUTO-CAPITALIZE FIRST LETTER OF EACH WORD (on space) ---- */
+function applyAutoCapitalize(input) {
+  // Capitalize first character immediately when user starts typing
+  input.addEventListener("input", () => {
+    if (input.value.length === 1) {
+      input.value = input.value.toUpperCase();
+    }
+  });
+  // Capitalize after every space
+  input.addEventListener("keyup", e => {
+    if (e.key !== " ") return;
+    input.value = input.value.replace(/(^\s*|\s+)(\S)/g, (match, space, char) =>
+      space + char.toUpperCase()
+    );
+  });
+}
+
+/* ---- ENTER KEY MOVES TO NEXT FIELD ---- */
+function applyEnterToNext(fields) {
+  fields.forEach((el, i) => {
+    if (!el) return;
+    el.addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      // Find next non-disabled, visible field
+      for (let j = i + 1; j < fields.length; j++) {
+        if (fields[j] && !fields[j].disabled && !fields[j].readOnly) {
+          fields[j].focus();
+          break;
+        }
+      }
+    });
+  });
+}
+
+/* ---- WIRE UP ALL BOOKING FORM INPUTS ---- */
+(function applyBookingInputBehaviours() {
+  // Text inputs that should auto-capitalize
+  const textInputs = ["eventName", "bookerName"];
+  textInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) applyAutoCapitalize(el);
+  });
+
+  // Tab order for Enter-key navigation
+  // Order follows the visual form layout top to bottom
+  const tabOrder = [
+    document.getElementById("roomSelect"),
+    document.getElementById("bookingDate"),
+    document.getElementById("startTime"),
+    document.getElementById("duration"),
+    document.getElementById("eventName"),
+    document.getElementById("bookerName"),
+    document.getElementById("bookerDept"),
+    document.getElementById("bookerPhone"),
+  ];
+  applyEnterToNext(tabOrder);
+})();
 </script>
