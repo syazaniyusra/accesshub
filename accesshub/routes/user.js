@@ -4,7 +4,8 @@ const db      = require("../db");
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
 
-const SECRET_KEY = "accesshub_secret";
+// ← Use environment variable, not hardcoded string
+const SECRET_KEY = process.env.JWT_SECRET || "accesshub_secret";
 
 function verifyToken(req, res, next) {
   const token = (req.headers["authorization"] || "").split(" ")[1];
