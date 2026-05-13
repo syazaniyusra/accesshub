@@ -1,12 +1,15 @@
 const mysql = require("mysql2/promise");
+
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+  host:               process.env.DB_HOST,
+  user:               process.env.DB_USER,
+  password:           process.env.DB_PASSWORD,
+  database:           process.env.DB_NAME,
+  port:               process.env.DB_PORT || 3306,
   waitForConnections: true,
-  connectionLimit: 4,  // ← change 5 to 4 (stay under MySQL's limit)
-  queueLimit: 0
+  connectionLimit:    10,
+  queueLimit:         100,
+  connectTimeout:     10000
 });
+
 module.exports = pool;
