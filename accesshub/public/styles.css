@@ -56,44 +56,51 @@ body {
   border-right: 1px solid var(--border);
 }
 
+/* ── BRAND / LOGO — large centered, matches admin.html ── */
 .sidebar-brand {
-  padding: 24px 20px 16px;
+  padding: 24px 20px 20px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .sidebar-logo-wrap {
-  width: 44px; height: 44px;
-  border-radius: 10px;
-  background: transparent;
+  width: 90px; height: 90px;
+  border-radius: 20px;
+  background: #fff;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: none;
+  border: 2px solid var(--border);
 }
 
 .sidebar-logo {
-  width: 44px; height: 44px;
+  width: 76px; height: 76px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
-.sidebar-brand-text { display: flex; flex-direction: column; gap: 3px; }
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: center;
+}
 
 .sidebar-brand-name {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 26px;
   color: var(--ink);
   line-height: 1;
 }
 
 .sidebar-brand-sub {
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
   color: var(--pink);
 }
@@ -282,8 +289,7 @@ body {
 .input-group button:hover { color: var(--pink); }
 
 /* ══════════════════════════════════════
-   DASHBOARD CARDS — pic 2 style
-   Subtle, rounded, blends with bg
+   DASHBOARD CARDS
 ══════════════════════════════════════ */
 #dashboard {
   display: flex;
@@ -319,14 +325,11 @@ body {
   display: flex; align-items: center; justify-content: center;
   color: var(--pink);
   font-size: 14px;
-  /* Subtle pulse on card hover */
   transition: transform var(--t);
 }
 .card:hover .card-icon { transform: scale(1.08); }
 
-.card-body {
-  flex: 1;
-}
+.card-body { flex: 1; }
 
 .card-body h4 {
   font-size: 14px;
@@ -393,7 +396,6 @@ body {
   overflow: hidden;
 }
 
-/* ── Left card: avatar header + fields ── */
 .profile-card-header {
   display: flex;
   align-items: center;
@@ -466,7 +468,6 @@ body {
   border: 1px solid #b2ddd6;
 }
 
-/* ── Right card: password ── */
 .profile-card-body {
   padding: 24px;
   display: flex;
