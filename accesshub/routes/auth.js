@@ -1,9 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const db = require("../db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const SECRET_KEY = "accesshub_secret";
+const express    = require("express");
+const router     = express.Router();
+const db         = require("../db");
+const bcrypt     = require("bcryptjs");
+const jwt        = require("jsonwebtoken");
+
+// ← Use environment variable for security
+const SECRET_KEY = process.env.JWT_SECRET || "accesshub_secret";
 
 // =====================================
 // LOGIN
@@ -41,12 +43,12 @@ router.post("/login", async (req, res) => {
     res.json({
       message: "Login success",
       token,
-      role: user.role,   // explicitly returned so frontend can store it cleanly
-      user: safeUser
+      role:    user.role,
+      user:    safeUser
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
