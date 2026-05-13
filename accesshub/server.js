@@ -1,8 +1,8 @@
-const express    = require("express");
-const cors       = require("cors");
-const path       = require("path");
-const helmet     = require("helmet");
-const rateLimit  = require("express-rate-limit");
+const express     = require("express");
+const cors        = require("cors");
+const path        = require("path");
+const helmet      = require("helmet");
+const rateLimit   = require("express-rate-limit");
 const compression = require("compression");
 require("dotenv").config();
 
@@ -10,47 +10,46 @@ const db  = require("./db");
 const app = express();
 
 /* ══════════════════════════════════════
-   SECURITY & PERFORMANCE MIDDLEWARE
+   TRUST PROXY — required for Railway
 ══════════════════════════════════════ */
-
-// Security headers
-app.use(helmet({
-  contentSecurityPolicy: false // disable CSP so your frontend still loads
-}));
-
-// Compress all responses — faster loading for 400 staff
-app.use(compression());
-
-// Trust Railway proxy
 app.set("trust proxy", 1);
 
-// CORS
-app.use(cors());
+/* ══════════════════════════════════════
+   SECURITY & PERFORMANCE MIDDLEWARE
+══════════════════════════════════════ */
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 
-// Parse JSON
+app.use(compression());
+app.use(cors());
 app.use(express.json());
 
-// Rate limiting — max 100 requests per 15 minutes per IP
+// Rate limiting — 300 requests per 15 minutes per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: "Too many requests, please try again later." }
+  max: 300,
+  message: { error: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 app.use("/api/", limiter);
 
-// Stricter limit for login — max 10 attempts per 15 minutes
+// Login limiter — max 20 attempts per 15 minutes
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: "Too many login attempts, please try again later." }
+  max: 20,
+  message: { error: "Too many login attempts, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 app.use("/api/auth/login", loginLimiter);
 
 /* ══════════════════════════════════════
-   STATIC FILES — with cache headers
+   STATIC FILES
 ══════════════════════════════════════ */
 app.use(express.static(path.join(__dirname, "public"), {
-  maxAge: "1d",  // browser caches CSS/JS for 1 day
+  maxAge: "1d",
   etag: true
 }));
 
@@ -59,7 +58,7 @@ app.use(express.static(path.join(__dirname, "public"), {
 ══════════════════════════════════════ */
 app.get("/health", async (req, res) => {
   try {
-    await db.query("SELECT 1"); // test DB connection
+    await db.query("SELECT 1");
     res.json({
       status:   "ok",
       database: "connected",
