@@ -1,10 +1,10 @@
-const express = require("express");
-const router  = express.Router();
-const db      = require("../db");
-const bcrypt  = require("bcryptjs");
-const jwt     = require("jsonwebtoken");
+const express    = require("express");
+const router     = express.Router();
+const db         = require("../db");
+const bcrypt     = require("bcryptjs");
+const jwt        = require("jsonwebtoken");
 
-// ← Use environment variable, not hardcoded string
+// ← Use environment variable for security
 const SECRET_KEY = process.env.JWT_SECRET || "accesshub_secret";
 
 function verifyToken(req, res, next) {
