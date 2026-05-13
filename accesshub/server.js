@@ -21,6 +21,9 @@ app.use(helmet({
 // Compress all responses — faster loading for 400 staff
 app.use(compression());
 
+// Trust Railway proxy
+app.set("trust proxy", 1);
+
 // CORS
 app.use(cors());
 
