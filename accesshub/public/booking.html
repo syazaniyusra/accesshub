@@ -464,7 +464,6 @@
 .inner-section { display: none; }
 .inner-section.active { display: block; }
 
-/* section heading */
 .booking-section-title {
   font-family: var(--font-display);
   font-size: 24px;
@@ -489,9 +488,105 @@
 
 .booking-section-title .accent { color: var(--pink); }
 
+/* ══════════════════════════════════════
+   BOOKING POPUP MODAL
+══════════════════════════════════════ */
+.booking-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.booking-modal-overlay.open {
+  display: flex;
+}
+
+.booking-modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+  animation: bookingModalPop 0.25s cubic-bezier(.34,1.56,.64,1) both;
+  text-align: center;
+}
+
+@keyframes bookingModalPop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.booking-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 22px;
+}
+
+.booking-modal-icon.error   { background: #fee2e2; color: #b91c1c; }
+.booking-modal-icon.success { background: #dcfce7; color: #15803d; }
+.booking-modal-icon.warning { background: #fef9c3; color: #854d0e; }
+
+.booking-modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.booking-modal-msg {
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.booking-modal-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.booking-modal-btn.error   { background: var(--pink); color: #fff; }
+.booking-modal-btn.success { background: #16a34a; color: #fff; }
+.booking-modal-btn.warning { background: #d97706; color: #fff; }
+
+.booking-modal-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ══════════════════════════════════════
+     BOOKING POPUP MODAL
+══════════════════════════════════════ -->
+<div class="booking-modal-overlay" id="bookingModal">
+  <div class="booking-modal-box">
+    <div class="booking-modal-icon" id="bookingModalIcon">
+      <i id="bookingModalIconI" class="fas fa-circle-exclamation"></i>
+    </div>
+    <div class="booking-modal-title" id="bookingModalTitle">Error</div>
+    <div class="booking-modal-msg"   id="bookingModalMsg"></div>
+    <button class="booking-modal-btn" id="bookingModalBtn" onclick="closeBookingModal()">OK</button>
+  </div>
+</div>
 
 <!-- TOP BUTTONS -->
 <div class="top-actions">
@@ -714,6 +809,54 @@
 
 <script>
 
+/* ══════════════════════════════════════
+   BOOKING POPUP MODAL FUNCTIONS
+══════════════════════════════════════ */
+function showBookingModal(type, title, message) {
+  const overlay = document.getElementById('bookingModal');
+  const icon    = document.getElementById('bookingModalIcon');
+  const iconI   = document.getElementById('bookingModalIconI');
+  const titleEl = document.getElementById('bookingModalTitle');
+  const msgEl   = document.getElementById('bookingModalMsg');
+  const btn     = document.getElementById('bookingModalBtn');
+
+  // Set icon
+  const icons = {
+    error:   'fas fa-circle-exclamation',
+    success: 'fas fa-circle-check',
+    warning: 'fas fa-triangle-exclamation'
+  };
+
+  // Reset classes
+  icon.className  = `booking-modal-icon ${type}`;
+  iconI.className = icons[type] || icons.error;
+  btn.className   = `booking-modal-btn ${type}`;
+
+  titleEl.textContent = title;
+  msgEl.textContent   = message;
+
+  overlay.classList.add('open');
+}
+
+function closeBookingModal() {
+  document.getElementById('bookingModal').classList.remove('open');
+}
+
+// Close when clicking outside the box
+document.getElementById('bookingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBookingModal();
+});
+
+/* ── HELPER: replaces alert() ── */
+function _showPopup(msg, type) {
+  const titles = {
+    error:   'Oops!',
+    success: 'Success!',
+    warning: 'Warning'
+  };
+  showBookingModal(type || 'error', titles[type] || 'Oops!', msg);
+}
+
 /* ---- AUTO-FILL from session ---- */
 (function prefillUser() {
   try {
@@ -721,13 +864,11 @@
     if (!userData) return;
     const user = JSON.parse(userData);
 
-    // Full name
     if (user.name) {
       const nameEl = document.getElementById('bookerName');
       if (nameEl) nameEl.value = user.name;
     }
 
-    // Department — match against work department
     if (window.userDepartments?.length) {
       const deptName = window.userDepartments[0]?.name || '';
       const deptEl   = document.getElementById('bookerDept');
@@ -908,12 +1049,12 @@ async function submitBooking() {
   const phone    = document.getElementById('bookerPhone').value.trim();
 
   if (!room || !date || !start || !duration || !event || !name || !dept || !phone) {
-    _toast('Please fill in all required fields', 'error');
+    _showPopup('Please fill in all required fields before confirming your booking.', 'error');
     return;
   }
 
   if (phone.length < 7) {
-    _toast('Please enter a valid phone number (min 7 digits)', 'error');
+    _showPopup('Please enter a valid phone number (minimum 7 digits).', 'error');
     return;
   }
 
@@ -939,25 +1080,25 @@ async function submitBooking() {
     });
 
     if (res.ok) {
-      _toast('✅ Booking confirmed!', 'success');
+      _showPopup('Your room has been successfully booked! Check "My Bookings" to view your booking.', 'success');
       resetForm();
     } else {
       const err = await res.json().catch(() => ({}));
       if (res.status === 409) {
-        _toast('⚠️ Room not available for this time slot. Please choose another time.', 'error');
+        _showPopup('This room is not available for the selected time slot. Please choose a different time or room.', 'warning');
       } else {
-        _toast(err.error || err.message || 'Booking failed. Please try again.', 'error');
+        _showPopup(err.error || err.message || 'Booking failed. Please try again.', 'error');
       }
     }
   } catch (e) {
     console.error('submitBooking:', e);
-    _toast('Something went wrong: ' + e.message, 'error');
+    _showPopup('Something went wrong. Please check your connection and try again.', 'error');
   }
 }
 
 function _toast(msg, type) {
   if (typeof showToast === 'function') showToast(msg, type);
-  else alert(msg);
+  else _showPopup(msg, type);
 }
 
 function resetForm() {
@@ -967,7 +1108,6 @@ function resetForm() {
   ['bookingDate','eventName','bookerPhone','endTime'].forEach(id =>
     document.getElementById(id).value = ''
   );
-  // Re-prefill name after reset
   try {
     const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
     if (userData) {
@@ -1159,15 +1299,12 @@ function toTitleCase(input) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-/* ---- AUTO-CAPITALIZE FIRST LETTER OF EACH WORD (on space) ---- */
 function applyAutoCapitalize(input) {
-  // Capitalize first character immediately when user starts typing
   input.addEventListener("input", () => {
     if (input.value.length === 1) {
       input.value = input.value.toUpperCase();
     }
   });
-  // Capitalize after every space
   input.addEventListener("keyup", e => {
     if (e.key !== " ") return;
     input.value = input.value.replace(/(^\s*|\s+)(\S)/g, (match, space, char) =>
@@ -1176,14 +1313,12 @@ function applyAutoCapitalize(input) {
   });
 }
 
-/* ---- ENTER KEY MOVES TO NEXT FIELD ---- */
 function applyEnterToNext(fields) {
   fields.forEach((el, i) => {
     if (!el) return;
     el.addEventListener("keydown", e => {
       if (e.key !== "Enter") return;
       e.preventDefault();
-      // Find next non-disabled, visible field
       for (let j = i + 1; j < fields.length; j++) {
         if (fields[j] && !fields[j].disabled && !fields[j].readOnly) {
           fields[j].focus();
@@ -1194,17 +1329,13 @@ function applyEnterToNext(fields) {
   });
 }
 
-/* ---- WIRE UP ALL BOOKING FORM INPUTS ---- */
 (function applyBookingInputBehaviours() {
-  // Text inputs that should auto-capitalize
   const textInputs = ["eventName", "bookerName"];
   textInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) applyAutoCapitalize(el);
   });
 
-  // Tab order for Enter-key navigation
-  // Order follows the visual form layout top to bottom
   const tabOrder = [
     document.getElementById("roomSelect"),
     document.getElementById("bookingDate"),
