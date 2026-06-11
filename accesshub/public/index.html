@@ -165,7 +165,6 @@
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
 
-  <!-- Logo: clean horizontal row, uses styles.css defaults (44px logo) -->
   <div class="sidebar-brand">
     <div class="sidebar-logo-wrap">
       <img src="bismi_logo.jpeg" alt="Bismi" class="sidebar-logo">
@@ -221,7 +220,11 @@
     <div id="dashboard"></div>
   </div>
 
+  <!-- Booking page (Room Booking) -->
   <div id="bookingPage" style="display:none;"></div>
+
+  <!-- Training page (Training Module) -->
+  <div id="trainingPage" style="display:none;"></div>
 
   <div id="profilePage" style="display:none;">
     <div class="page-header">
@@ -315,6 +318,14 @@ function closeSidebar() {
 function navClick() { if (window.innerWidth <= 900) closeSidebar(); }
 window.addEventListener("resize", () => { if (window.innerWidth > 900) closeSidebar(); });
 
+/* ── hide all main pages ── */
+function hideAllPages() {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("bookingPage").style.display   = "none";
+  document.getElementById("trainingPage").style.display  = "none";
+  document.getElementById("profilePage").style.display   = "none";
+}
+
 async function loadDepartments() {
   const token    = getStore("token");
   const userData = getStore("user");
@@ -397,24 +408,50 @@ function setActive(btn) {
   document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
 }
+
 function showDashboard() {
+  hideAllPages();
   document.getElementById("dashboardPage").style.display = "block";
-  document.getElementById("bookingPage").style.display   = "none";
-  document.getElementById("profilePage").style.display   = "none";
 }
-function loadTrainingPage(button) {
+
+/* ── Load page helper (shared by booking & training) ── */
+async function loadSubPage(containerId, filename, loadedKey) {
+  const container = document.getElementById(containerId);
+  hideAllPages();
+  container.style.display = "block";
+  if (container.dataset.loaded === loadedKey) return;
+  container.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading...</p></div>`;
+  try {
+    let html = await (await fetch(filename)).text();
+    html = html.replace(/<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, "");
+    html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
+    container.innerHTML = html;
+    container.querySelectorAll("script").forEach(s => {
+      const n = document.createElement("script");
+      s.src ? (n.src = s.src) : (n.textContent = s.textContent);
+      document.body.appendChild(n); s.remove();
+    });
+    container.dataset.loaded = loadedKey;
+  } catch {
+    container.dataset.loaded = "";
+    container.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load page</p></div>`;
+  }
+}
+
+async function loadBookingPage(button) {
   setActive(button); navClick();
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("profilePage").style.display   = "none";
-  const bc = document.getElementById("bookingPage");
-  bc.style.display = "block"; bc.dataset.loaded = "training";
-  bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-graduation-cap"></i></div><p>Training Module coming soon</p></div>`;
+  await loadSubPage("bookingPage", "booking.html", "booking");
 }
+
+async function loadTrainingPage(button) {
+  setActive(button); navClick();
+  await loadSubPage("trainingPage", "training.html", "training");
+}
+
 function loadProfilePage(button) {
   setActive(button); navClick();
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("bookingPage").style.display   = "none";
-  document.getElementById("profilePage").style.display   = "block";
+  hideAllPages();
+  document.getElementById("profilePage").style.display = "block";
   const userData  = getStore("user");
   const role      = getStore("role");
   const user      = JSON.parse(userData);
@@ -436,12 +473,14 @@ function loadProfilePage(button) {
     window.userLinkDepts.forEach(d => { const t = document.createElement("span"); t.className = "dept-tag dept-tag--access"; t.textContent = d.name; accessEl.appendChild(t); });
   } else { accessEl.innerHTML = "<span style='color:var(--ink-light)'>—</span>"; }
 }
+
 function togglePw(inputId, btn) {
   const input = document.getElementById(inputId);
   const isText = input.type === "text";
   input.type = isText ? "password" : "text";
   btn.querySelector("i").className = isText ? "fas fa-eye" : "fas fa-eye-slash";
 }
+
 async function changePassword() {
   const current = document.getElementById("pwCurrent").value.trim();
   const newPw   = document.getElementById("pwNew").value.trim();
@@ -470,30 +509,7 @@ async function changePassword() {
     } else { showMsg(data.message || "Failed to update password.", "error"); }
   } catch { showMsg("Server error. Please try again.", "error"); }
 }
-async function loadBookingPage(button) {
-  setActive(button); navClick();
-  document.getElementById("dashboardPage").style.display = "none";
-  document.getElementById("profilePage").style.display   = "none";
-  const bc = document.getElementById("bookingPage");
-  bc.style.display = "block";
-  if (bc.dataset.loaded === "booking") return;
-  bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading...</p></div>`;
-  try {
-    let html = await (await fetch("booking.html")).text();
-    html = html.replace(/<!DOCTYPE html>[\s\S]*?<body>/i, "");
-    html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
-    bc.innerHTML = html;
-    bc.querySelectorAll("script").forEach(s => {
-      const n = document.createElement("script");
-      s.src ? (n.src = s.src) : (n.textContent = s.textContent);
-      document.body.appendChild(n); s.remove();
-    });
-    bc.dataset.loaded = "booking";
-  } catch {
-    bc.dataset.loaded = "";
-    bc.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load booking page</p></div>`;
-  }
-}
+
 function doSearch() {
   const kw = document.getElementById("searchInput").value.toLowerCase();
   renderDashboard(allData.filter(i => i.name.toLowerCase().includes(kw)), kw);
