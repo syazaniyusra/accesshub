@@ -195,7 +195,7 @@
   <div class="th-stat"><div class="th-stat-icon"><i class="fas fa-calendar-alt"></i></div><div class="th-stat-value" id="tStTotal">0</div><div class="th-stat-label">Total Events</div></div>
   <div class="th-stat"><div class="th-stat-icon"><i class="fas fa-clock"></i></div><div class="th-stat-value" id="tStUp">0</div><div class="th-stat-label">Upcoming</div></div>
   <div class="th-stat"><div class="th-stat-icon"><i class="fas fa-check-circle"></i></div><div class="th-stat-value" id="tStPast">0</div><div class="th-stat-label">Completed</div></div>
-  <div class="th-stat"><div class="th-stat-icon"><i class="fas fa-paperclip"></i></div><div class="th-stat-value" id="tStFiles">0</div><div class="th-stat-label">Total Files</div></div>
+
 </div>
 
 <div class="th-toolbar">
@@ -268,7 +268,6 @@
     document.getElementById('tStTotal').textContent=tEvts.length;
     document.getElementById('tStUp').textContent=tEvts.filter(e=>e.dateStart>=today).length;
     document.getElementById('tStPast').textContent=tEvts.filter(e=>e.dateStart<today).length;
-    document.getElementById('tStFiles').textContent=tEvts.reduce((s,e)=>s+(e.files?.length||0),0);
   }
 
   window.tRender=function(){
