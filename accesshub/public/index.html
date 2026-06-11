@@ -463,6 +463,7 @@ async function loadBookingPage(button) {
 
 async function loadTrainingPage(button) {
   setActive(button); navClick();
+  document.getElementById("trainingPage").dataset.loaded = "";
   await loadSubPage("trainingPage", "training.html", "training");
 }
 
