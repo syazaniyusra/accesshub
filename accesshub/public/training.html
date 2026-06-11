@@ -9,14 +9,12 @@
 </head>
 <body>
 
-<!-- ══ SINGLE ROOT WRAPPER — everything lives here so injection stays intact ══ -->
 <div id="tRoot">
 
 <style>
 #tRoot { font-family: 'Plus Jakarta Sans', sans-serif; color: #111827; position: relative; }
 #tRoot *, #tRoot *::before, #tRoot *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* PAGE HEADER */
 #tRoot .th-header { margin-bottom: 28px; }
 #tRoot .th-title {
   font-family: 'DM Serif Display', serif; font-size: 28px; color: #111827;
@@ -46,14 +44,6 @@
   background: #fff; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none;
 }
 #tRoot .th-select:focus { border-color: #D4186C; }
-#tRoot .th-add-btn {
-  display: flex; align-items: center; gap: 8px; padding: 10px 20px;
-  background: #D4186C; color: #fff; border: none; border-radius: 10px;
-  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: background .2s, transform .15s; white-space: nowrap; margin: 0; width: auto;
-}
-#tRoot .th-add-btn:hover { background: #b8155d; }
-#tRoot .th-add-btn:active { transform: scale(0.97); }
 
 /* STATS */
 #tRoot .th-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 28px; }
@@ -78,16 +68,6 @@
   display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
   border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase;
 }
-#tRoot .th-actions { display: flex; gap: 6px; }
-#tRoot .th-icon-btn {
-  width: 30px; height: 30px; border: 1.5px solid #e5e7eb; border-radius: 8px;
-  background: #fff; color: #4b5563; font-size: 12px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all .15s; padding: 0; margin: 0;
-}
-#tRoot .th-icon-btn:hover           { background: #f3f4f6; color: #111827; }
-#tRoot .th-icon-btn.th-edit:hover   { background: #fdf0f5; border-color: #D4186C; color: #D4186C; }
-#tRoot .th-icon-btn.th-del:hover    { background: #fef2f2; border-color: #fca5a5; color: #ef4444; }
 #tRoot .th-card-title  { font-size: 16px; font-weight: 700; color: #111827; line-height: 1.3; cursor: pointer; }
 #tRoot .th-card-date   { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4b5563; }
 #tRoot .th-card-date i { color: #D4186C; font-size: 12px; }
@@ -127,7 +107,7 @@
 #tRoot .tpill-done     { margin-left:6px; padding:1px 7px; background:#f3f4f6; border-radius:10px; font-size:11px; color:#9ca3af; }
 #tRoot .tpill-upcoming { margin-left:6px; padding:1px 7px; background:#ecfdf5; border-radius:10px; font-size:11px; color:#059669; }
 
-/* MODAL OVERLAY */
+/* VIEW MODAL OVERLAY */
 #tRoot .tm-overlay {
   display: none; position: fixed; inset: 0; z-index: 1100;
   background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
@@ -136,118 +116,20 @@
 }
 #tRoot .tm-overlay.open { display: flex; }
 
-/* MODAL BOX */
-#tRoot .tm-box {
-  background: #fff; border-radius: 18px; width: 100%; max-width: 560px; margin: auto;
+/* VIEW MODAL BOX */
+#tRoot .tm-view-box {
+  background: #fff; border-radius: 18px; width: 100%; max-width: 560px; margin: auto; overflow: hidden;
   box-shadow: 0 24px 60px rgba(0,0,0,.18);
   animation: tmPop .25s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes tmPop { from { transform: scale(.88) translateY(20px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
-#tRoot .tm-header { display:flex; align-items:center; justify-content:space-between; padding:22px 24px 0; margin-bottom:20px; }
-#tRoot .tm-title  { font-family:'DM Serif Display',serif; font-size:20px; color:#111827; }
-#tRoot .tm-close  {
+#tRoot .tm-close {
   width:32px; height:32px; border:1.5px solid #e5e7eb; border-radius:8px;
   background:none; color:#4b5563; font-size:14px;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; transition:all .15s; padding:0; margin:0; flex-shrink:0;
 }
 #tRoot .tm-close:hover { background:#f3f4f6; color:#111827; }
-#tRoot .tm-body { padding: 0 24px 24px; }
-
-/* FORM */
-#tRoot .tf-row { margin-bottom: 16px; }
-#tRoot .tf-row label { display:block; font-size:13px; font-weight:600; color:#4b5563; margin-bottom:6px; }
-#tRoot .tf-row label span { color:#D4186C; }
-#tRoot .tf-input {
-  width:100%; padding:10px 14px; border:1.5px solid #e5e7eb; border-radius:10px;
-  font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; color:#111827;
-  background:#fff; outline:none; transition:border-color .2s;
-  -webkit-appearance:none; appearance:none;
-}
-#tRoot .tf-input:focus { border-color:#D4186C; }
-#tRoot textarea.tf-input { resize:vertical; min-height:80px; }
-#tRoot .tf-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
-
-/* CATEGORY PICKER */
-#tRoot .tf-cat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-#tRoot .tf-cat-opt {
-  display:flex; flex-direction:column; align-items:center; gap:5px;
-  padding:10px 6px; border:1.5px solid #e5e7eb; border-radius:10px;
-  cursor:pointer; font-size:12px; font-weight:500; color:#4b5563;
-  transition:all .15s; background:#fff; font-family:'Plus Jakarta Sans',sans-serif; text-align:center;
-}
-#tRoot .tf-cat-opt i { font-size:16px; }
-#tRoot .tf-cat-opt:hover    { background:#f3f4f6; }
-#tRoot .tf-cat-opt.selected { border-color:#D4186C; background:#fdf0f5; color:#D4186C; }
-
-/* UPLOAD ZONE */
-#tRoot .tf-zone {
-  border:2px dashed #e5e7eb; border-radius:12px; padding:24px;
-  text-align:center; cursor:pointer; transition:all .2s; background:#f9fafb; position:relative;
-}
-#tRoot .tf-zone:hover, #tRoot .tf-zone.drag-over { border-color:#D4186C; background:#fdf0f5; }
-#tRoot .tf-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-#tRoot .tf-zone-icon { font-size:28px; color:#9ca3af; margin-bottom:8px; }
-#tRoot .tf-zone p    { font-size:13px; color:#4b5563; }
-#tRoot .tf-zone span { font-size:12px; color:#9ca3af; }
-#tRoot .tf-flist { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
-#tRoot .tf-fitem {
-  display:flex; align-items:center; gap:10px; padding:8px 12px;
-  border:1.5px solid #e5e7eb; border-radius:8px; background:#fff; font-size:13px;
-}
-#tRoot .tf-fname { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#111827; }
-#tRoot .tf-fsize { font-size:11px; color:#9ca3af; white-space:nowrap; }
-#tRoot .tf-fremove {
-  width:22px; height:22px; border:none; background:none; color:#9ca3af; font-size:12px;
-  cursor:pointer; border-radius:5px; display:flex; align-items:center; justify-content:center;
-  transition:all .15s; padding:0; margin:0;
-}
-#tRoot .tf-fremove:hover { background:#fef2f2; color:#ef4444; }
-
-/* MODAL FOOTER */
-#tRoot .tm-footer { display:flex; gap:10px; padding-top:16px; border-top:1px solid #e5e7eb; margin-top:16px; }
-#tRoot .tm-btn-cancel {
-  flex:1; padding:11px; border:1.5px solid #e5e7eb; border-radius:10px;
-  background:#fff; color:#4b5563; font-size:14px; font-weight:500;
-  cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:background .2s;
-}
-#tRoot .tm-btn-cancel:hover { background:#f3f4f6; }
-#tRoot .tm-btn-save {
-  flex:2; padding:11px; border:none; border-radius:10px;
-  background:#D4186C; color:#fff; font-size:14px; font-weight:600;
-  cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  transition:background .2s, transform .15s; margin:0; width:auto;
-}
-#tRoot .tm-btn-save:hover  { background:#b8155d; }
-#tRoot .tm-btn-save:active { transform:scale(.97); }
-
-/* DELETE MODAL */
-#tRoot .tm-del-box {
-  background:#fff; border-radius:18px; padding:28px 28px 22px;
-  width:100%; max-width:360px; margin:auto;
-  box-shadow:0 24px 60px rgba(0,0,0,.15);
-  animation:tmPop .22s cubic-bezier(.34,1.56,.64,1) both;
-}
-#tRoot .tm-del-icon { width:44px; height:44px; background:#fef2f2; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:18px; margin-bottom:14px; }
-#tRoot .tm-del-box h3 { font-family:'DM Serif Display',serif; font-size:19px; margin-bottom:6px; color:#111827; }
-#tRoot .tm-del-box p  { font-size:13.5px; color:#4b5563; margin-bottom:20px; line-height:1.5; }
-#tRoot .tm-del-actions { display:flex; gap:10px; }
-#tRoot .tm-btn-delete {
-  flex:2; padding:11px; border:none; border-radius:10px;
-  background:#ef4444; color:#fff; font-size:14px; font-weight:600;
-  cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  transition:background .2s; margin:0; width:auto;
-}
-#tRoot .tm-btn-delete:hover { background:#dc2626; }
-
-/* VIEW MODAL */
-#tRoot .tm-view-box {
-  background:#fff; border-radius:18px; width:100%; max-width:560px; margin:auto; overflow:hidden;
-  box-shadow:0 24px 60px rgba(0,0,0,.18);
-  animation:tmPop .25s cubic-bezier(.34,1.56,.64,1) both;
-}
 #tRoot .tm-view-head { padding:22px 24px 18px; border-bottom:1px solid #e5e7eb; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
 #tRoot .tm-view-body { padding:20px 24px 24px; display:flex; flex-direction:column; gap:16px; }
 #tRoot .tv-lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#9ca3af; margin-bottom:4px; }
@@ -269,76 +151,9 @@
 #tToast.error   i { color:#f87171; }
 
 @media (max-width:600px) {
-  #tRoot .tf-row2       { grid-template-columns:1fr; }
-  #tRoot .tf-cat-grid   { grid-template-columns:repeat(2,1fr); }
-  #tRoot .th-toolbar    { flex-direction:column; align-items:stretch; }
-  #tRoot .th-add-btn    { justify-content:center; }
+  #tRoot .th-toolbar { flex-direction:column; align-items:stretch; }
 }
 </style>
-
-<!-- ADD/EDIT MODAL -->
-<div class="tm-overlay" id="tFormModal">
-  <div class="tm-box">
-    <div class="tm-header">
-      <span class="tm-title" id="tFormTitle">Add Training Event</span>
-      <button class="tm-close" onclick="tCloseForm()"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="tm-body">
-      <div class="tf-row">
-        <label>Event Name <span>*</span></label>
-        <input type="text" id="tFName" class="tf-input" placeholder="e.g. Fire Safety Drill 2025">
-      </div>
-      <div class="tf-row2">
-        <div class="tf-row" style="margin:0"><label>Start Date <span>*</span></label><input type="date" id="tFStart" class="tf-input"></div>
-        <div class="tf-row" style="margin:0"><label>End Date</label><input type="date" id="tFEnd" class="tf-input"></div>
-      </div>
-      <div class="tf-row">
-        <label>Category</label>
-        <div class="tf-cat-grid">
-          <div class="tf-cat-opt selected" data-cat="general"    onclick="tPickCat(this)"><i class="fas fa-layer-group"></i> General</div>
-          <div class="tf-cat-opt"          data-cat="onboarding" onclick="tPickCat(this)"><i class="fas fa-user-plus"></i> Onboarding</div>
-          <div class="tf-cat-opt"          data-cat="compliance" onclick="tPickCat(this)"><i class="fas fa-gavel"></i> Compliance</div>
-          <div class="tf-cat-opt"          data-cat="technical"  onclick="tPickCat(this)"><i class="fas fa-tools"></i> Technical</div>
-          <div class="tf-cat-opt"          data-cat="leadership" onclick="tPickCat(this)"><i class="fas fa-crown"></i> Leadership</div>
-          <div class="tf-cat-opt"          data-cat="safety"     onclick="tPickCat(this)"><i class="fas fa-hard-hat"></i> Safety</div>
-        </div>
-      </div>
-      <div class="tf-row">
-        <label>Description</label>
-        <textarea id="tFDesc" class="tf-input" placeholder="Brief description…"></textarea>
-      </div>
-      <div class="tf-row">
-        <label>Attachments</label>
-        <div class="tf-zone" id="tZone">
-          <input type="file" id="tFileIn" multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.avi,.mkv,.zip,.rar,.txt,.csv"
-            onchange="tHandleFiles(this.files)">
-          <div class="tf-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-          <p>Click to upload or drag & drop files</p>
-          <span>PDF, Word, Excel, Images, Videos, and more</span>
-        </div>
-        <div class="tf-flist" id="tFList"></div>
-      </div>
-      <div class="tm-footer">
-        <button class="tm-btn-cancel" onclick="tCloseForm()">Cancel</button>
-        <button class="tm-btn-save"   onclick="tSave()"><i class="fas fa-save"></i> Save Event</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE MODAL -->
-<div class="tm-overlay" id="tDelModal">
-  <div class="tm-del-box">
-    <div class="tm-del-icon"><i class="fas fa-trash-alt"></i></div>
-    <h3>Delete Event?</h3>
-    <p id="tDelMsg">This will permanently remove the training event and all its files.</p>
-    <div class="tm-del-actions">
-      <button class="tm-btn-cancel" onclick="tCloseDel()">Cancel</button>
-      <button class="tm-btn-delete" onclick="tConfirmDel()"><i class="fas fa-trash-alt"></i> Delete</button>
-    </div>
-  </div>
-</div>
 
 <!-- VIEW MODAL -->
 <div class="tm-overlay" id="tViewModal">
@@ -367,13 +182,13 @@
 <!-- TOAST -->
 <div id="tToast"><i class="fas fa-check-circle"></i><span id="tToastMsg"></span></div>
 
-<!-- ══ PAGE CONTENT ══ -->
+<!-- PAGE CONTENT -->
 <div class="th-header">
   <h2 class="th-title">
     <div class="th-title-icon"><i class="fas fa-graduation-cap"></i></div>
     Training <span class="th-accent">Module</span>
   </h2>
-  <p class="th-subtitle">Manage training events, schedules, and reference materials</p>
+  <p class="th-subtitle">Browse training events and download reference materials</p>
 </div>
 
 <div class="th-stats">
@@ -402,7 +217,6 @@
     <option value="upcoming">Upcoming</option>
     <option value="past">Past</option>
   </select>
-  <button class="th-add-btn" onclick="tOpenAdd()"><i class="fas fa-plus"></i> Add Event</button>
 </div>
 
 <div class="th-grid" id="tGrid"></div>
@@ -412,17 +226,6 @@
 <script>
 (function(){
   let tEvts = JSON.parse(localStorage.getItem('trainingEvents')||'[]');
-  let tPend = [], tEditId = null, tDelId = null;
-
-  function tPersist(){ localStorage.setItem('trainingEvents', JSON.stringify(tEvts)); }
-  function tId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
-
-  function tFmtDate(d){
-    if(!d) return '';
-    const [y,m,day]=d.split('-');
-    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+(+day)+', '+y;
-  }
-  function tFmtSize(b){ if(!b)return''; if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
 
   const tCats={
     general:   {label:'General',   icon:'fas fa-layer-group',cls:'tcat-general'   },
@@ -432,6 +235,12 @@
     leadership:{label:'Leadership',icon:'fas fa-crown',      cls:'tcat-leadership'},
     safety:    {label:'Safety',    icon:'fas fa-hard-hat',   cls:'tcat-safety'    },
   };
+
+  function tFmtDate(d){
+    if(!d) return '';
+    const [y,m,day]=d.split('-');
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+(+day)+', '+y;
+  }
 
   function tChip(name){
     const e=name.split('.').pop().toLowerCase();
@@ -473,33 +282,40 @@
     if(cf) list=list.filter(e=>e.category===cf);
     if(tf==='upcoming') list=list.filter(e=>e.dateStart>=today);
     if(tf==='past')     list=list.filter(e=>e.dateStart<today);
+
     if(!list.length){
-      grid.innerHTML='<div class="th-empty"><div class="th-empty-icon"><i class="fas fa-graduation-cap"></i></div><p>No training events found</p><span>Click "Add Event" to create your first training event</span></div>';
+      grid.innerHTML='<div class="th-empty"><div class="th-empty-icon"><i class="fas fa-graduation-cap"></i></div><p>No training events yet</p><span>Training events will appear here once added by an admin</span></div>';
       tStats(); return;
     }
+
     grid.innerHTML=list.map(ev=>{
       const cc=tCats[ev.category]||tCats.general;
       const files=ev.files||[];
-      const chips=files.slice(0,4).map(f=>`<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}"><i class="${tIco(f.name)}"></i><span>${f.name}</span></span>`).join('');
+      const chips=files.slice(0,4).map(f=>
+        `<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}">
+          <i class="${tIco(f.name)}"></i><span>${f.name}</span>
+        </span>`
+      ).join('');
       const more=files.length>4?`<span class="th-chip tc-misc">+${files.length-4} more</span>`:'';
-      const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`:tFmtDate(ev.dateStart);
+      const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart
+        ?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`
+        :tFmtDate(ev.dateStart);
       const past=ev.dateStart<today;
       return`<div class="th-card">
         <div class="th-card-top">
           <div class="th-card-meta">
             <span class="th-cat-badge ${cc.cls}"><i class="${cc.icon}"></i> ${cc.label}</span>
-            <div class="th-actions">
-              <button class="th-icon-btn th-edit" onclick="tOpenEdit('${ev.id}')" title="Edit"><i class="fas fa-pencil-alt"></i></button>
-              <button class="th-icon-btn th-del"  onclick="tOpenDel('${ev.id}')"  title="Delete"><i class="fas fa-trash-alt"></i></button>
-            </div>
           </div>
           <div class="th-card-title" onclick="tOpenView('${ev.id}')">${ev.name}</div>
-          <div class="th-card-date"><i class="fas fa-calendar-alt"></i>${ds}<span class="${past?'tpill-done':'tpill-upcoming'}">${past?'Completed':'Upcoming'}</span></div>
+          <div class="th-card-date">
+            <i class="fas fa-calendar-alt"></i>${ds}
+            <span class="${past?'tpill-done':'tpill-upcoming'}">${past?'Completed':'Upcoming'}</span>
+          </div>
           ${ev.desc?`<div class="th-card-desc">${ev.desc}</div>`:''}
         </div>
         <div class="th-card-files">
           <div class="th-files-lbl"><i class="fas fa-paperclip" style="margin-right:4px"></i>Files (${files.length})</div>
-          ${files.length?`<div class="th-chips">${chips}${more}</div>`:'<div class="th-no-files">No attachments yet</div>'}
+          ${files.length?`<div class="th-chips">${chips}${more}</div>`:'<div class="th-no-files">No attachments</div>'}
         </div>
       </div>`;
     }).join('');
@@ -512,137 +328,33 @@
     const a=document.createElement('a'); a.href=f.dataUrl; a.download=f.name; a.click();
   };
 
-  window.tOpenAdd=function(){
-    tEditId=null; tPend=[];
-    document.getElementById('tFormTitle').textContent='Add Training Event';
-    ['tFName','tFStart','tFEnd','tFDesc'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('tFList').innerHTML='';
-    document.querySelectorAll('#tRoot .tf-cat-opt').forEach(o=>o.classList.remove('selected'));
-    document.querySelector('#tRoot .tf-cat-opt[data-cat="general"]').classList.add('selected');
-    document.getElementById('tFormModal').classList.add('open');
-  };
-
-  window.tOpenEdit=function(id){
-    const ev=tEvts.find(e=>e.id===id); if(!ev)return;
-    tEditId=id; tPend=(ev.files||[]).map(f=>({...f}));
-    document.getElementById('tFormTitle').textContent='Edit Training Event';
-    document.getElementById('tFName').value=ev.name;
-    document.getElementById('tFStart').value=ev.dateStart;
-    document.getElementById('tFEnd').value=ev.dateEnd||'';
-    document.getElementById('tFDesc').value=ev.desc||'';
-    document.querySelectorAll('#tRoot .tf-cat-opt').forEach(o=>o.classList.toggle('selected',o.dataset.cat===ev.category));
-    tRenderFList();
-    document.getElementById('tFormModal').classList.add('open');
-  };
-
-  window.tCloseForm=function(){
-    document.getElementById('tFormModal').classList.remove('open');
-    tPend=[]; tEditId=null;
-  };
-
-  window.tPickCat=function(el){
-    document.querySelectorAll('#tRoot .tf-cat-opt').forEach(o=>o.classList.remove('selected'));
-    el.classList.add('selected');
-  };
-
-  window.tHandleFiles=function(files){
-    Array.from(files).forEach(f=>{
-      const r=new FileReader();
-      r.onload=e=>{tPend.push({id:tId(),name:f.name,size:f.size,type:f.type,dataUrl:e.target.result});tRenderFList();};
-      r.readAsDataURL(f);
-    });
-    document.getElementById('tFileIn').value='';
-  };
-
-  function tRenderFList(){
-    document.getElementById('tFList').innerHTML=tPend.map((f,i)=>`
-      <div class="tf-fitem">
-        <i class="${tIco(f.name)}" style="color:#D4186C;font-size:14px;flex-shrink:0;"></i>
-        <span class="tf-fname">${f.name}</span>
-        <span class="tf-fsize">${tFmtSize(f.size)}</span>
-        <button class="tf-fremove" onclick="tRemFile(${i})"><i class="fas fa-times"></i></button>
-      </div>`).join('');
-  }
-
-  window.tRemFile=function(i){tPend.splice(i,1);tRenderFList();};
-
-  const zone=document.getElementById('tZone');
-  if(zone){
-    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
-    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
-    zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');window.tHandleFiles(e.dataTransfer.files);});
-  }
-
-  window.tSave=function(){
-    const name=document.getElementById('tFName').value.trim();
-    const ds=document.getElementById('tFStart').value;
-    const de=document.getElementById('tFEnd').value;
-    const desc=document.getElementById('tFDesc').value.trim();
-    const cat=document.querySelector('#tRoot .tf-cat-opt.selected')?.dataset.cat||'general';
-    if(!name) return tToast('Event name is required','error');
-    if(!ds)   return tToast('Start date is required','error');
-    if(de&&de<ds) return tToast('End date cannot be before start date','error');
-    if(tEditId){
-      const i=tEvts.findIndex(e=>e.id===tEditId);
-      if(i!==-1) tEvts[i]={...tEvts[i],name,dateStart:ds,dateEnd:de,desc,category:cat,files:tPend};
-      tToast('Event updated');
-    } else {
-      tEvts.push({id:tId(),name,dateStart:ds,dateEnd:de,desc,category:cat,files:tPend,createdAt:Date.now()});
-      tToast('Event added');
-    }
-    tPersist(); tRender(); tCloseForm();
-  };
-
-  window.tOpenDel=function(id){
-    tDelId=id;
-    const ev=tEvts.find(e=>e.id===id);
-    document.getElementById('tDelMsg').textContent=`"${ev?.name}" will be permanently deleted along with ${ev?.files?.length||0} attached file(s).`;
-    document.getElementById('tDelModal').classList.add('open');
-  };
-  window.tCloseDel=function(){document.getElementById('tDelModal').classList.remove('open');tDelId=null;};
-  window.tConfirmDel=function(){
-    tEvts=tEvts.filter(e=>e.id!==tDelId);
-    tPersist();tRender();tCloseDel();tToast('Event deleted','error');
-  };
-
   window.tOpenView=function(id){
-    const ev=tEvts.find(e=>e.id===id);if(!ev)return;
+    const ev=tEvts.find(e=>e.id===id); if(!ev)return;
     const cc=tCats[ev.category]||tCats.general;
     const badge=document.getElementById('tViewBadge');
     badge.className=`th-cat-badge ${cc.cls}`;
     badge.innerHTML=`<i class="${cc.icon}"></i> ${cc.label}`;
     document.getElementById('tViewName').textContent=ev.name;
-    const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`:tFmtDate(ev.dateStart);
+    const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart
+      ?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`
+      :tFmtDate(ev.dateStart);
     document.getElementById('tViewDate').innerHTML=`<i class="fas fa-calendar-alt" style="color:#D4186C;margin-right:5px"></i>${ds}`;
     const dw=document.getElementById('tViewDescWrap');
     if(ev.desc){dw.style.display='block';document.getElementById('tViewDesc').textContent=ev.desc;}
     else dw.style.display='none';
     document.getElementById('tViewFiles').innerHTML=(ev.files||[]).map(f=>
-      `<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}" style="cursor:pointer"><i class="${tIco(f.name)}"></i><span>${f.name}</span></span>`
+      `<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}">
+        <i class="${tIco(f.name)}"></i><span>${f.name}</span>
+      </span>`
     ).join('')||'<span style="color:#9ca3af;font-size:13px">No attachments</span>';
     document.getElementById('tViewModal').classList.add('open');
   };
-  window.tCloseView=function(){document.getElementById('tViewModal').classList.remove('open');};
 
-  ['tFormModal','tDelModal','tViewModal'].forEach(id=>{
-    document.getElementById(id).addEventListener('click',e=>{
-      if(e.target.id===id){
-        if(id==='tFormModal') tCloseForm();
-        if(id==='tDelModal')  tCloseDel();
-        if(id==='tViewModal') tCloseView();
-      }
-    });
+  window.tCloseView=function(){ document.getElementById('tViewModal').classList.remove('open'); };
+
+  document.getElementById('tViewModal').addEventListener('click',e=>{
+    if(e.target.id==='tViewModal') tCloseView();
   });
-
-  let tTT;
-  function tToast(msg,type='success'){
-    const t=document.getElementById('tToast'),ic=t.querySelector('i');
-    document.getElementById('tToastMsg').textContent=msg;
-    t.className=`show ${type}`;
-    ic.className=type==='success'?'fas fa-check-circle':'fas fa-exclamation-circle';
-    clearTimeout(tTT);
-    tTT=setTimeout(()=>t.className='',3000);
-  }
 
   tRender();
 })();
