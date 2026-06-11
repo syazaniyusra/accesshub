@@ -422,15 +422,33 @@ async function loadSubPage(containerId, filename, loadedKey) {
   if (container.dataset.loaded === loadedKey) return;
   container.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading...</p></div>`;
   try {
-    let html = await (await fetch(filename)).text();
+    const raw = await (await fetch(filename)).text();
+
+    // ── 1. Inject <style> blocks into <head> so CSS always loads ──
+    const styleMatches = [...raw.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
+    styleMatches.forEach(match => {
+      const styleId = "injected-style-" + loadedKey;
+      if (!document.getElementById(styleId)) {
+        const tag = document.createElement("style");
+        tag.id = styleId;
+        tag.textContent = match[1];
+        document.head.appendChild(tag);
+      }
+    });
+
+    // ── 2. Strip <html>/<head>/<body> wrapper, keep body content ──
+    let html = raw.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ""); // already injected above
     html = html.replace(/<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, "");
     html = html.replace(/<\/body>[\s\S]*<\/html>/i, "");
     container.innerHTML = html;
+
+    // ── 3. Re-execute <script> blocks (innerHTML doesn't run them) ──
     container.querySelectorAll("script").forEach(s => {
       const n = document.createElement("script");
       s.src ? (n.src = s.src) : (n.textContent = s.textContent);
       document.body.appendChild(n); s.remove();
     });
+
     container.dataset.loaded = loadedKey;
   } catch {
     container.dataset.loaded = "";
