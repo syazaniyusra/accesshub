@@ -1,94 +1,350 @@
-const express = require("express");
-const router  = express.Router();
-const db      = require("../db");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Module</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
 
-// Auto-create table if it doesn't exist
-async function ensureTable() {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS training_events (
-      id          VARCHAR(32)   PRIMARY KEY,
-      name        VARCHAR(255)  NOT NULL,
-      category    VARCHAR(50)   DEFAULT 'general',
-      date_start  DATE          NOT NULL,
-      date_end    DATE          NULL,
-      description TEXT          NULL,
-      files       LONGTEXT      NULL,
-      created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+<div id="tRoot">
+
+<style>
+#tRoot { font-family: 'Plus Jakarta Sans', sans-serif; color: #111827; position: relative; }
+#tRoot *, #tRoot *::before, #tRoot *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+#tRoot .th-header { margin-bottom: 28px; }
+#tRoot .th-title {
+  font-family: 'DM Serif Display', serif; font-size: 28px; color: #111827;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
 }
-ensureTable().catch(err => console.error("ensureTable training_events:", err));
+#tRoot .th-title-icon {
+  width: 40px; height: 40px; background: #fdf0f5; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #D4186C; font-size: 16px; flex-shrink: 0;
+}
+#tRoot .th-accent { color: #D4186C; }
+#tRoot .th-subtitle { font-size: 14px; color: #4b5563; margin-left: 52px; }
 
-// GET all events
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await db.query(
-      "SELECT * FROM training_events ORDER BY date_start ASC"
-    );
-    const events = rows.map(r => ({
-      id:        r.id,
-      name:      r.name,
-      category:  r.category,
-      dateStart: r.date_start,
-      dateEnd:   r.date_end || "",
-      desc:      r.description || "",
-      files:     r.files ? JSON.parse(r.files) : [],
-      createdAt: r.created_at,
-    }));
-    res.json(events);
-  } catch (err) {
-    console.error("GET /api/training:", err);
-    res.status(500).json({ error: err.message });
+#tRoot .th-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+#tRoot .th-search { flex: 1; min-width: 200px; position: relative; }
+#tRoot .th-search input {
+  width: 100%; padding: 10px 14px 10px 40px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #111827;
+  background: #fff; outline: none; transition: border-color .2s;
+}
+#tRoot .th-search input:focus { border-color: #D4186C; }
+#tRoot .th-search i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 14px; }
+#tRoot .th-select {
+  padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #111827;
+  background: #fff; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none;
+}
+#tRoot .th-select:focus { border-color: #D4186C; }
+
+#tRoot .th-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+#tRoot .th-stat {
+  background: #fff; border: 1.5px solid #e5e7eb; border-radius: 14px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+}
+#tRoot .th-stat-label { font-size: 12px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+#tRoot .th-stat-value { font-size: 26px; font-family: 'DM Serif Display', serif; color: #111827; }
+#tRoot .th-stat-icon  { font-size: 18px; color: #D4186C; margin-bottom: 4px; }
+
+#tRoot .th-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+#tRoot .th-card {
+  background: #fff; border: 1.5px solid #e5e7eb; border-radius: 14px;
+  overflow: hidden; transition: box-shadow .2s, transform .2s; display: flex; flex-direction: column;
+}
+#tRoot .th-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.10); transform: translateY(-2px); }
+#tRoot .th-card-top { padding: 18px 18px 14px; border-bottom: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 10px; }
+#tRoot .th-cat-badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+  border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase;
+}
+#tRoot .th-card-title  { font-size: 16px; font-weight: 700; color: #111827; line-height: 1.3; cursor: pointer; }
+#tRoot .th-card-title:hover { color: #D4186C; }
+#tRoot .th-card-date   { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4b5563; flex-wrap: wrap; }
+#tRoot .th-card-date i { color: #D4186C; font-size: 12px; }
+#tRoot .th-card-desc   { font-size: 13px; color: #4b5563; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#tRoot .th-card-files  { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+#tRoot .th-files-lbl   { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; }
+#tRoot .th-chips       { display: flex; flex-wrap: wrap; gap: 6px; }
+#tRoot .th-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+  border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer;
+  border: 1.5px solid transparent; transition: all .15s; max-width: 180px;
+}
+#tRoot .th-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#tRoot .tc-pdf  { background:#fef2f2; color:#dc2626; border-color:#fecaca; } #tRoot .tc-pdf:hover  { background:#fee2e2; }
+#tRoot .tc-img  { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; } #tRoot .tc-img:hover  { background:#dbeafe; }
+#tRoot .tc-xls  { background:#f0fdf4; color:#16a34a; border-color:#bbf7d0; } #tRoot .tc-xls:hover  { background:#dcfce7; }
+#tRoot .tc-vid  { background:#fdf4ff; color:#9333ea; border-color:#e9d5ff; } #tRoot .tc-vid:hover  { background:#f3e8ff; }
+#tRoot .tc-doc  { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; } #tRoot .tc-doc:hover  { background:#dbeafe; }
+#tRoot .tc-misc { background:#f3f4f6; color:#4b5563; border-color:#e5e7eb; } #tRoot .tc-misc:hover { background:#e5e7eb; }
+#tRoot .th-no-files { font-size: 12.5px; color: #9ca3af; font-style: italic; }
+
+#tRoot .th-empty { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 24px; gap:12px; text-align:center; }
+#tRoot .th-empty-icon { width:64px; height:64px; background:#fdf0f5; border-radius:16px; display:flex; align-items:center; justify-content:center; color:#D4186C; font-size:24px; margin-bottom:4px; }
+#tRoot .th-empty p    { color:#4b5563; font-size:15px; }
+#tRoot .th-empty span { color:#9ca3af; font-size:13px; }
+
+#tRoot .tcat-general    { background:#f3f4f6; color:#4b5563; }
+#tRoot .tcat-onboarding { background:#eff6ff; color:#1d4ed8; }
+#tRoot .tcat-compliance { background:#fef3c7; color:#b45309; }
+#tRoot .tcat-technical  { background:#f0fdf4; color:#15803d; }
+#tRoot .tcat-leadership { background:#fdf4ff; color:#7e22ce; }
+#tRoot .tcat-safety     { background:#fff7ed; color:#c2410c; }
+
+#tRoot .tpill-done     { margin-left:6px; padding:1px 7px; background:#f3f4f6; border-radius:10px; font-size:11px; color:#9ca3af; }
+#tRoot .tpill-upcoming { margin-left:6px; padding:1px 7px; background:#ecfdf5; border-radius:10px; font-size:11px; color:#059669; }
+
+#tRoot .tm-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1100;
+  background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+  justify-content: center; align-items: flex-start;
+  padding: 24px 16px; overflow-y: auto;
+}
+#tRoot .tm-overlay.open { display: flex; }
+#tRoot .tm-view-box {
+  background: #fff; border-radius: 18px; width: 100%; max-width: 560px; margin: auto; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.18);
+  animation: tmPop .25s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes tmPop { from { transform: scale(.88) translateY(20px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
+#tRoot .tm-close {
+  width:32px; height:32px; border:1.5px solid #e5e7eb; border-radius:8px;
+  background:none; color:#4b5563; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .15s; padding:0; margin:0; flex-shrink:0;
+}
+#tRoot .tm-close:hover { background:#f3f4f6; color:#111827; }
+#tRoot .tm-view-head { padding:22px 24px 18px; border-bottom:1px solid #e5e7eb; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+#tRoot .tm-view-body { padding:20px 24px 24px; display:flex; flex-direction:column; gap:16px; }
+#tRoot .tv-lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#9ca3af; margin-bottom:4px; }
+#tRoot .tv-val { font-size:14px; color:#111827; line-height:1.6; }
+
+#tToast {
+  position:fixed; bottom:24px; right:24px; background:#111827; color:#fff;
+  padding:12px 18px; border-radius:12px; font-size:14px; font-weight:500;
+  font-family:'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; gap:9px;
+  box-shadow:0 8px 24px rgba(0,0,0,.2); transform:translateY(80px); opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1); z-index:1200; max-width:320px;
+}
+#tToast.show { transform:translateY(0); opacity:1; }
+#tToast.success i { color:#34d399; }
+#tToast.error   i { color:#f87171; }
+
+@media (max-width:600px) {
+  #tRoot .th-toolbar { flex-direction:column; align-items:stretch; }
+  #tRoot .th-stats   { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- VIEW MODAL -->
+<div class="tm-overlay" id="tViewModal">
+  <div class="tm-view-box">
+    <div class="tm-view-head">
+      <div>
+        <div style="margin-bottom:8px"><span id="tViewBadge" class="th-cat-badge"></span></div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#111827" id="tViewName"></div>
+        <div style="font-size:13px;color:#4b5563;margin-top:4px" id="tViewDate"></div>
+      </div>
+      <button class="tm-close" onclick="tCloseView()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="tm-view-body">
+      <div id="tViewDescWrap">
+        <div class="tv-lbl">Description</div>
+        <div class="tv-val" id="tViewDesc"></div>
+      </div>
+      <div>
+        <div class="tv-lbl">Attachments</div>
+        <div id="tViewFiles" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tToast"><i class="fas fa-check-circle"></i><span id="tToastMsg"></span></div>
+
+<!-- PAGE -->
+<div class="th-header">
+  <h2 class="th-title">
+    <div class="th-title-icon"><i class="fas fa-graduation-cap"></i></div>
+    Training <span class="th-accent">Module</span>
+  </h2>
+  <p class="th-subtitle">Browse training events and download reference materials</p>
+</div>
+
+<div class="th-stats">
+  <div class="th-stat">
+    <div class="th-stat-icon"><i class="fas fa-calendar-alt"></i></div>
+    <div class="th-stat-value" id="tStTotal">0</div>
+    <div class="th-stat-label">Total Events</div>
+  </div>
+  <div class="th-stat">
+    <div class="th-stat-icon"><i class="fas fa-clock"></i></div>
+    <div class="th-stat-value" id="tStUp">0</div>
+    <div class="th-stat-label">Upcoming</div>
+  </div>
+  <div class="th-stat">
+    <div class="th-stat-icon"><i class="fas fa-check-circle"></i></div>
+    <div class="th-stat-value" id="tStPast">0</div>
+    <div class="th-stat-label">Completed</div>
+  </div>
+</div>
+
+<div class="th-toolbar">
+  <div class="th-search">
+    <i class="fas fa-search"></i>
+    <input type="text" id="tSearch" placeholder="Search events..." oninput="tRender()">
+  </div>
+  <select class="th-select" id="tCatF" onchange="tRender()">
+    <option value="">All Categories</option>
+    <option value="general">General</option>
+    <option value="onboarding">Onboarding</option>
+    <option value="compliance">Compliance</option>
+    <option value="technical">Technical</option>
+    <option value="leadership">Leadership</option>
+    <option value="safety">Safety</option>
+  </select>
+  <select class="th-select" id="tTimeF" onchange="tRender()">
+    <option value="">All Time</option>
+    <option value="upcoming">Upcoming</option>
+    <option value="past">Past</option>
+  </select>
+</div>
+
+<div class="th-grid" id="tGrid"></div>
+
+</div>
+
+<script>
+(function(){
+  let tEvts = [];
+
+  async function tInit(){
+    try{
+      const res = await fetch((window.API || window.location.origin) + '/api/training');
+      tEvts = await res.json();
+    }catch(e){ console.error('training fetch:', e); tEvts=[]; }
+    tRender();
   }
-});
 
-// POST create event
-router.post("/", async (req, res) => {
-  try {
-    const { id, name, category, dateStart, dateEnd, desc, files } = req.body;
-    if (!id || !name || !dateStart) {
-      return res.status(400).json({ error: "id, name and dateStart are required" });
+  const tCats={
+    general:   {label:'General',   icon:'fas fa-layer-group', cls:'tcat-general'   },
+    onboarding:{label:'Onboarding',icon:'fas fa-user-plus',   cls:'tcat-onboarding'},
+    compliance:{label:'Compliance',icon:'fas fa-gavel',       cls:'tcat-compliance'},
+    technical: {label:'Technical', icon:'fas fa-tools',       cls:'tcat-technical' },
+    leadership:{label:'Leadership',icon:'fas fa-crown',       cls:'tcat-leadership'},
+    safety:    {label:'Safety',    icon:'fas fa-hard-hat',    cls:'tcat-safety'    },
+  };
+
+  function tFmtDate(d){
+    if(!d) return '';
+    const [y,m,day]=d.split('-');
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+(+day)+', '+y;
+  }
+  function tChip(name){
+    const e=name.split('.').pop().toLowerCase();
+    if(e==='pdf') return 'tc-pdf';
+    if(['jpg','jpeg','png','gif','webp'].includes(e)) return 'tc-img';
+    if(['xls','xlsx','csv'].includes(e)) return 'tc-xls';
+    if(['mp4','mov','avi','mkv','webm'].includes(e)) return 'tc-vid';
+    if(['doc','docx','ppt','pptx','txt'].includes(e)) return 'tc-doc';
+    return 'tc-misc';
+  }
+  function tIco(name){
+    const e=name.split('.').pop().toLowerCase();
+    if(e==='pdf') return 'fas fa-file-pdf';
+    if(['jpg','jpeg','png','gif','webp'].includes(e)) return 'fas fa-file-image';
+    if(['xls','xlsx','csv'].includes(e)) return 'fas fa-file-excel';
+    if(['mp4','mov','avi','mkv','webm'].includes(e)) return 'fas fa-file-video';
+    if(['doc','docx'].includes(e)) return 'fas fa-file-word';
+    if(['ppt','pptx'].includes(e)) return 'fas fa-file-powerpoint';
+    if(['zip','rar'].includes(e)) return 'fas fa-file-archive';
+    return 'fas fa-file-alt';
+  }
+
+  function tStats(){
+    const today=new Date().toISOString().slice(0,10);
+    document.getElementById('tStTotal').textContent=tEvts.length;
+    document.getElementById('tStUp').textContent=tEvts.filter(e=>e.dateStart>=today).length;
+    document.getElementById('tStPast').textContent=tEvts.filter(e=>e.dateStart<today).length;
+  }
+
+  window.tRender=function(){
+    const kw=document.getElementById('tSearch').value.toLowerCase();
+    const cf=document.getElementById('tCatF').value;
+    const tf=document.getElementById('tTimeF').value;
+    const today=new Date().toISOString().slice(0,10);
+    const grid=document.getElementById('tGrid');
+    let list=[...tEvts].sort((a,b)=>a.dateStart.localeCompare(b.dateStart));
+    if(kw) list=list.filter(e=>e.name.toLowerCase().includes(kw)||(e.desc||'').toLowerCase().includes(kw));
+    if(cf) list=list.filter(e=>e.category===cf);
+    if(tf==='upcoming') list=list.filter(e=>e.dateStart>=today);
+    if(tf==='past')     list=list.filter(e=>e.dateStart<today);
+    if(!list.length){
+      grid.innerHTML='<div class="th-empty"><div class="th-empty-icon"><i class="fas fa-graduation-cap"></i></div><p>No training events yet</p><span>Training events will appear here once added by an admin</span></div>';
+      tStats(); return;
     }
-    await db.query(
-      `INSERT INTO training_events (id, name, category, date_start, date_end, description, files)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [id, name, category || "general", dateStart, dateEnd || null, desc || null,
-       files ? JSON.stringify(files) : null]
-    );
-    res.status(201).json({ success: true, id });
-  } catch (err) {
-    console.error("POST /api/training:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+    grid.innerHTML=list.map(ev=>{
+      const cc=tCats[ev.category]||tCats.general;
+      const files=ev.files||[];
+      const chips=files.slice(0,4).map(f=>`<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}"><i class="${tIco(f.name)}"></i><span>${f.name}</span></span>`).join('');
+      const more=files.length>4?`<span class="th-chip tc-misc">+${files.length-4} more</span>`:'';
+      const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`:tFmtDate(ev.dateStart);
+      const past=ev.dateStart<today;
+      return`<div class="th-card">
+        <div class="th-card-top">
+          <span class="th-cat-badge ${cc.cls}"><i class="${cc.icon}"></i> ${cc.label}</span>
+          <div class="th-card-title" onclick="tOpenView('${ev.id}')">${ev.name}</div>
+          <div class="th-card-date"><i class="fas fa-calendar-alt"></i>${ds}<span class="${past?'tpill-done':'tpill-upcoming'}">${past?'Completed':'Upcoming'}</span></div>
+          ${ev.desc?`<div class="th-card-desc">${ev.desc}</div>`:''}
+        </div>
+        <div class="th-card-files">
+          <div class="th-files-lbl"><i class="fas fa-paperclip" style="margin-right:4px"></i>Files (${files.length})</div>
+          ${files.length?`<div class="th-chips">${chips}${more}</div>`:'<div class="th-no-files">No attachments</div>'}
+        </div>
+      </div>`;
+    }).join('');
+    tStats();
+  };
 
-// PUT update event
-router.put("/:id", async (req, res) => {
-  try {
-    const { name, category, dateStart, dateEnd, desc, files } = req.body;
-    await db.query(
-      `UPDATE training_events
-       SET name=?, category=?, date_start=?, date_end=?, description=?, files=?
-       WHERE id=?`,
-      [name, category || "general", dateStart, dateEnd || null, desc || null,
-       files ? JSON.stringify(files) : null, req.params.id]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    console.error("PUT /api/training/:id:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+  window.tOpenFile=function(eid,fid){
+    const ev=tEvts.find(e=>e.id===eid); if(!ev)return;
+    const f=ev.files.find(x=>x.id===fid); if(!f||!f.dataUrl)return;
+    const a=document.createElement('a'); a.href=f.dataUrl; a.download=f.name; a.click();
+  };
 
-// DELETE event
-router.delete("/:id", async (req, res) => {
-  try {
-    await db.query("DELETE FROM training_events WHERE id=?", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("DELETE /api/training/:id:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+  window.tOpenView=function(id){
+    const ev=tEvts.find(e=>e.id===id); if(!ev)return;
+    const cc=tCats[ev.category]||tCats.general;
+    const badge=document.getElementById('tViewBadge');
+    badge.className=`th-cat-badge ${cc.cls}`;
+    badge.innerHTML=`<i class="${cc.icon}"></i> ${cc.label}`;
+    document.getElementById('tViewName').textContent=ev.name;
+    const ds=ev.dateEnd&&ev.dateEnd!==ev.dateStart?`${tFmtDate(ev.dateStart)} – ${tFmtDate(ev.dateEnd)}`:tFmtDate(ev.dateStart);
+    document.getElementById('tViewDate').innerHTML=`<i class="fas fa-calendar-alt" style="color:#D4186C;margin-right:5px"></i>${ds}`;
+    const dw=document.getElementById('tViewDescWrap');
+    if(ev.desc){dw.style.display='block';document.getElementById('tViewDesc').textContent=ev.desc;}
+    else dw.style.display='none';
+    document.getElementById('tViewFiles').innerHTML=(ev.files||[]).map(f=>
+      `<span class="th-chip ${tChip(f.name)}" onclick="tOpenFile('${ev.id}','${f.id}')" title="${f.name}"><i class="${tIco(f.name)}"></i><span>${f.name}</span></span>`
+    ).join('')||'<span style="color:#9ca3af;font-size:13px">No attachments</span>';
+    document.getElementById('tViewModal').classList.add('open');
+  };
 
-module.exports = router;
+  window.tCloseView=function(){ document.getElementById('tViewModal').classList.remove('open'); };
+
+  document.getElementById('tViewModal').addEventListener('click',e=>{
+    if(e.target.id==='tViewModal') tCloseView();
+  });
+
+  tInit();
+})();
+</script>
+</body>
+</html>
