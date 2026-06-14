@@ -82,6 +82,7 @@ app.use("/api/departments", require("./routes/departments"));
 app.use("/api/links",       require("./routes/links"));
 app.use("/api/bookings",    require("./routes/booking"));
 app.use("/api/access-dept", require("./routes/accessDept"));
+app.use("/api/training",    require("./routes/training"));
 
 /* ══════════════════════════════════════
    FRONTEND
