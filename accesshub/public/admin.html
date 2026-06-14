@@ -654,13 +654,20 @@ let allAccessDepts   = [];
 let adminWorkDeptIds = [];
 
 /* ── TRAINING STATE ── */
-let tEvents      = JSON.parse(localStorage.getItem('trainingEvents') || '[]');
+let tEvents      = [];
 let tPending     = [];   // staged files for add form
 let tEditPending = [];   // staged files for edit modal
 let tEditingId   = null;
 
-function tSave() { localStorage.setItem('trainingEvents', JSON.stringify(tEvents)); }
-function tUid()  { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function tUid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+async function tLoadEvents() {
+  try {
+    const res = await fetch(`${API}/api/training`);
+    tEvents = await res.json();
+  } catch(e) { console.error('tLoadEvents:', e); tEvents = []; }
+  tRenderTable();
+}
 
 /* ── HELPERS ── */
 function getStore(k) { return localStorage.getItem(k) || sessionStorage.getItem(k) || null; }
@@ -876,8 +883,13 @@ function closeDeleteModal(){document.getElementById("deleteModal").style.display
 async function confirmDelete(){
   const token=getStore("token");
   if(deleteType==="training"){
-    tEvents=tEvents.filter(e=>e.id!==deleteId);tSave();tRenderTable();
-    showToast("Training event deleted");closeDeleteModal();return;
+    try{
+      await fetch(`${API}/api/training/${deleteId}`,{method:"DELETE"});
+      showToast("Training event deleted");
+      closeDeleteModal();
+      await tLoadEvents();
+    }catch(e){console.error(e);showToast("Failed to delete","error");}
+    return;
   }
   const url=deleteType==="link"?`${API}/api/links/${deleteId}`:deleteType==="booking"?`${API}/api/bookings/${deleteId}`:`${API}/api/users/${deleteId}`;
   await fetch(url,{method:"DELETE",headers:{"Authorization":`Bearer ${token}`}});
@@ -1011,7 +1023,7 @@ function tRenderFileList(listId,arr,removeFn){
 }
 
 /* Save new event */
-function tSaveEvent(){
+async function tSaveEvent(){
   const name=document.getElementById("tName").value.trim();
   const dateStart=document.getElementById("tDateStart").value;
   const dateEnd=document.getElementById("tDateEnd").value;
@@ -1020,11 +1032,15 @@ function tSaveEvent(){
   if(!name){showToast("Event name is required","error");return;}
   if(!dateStart){showToast("Start date is required","error");return;}
   if(dateEnd&&dateEnd<dateStart){showToast("End date cannot be before start date","error");return;}
-  tEvents.push({id:tUid(),name,dateStart,dateEnd,desc,category,files:tPending,createdAt:Date.now()});
-  tSave();tRenderTable();
-  document.getElementById("tName").value="";document.getElementById("tDateStart").value="";document.getElementById("tDateEnd").value="";document.getElementById("tDesc").value="";document.getElementById("tCategory").value="general";
-  tPending=[];tRenderFileList("tFileList",tPending,"tRemoveFile");
-  showToast("Training event added!");
+  const newEvent={id:tUid(),name,dateStart,dateEnd,desc,category,files:tPending};
+  try{
+    const res=await fetch(`${API}/api/training`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(newEvent)});
+    if(!res.ok){const e=await res.json();showToast(e.error||"Failed to save event","error");return;}
+    showToast("Training event added!");
+    document.getElementById("tName").value="";document.getElementById("tDateStart").value="";document.getElementById("tDateEnd").value="";document.getElementById("tDesc").value="";document.getElementById("tCategory").value="general";
+    tPending=[];tRenderFileList("tFileList",tPending,"tRemoveFile");
+    await tLoadEvents();
+  }catch(e){console.error(e);showToast("Server error","error");}
 }
 
 /* Render table */
@@ -1089,7 +1105,7 @@ function tOpenEditModal(id){
 }
 function tCloseEditModal(){document.getElementById("tEditModal").style.display="none";tEditingId=null;tEditPending=[];}
 
-function tConfirmEdit(){
+async function tConfirmEdit(){
   const name=document.getElementById("tEditName").value.trim();
   const dateStart=document.getElementById("tEditDateStart").value;
   const dateEnd=document.getElementById("tEditDateEnd").value;
@@ -1098,10 +1114,13 @@ function tConfirmEdit(){
   if(!name){showToast("Event name is required","error");return;}
   if(!dateStart){showToast("Start date is required","error");return;}
   if(dateEnd&&dateEnd<dateStart){showToast("End date cannot be before start date","error");return;}
-  const idx=tEvents.findIndex(e=>e.id===tEditingId);
-  if(idx!==-1) tEvents[idx]={...tEvents[idx],name,dateStart,dateEnd,desc,category,files:tEditPending};
-  tSave();tRenderTable();tCloseEditModal();
-  showToast("Training event updated!");
+  try{
+    const res=await fetch(`${API}/api/training/${tEditingId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,dateStart,dateEnd,desc,category,files:tEditPending})});
+    if(!res.ok){const e=await res.json();showToast(e.error||"Failed to update","error");return;}
+    showToast("Training event updated!");
+    tCloseEditModal();
+    await tLoadEvents();
+  }catch(e){console.error(e);showToast("Server error","error");}
 }
 
 /* Drag & drop for both upload zones */
@@ -1150,7 +1169,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     await loadUsers();
     await loadLinks();
     if(role==="superadmin") await loadBookings();
-    tRenderTable();
+    await tLoadEvents();
     tInitDragDrop("tUploadZone","tFileInput",tHandleFiles);
     tInitDragDrop("tEditUploadZone","tEditFileInput",tHandleEditFiles);
   }catch(err){console.error("INIT ERROR:",err);showToast("Failed to load data","error");}
