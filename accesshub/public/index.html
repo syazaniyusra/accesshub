@@ -422,7 +422,7 @@ async function loadSubPage(containerId, filename, loadedKey) {
   if (container.dataset.loaded === loadedKey) return;
   container.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div><p>Loading...</p></div>`;
   try {
-    const raw = await (await fetch(filename + "?v=" + Date.now())).text();
+    const raw = await (await fetch(filename + "?v=" + Date.now())).text(); 
 
     // ── 1. Inject <style> blocks into <head> so CSS always loads ──
     const styleMatches = [...raw.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
