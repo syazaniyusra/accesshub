@@ -427,13 +427,13 @@ async function loadSubPage(containerId, filename, loadedKey) {
     // ── 1. Inject <style> blocks into <head> so CSS always loads ──
     const styleMatches = [...raw.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
     styleMatches.forEach(match => {
-      const styleId = "injected-style-" + loadedKey;
-      if (!document.getElementById(styleId)) {
-        const tag = document.createElement("style");
-        tag.id = styleId;
-        tag.textContent = match[1];
-        document.head.appendChild(tag);
-      }
+      const styleId = "injected-style-v2-" + loadedKey;
+      const existing = document.getElementById(styleId);
+      if (existing) existing.remove();
+      const tag = document.createElement("style");
+      tag.id = styleId;
+      tag.textContent = match[1];
+      document.head.appendChild(tag);
     });
 
     // ── 2. Strip <html>/<head>/<body> wrapper, keep body content ──
