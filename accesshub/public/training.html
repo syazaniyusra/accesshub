@@ -244,7 +244,8 @@
 
   function tFmtDate(d){
     if(!d) return '';
-    const [y,m,day]=d.split('-');
+    const clean=d.slice(0,10);
+    const [y,m,day]=clean.split('-');
     return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+(+day)+', '+y;
   }
   function tChip(name){
