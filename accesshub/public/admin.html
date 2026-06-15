@@ -958,7 +958,10 @@ function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):"";}
 ══════════════════════════════════════ */
 
 function tFmtDate(d){
-  if(!d)return"";const[y,mo,day]=d.split("-"),months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  if(!d)return"";
+  const clean=d.slice(0,10);
+  const[y,mo,day]=clean.split("-");
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return`${months[+mo-1]} ${+day}, ${y}`;
 }
 function tFmtSize(b){if(!b)return"";if(b<1024)return b+" B";if(b<1048576)return(b/1024).toFixed(1)+" KB";return(b/1048576).toFixed(1)+" MB";}
